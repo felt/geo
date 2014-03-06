@@ -1,0 +1,42 @@
+defmodule GeoTest do
+  use ExUnit.Case
+
+  test "Decode WKT to Point" do
+    point = Geo.WKT.decode("POINT(30 -90)")
+    assert(point.type == :point)
+    assert(point.coordinates == [30, -90])
+  end
+
+  test "Decode WKT to Linestring" do
+    point = Geo.WKT.decode("LINESTRING(30 10, 10 30, 40 40)")
+    assert(point.type == :line_string)
+    assert(point.coordinates == [[30, 10], [10, 30], [40, 40]])
+  end
+
+  test "Decode WKT to Polygon" do
+    point = Geo.WKT.decode("POLYGON((35 10, 45 45, 15 40, 10 20, 35 10))")
+    assert(point.type == :polygon)
+    assert(point.coordinates == [[[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]]])
+  end
+
+  test "Decode WKT to Polygon 2" do
+    point = Geo.WKT.decode("POLYGON((35 10, 45 45, 15 40, 10 20, 35 10),(20 30, 35 35, 30 20, 20 30))")
+    assert(point.type == :polygon)
+    assert(point.coordinates == [ [[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]], [[20, 30], [35, 35], [30, 20], [20, 30]] ])
+  end
+
+  test "Encode Point to WKT" do
+    geom = Geo.Geometry.new(type: :point, coordinates: [30, -90])
+    assert(Geo.WKT.encode(geom) == "POINT(30 -90)")
+  end
+
+  test "Encode Linestring to WKT" do
+    geom = Geo.Geometry.new(type: :line_string, coordinates: [[30, 10], [10, 30], [40, 40]])
+    assert(Geo.WKT.encode(geom) == "LINESTRING(30 10, 10 30, 40 40)")
+  end
+
+  test "Encode Polygon to WKT" do
+    geom = Geo.Geometry.new(type: :polygon, coordinates: [ [[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]], [[20, 30], [35, 35], [30, 20], [20, 30]] ])
+    assert(Geo.WKT.encode(geom) == "POLYGON((35 10, 45 45, 15 40, 10 20, 35 10),(20 30, 35 35, 30 20, 20 30))")
+  end
+end
