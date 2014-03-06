@@ -1,41 +1,65 @@
 defmodule Geo.WKT do
   alias Geo.Geometry
+  @moduledoc """
+    Converts to and from WKT and EWKT
 
-  def encode(Geometry[type: :point, coordinates: coordinates]) do
-    "POINT(#{Enum.join(coordinates, " ")})"
+    iex(1)> point = Geo.WKT.decode("POINT(30 -90)")
+    Geo.Geometry[type: :point, coordinates: [30, -90], srid: nil]
+
+    iex(2)> Geo.WKT.encode(point)
+    "POINT(30 -90)"
+
+    iex(3)> point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
+    Geo.Geometry[type: :point, coordinates: [30, -90], srid: 4326]
+  """
+
+  def encode(Geometry[type: :point, coordinates: coordinates, srid: srid]) do
+    get_srid_binary(srid) <> "POINT(#{Enum.join(coordinates, " ")})"
   end
 
-  def encode(Geometry[type: :line_string, coordinates: coordinates]) do
+  def encode(Geometry[type: :line_string, coordinates: coordinates, srid: srid]) do
     s = Enum.map(coordinates, fn(x) -> Enum.join(x, " ") end)
-    "LINESTRING(#{Enum.join(s, ", ")})"
+    get_srid_binary(srid) <> "LINESTRING(#{Enum.join(s, ", ")})"
   end
 
-  def encode(Geometry[type: :polygon, coordinates: coordinates]) do
+  def encode(Geometry[type: :polygon, coordinates: coordinates, srid: srid]) do
     s = Enum.map(coordinates, fn(x) -> Enum.join(Enum.map(x, fn(y) -> Enum.join(y," ") end), ", ") end)
-    "POLYGON((#{Enum.join(s, "),(")}))"
+    get_srid_binary(srid) <> "POLYGON((#{Enum.join(s, "),(")}))"
+  end
+
+  defp get_srid_binary(srid) do
+    if srid, do: "SRID=#{srid};", else: ""
   end
 
   def decode(wkt) do
-      String.split(wkt, "(", [global: false, trim: true])
+      wkt_split = String.split(wkt, ";")
+      srid = nil
+      actual_wkt = wkt
+      if length(wkt_split) == 2 do
+        srid = hd(wkt_split) |> String.replace("SRID=","") |> binary_to_integer
+        actual_wkt = List.last(wkt_split)
+      end
+
+      String.split(actual_wkt, "(", [global: false, trim: true]) ++ [srid]
       |> list_to_tuple
       |> _decode
   end
 
-  defp _decode({"POINT", coordinates}) do
+  defp _decode({"POINT", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","")
-    Geometry.new(type: :point, coordinates: create_point(coordinates))
+    Geometry.new(type: :point, coordinates: create_point(coordinates), srid: srid)
   end
 
-  defp _decode({"LINESTRING", coordinates}) do
+  defp _decode({"LINESTRING", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","")
-    Geometry.new(type: :line_string, coordinates: create_line_string(coordinates))
+    Geometry.new(type: :line_string, coordinates: create_line_string(coordinates), srid: srid)
   end
 
-  defp _decode({"POLYGON", coordinates}) do
+  defp _decode({"POLYGON", coordinates, srid}) do
     coordinates = String.split(coordinates, "),(")
     |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
 
-    Geometry.new(type: :polygon, coordinates: Enum.map(coordinates, &create_line_string(&1)) )
+    Geometry.new(type: :polygon, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid )
   end
 
   defp create_point(coordinates) do

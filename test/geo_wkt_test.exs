@@ -25,6 +25,13 @@ defmodule GeoTest do
     assert(point.coordinates == [ [[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]], [[20, 30], [35, 35], [30, 20], [20, 30]] ])
   end
 
+  test "Decode EWKT to Point" do
+    point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
+    assert(point.type == :point)
+    assert(point.coordinates == [30, -90])
+    assert(point.srid == 4326)
+  end
+
   test "Encode Point to WKT" do
     geom = Geo.Geometry.new(type: :point, coordinates: [30, -90])
     assert(Geo.WKT.encode(geom) == "POINT(30 -90)")
@@ -38,5 +45,10 @@ defmodule GeoTest do
   test "Encode Polygon to WKT" do
     geom = Geo.Geometry.new(type: :polygon, coordinates: [ [[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]], [[20, 30], [35, 35], [30, 20], [20, 30]] ])
     assert(Geo.WKT.encode(geom) == "POLYGON((35 10, 45 45, 15 40, 10 20, 35 10),(20 30, 35 35, 30 20, 20 30))")
+  end
+
+  test "Encode Polygon to EWKT" do
+    geom = Geo.Geometry.new(type: :polygon, coordinates: [ [[35, 10], [45, 45], [15, 40], [10, 20], [35, 10]], [[20, 30], [35, 35], [30, 20], [20, 30]] ], srid: 4326)
+    assert(Geo.WKT.encode(geom) == "SRID=4326;POLYGON((35 10, 45 45, 15 40, 10 20, 35 10),(20 30, 35 35, 30 20, 20 30))")
   end
 end
