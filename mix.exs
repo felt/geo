@@ -3,7 +3,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.0.1",
+      version: "0.1.0",
       elixir: "~> 0.12.4",
       deps: deps,
       source_url: "https://github.com/bryanjos/geo"    ]
