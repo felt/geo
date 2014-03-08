@@ -1,4 +1,4 @@
-defmodule GeoTest do
+defmodule GeoWKTTest do
   use ExUnit.Case
 
   test "Decode WKT to Point" do
