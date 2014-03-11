@@ -39,10 +39,10 @@ defmodule Geo.Utils do
   def float_to_hex(float, size) do
     case size do
       32 ->
-        << value :: [integer, 32] >> = << 1.0 :: [float, 32] >>
+        << value :: [integer, 32] >> = << float :: [float, 32] >>
         value
       _ ->
-        << value :: [integer, 32] >> = << 1.0 :: [float, 32] >>
+        << value :: [integer, 64] >> = << float :: [float, 64] >>
         value
     end
   end
@@ -60,6 +60,26 @@ defmodule Geo.Utils do
     Enum.map(byte_range, fn(x) -> String.slice(hex, x*2, 2) end)
     |> Enum.reverse
     |> Enum.join
+  end
+
+  def pad_right(hex, size) do
+    if String.length(hex) == size do
+      hex
+    else
+      hex <> repeat("0", size - String.length(hex))
+    end
+  end
+
+  def pad_left(hex, size) do
+    if String.length(hex) == size do
+      hex
+    else
+      repeat("0", size - String.length(hex)) <> hex
+    end
+  end
+
+  def repeat(char, count) do
+    Enum.map(1..count, fn(x) -> char end) |> Enum.join
   end
 
   def ldexp(x, i) do
