@@ -3,7 +3,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.1.2",
+      version: "0.2.0",
       elixir: "~> 0.12.4",
       deps: deps,
       source_url: "https://github.com/bryanjos/geo"    ]
@@ -20,6 +20,6 @@ defmodule Geo.Mixfile do
   # To specify particular versions, regardless of the tag, do:
   # { :barbat, "~> 0.1", github: "elixir-lang/barbat" }
   defp deps do
-    [{:hex, github: "rjsamson/hex"}]
+    []
   end
 end

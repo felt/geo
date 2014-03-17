@@ -11,6 +11,8 @@ defmodule Geo.WKT do
 
     iex(3)> point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
     Geo.Geometry[type: :point, coordinates: [30, -90], srid: 4326]
+
+    Currently only supports points, line strings, and polygons
   """
 
   def encode(Geometry[type: :point, coordinates: coordinates, srid: srid]) do

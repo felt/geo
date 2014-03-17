@@ -79,7 +79,7 @@ defmodule Geo.Utils do
   end
 
   def repeat(char, count) do
-    Enum.map(1..count, fn(x) -> char end) |> Enum.join
+    Enum.map(1..count, fn(_x) -> char end) |> Enum.join
   end
 
   def ldexp(x, i) do

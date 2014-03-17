@@ -2,7 +2,7 @@
 
 A collection of GIS functions. Below is a list of currently implemented features:
 
-* The ability to encode and decode WKT and EWKT
+* Encode and decode WKT and EWKT
 
   ```
     iex(1)> point = Geo.WKT.decode("POINT(30 -90)")
@@ -16,7 +16,7 @@ A collection of GIS functions. Below is a list of currently implemented features
   ```
 
 
-* The ability to encode and decode WKB and EWKB
+* Encode and decode WKB and EWKB
 
   ```
     iex(1)> point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
