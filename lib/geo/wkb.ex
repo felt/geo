@@ -22,16 +22,17 @@ defmodule Geo.WKB do
   end
 
   defp encode_coordinates(:point, endian, coordinates) do
-
-    x = coordinates |> hd |> Geo.Utils.float_to_hex(64) |> integer_to_binary(16)
-    y = coordinates |> List.last |> Geo.Utils.float_to_hex(64) |> integer_to_binary(16)
-
-    if endian == :ndr do
-      x = Geo.Utils.reverse_byte_order(x)
-      y = Geo.Utils.reverse_byte_order(y)
+    if coordinates == [0,0] do
+      Geo.Utils.repeat("0", 32)
+    else
+      x = coordinates |> hd |> Geo.Utils.float_to_hex(64) |> integer_to_binary(16)
+      y = coordinates |> List.last |> Geo.Utils.float_to_hex(64) |> integer_to_binary(16)
+      if endian == :ndr do
+        x = Geo.Utils.reverse_byte_order(x)
+        y = Geo.Utils.reverse_byte_order(y)
+      end
+      "#{x}#{y}"
     end
-
-    "#{x}#{y}"
   end
 
   defp encode_coordinates(:line_string, endian, coordinates) do
@@ -62,6 +63,21 @@ defmodule Geo.WKB do
     end) |> Enum.join
 
     number_of_lines <> points
+  end
+
+  defp encode_coordinates(:multi_point, endian, coordinates) do
+    number_of_points = integer_to_binary(length(coordinates), 16)
+                       |> Geo.Utils.pad_left(8)
+
+    if endian == :ndr do
+      number_of_points = Geo.Utils.reverse_byte_order(number_of_points)
+    end
+
+    points = Enum.map(coordinates, fn(pair) ->
+      "0101000000" <> encode_coordinates(:point, endian, pair)
+    end) |> Enum.join
+
+    number_of_points <> points
   end
 
   def decode(wkb) do
@@ -134,6 +150,22 @@ defmodule Geo.WKB do
     end)
   end
 
+  defp decode_coordinates(:multi_point, coordinate_binary, endian) do
+    number_of_points = String.slice(coordinate_binary, 0, 8)
+
+    if endian == :ndr do
+      number_of_points = Geo.Utils.reverse_byte_order(number_of_points)
+    end
+
+    number_of_points = number_of_points |> binary_to_integer(16)
+
+    Enum.map(Enum.to_list(0..(number_of_points-1)), fn(x) ->
+      pair = String.slice(coordinate_binary, 8 + (42 * x), 42)
+      pair = String.slice(pair, 10, 32)
+      decode_coordinates(:point, pair, endian)
+    end)
+  end
+
   def get_line_strings(coordinate_binary, number_of_lines, endian, coordinates \\ []) do
     if coordinate_binary == "" or number_of_lines <= 0 do
       coordinates
@@ -161,6 +193,8 @@ defmodule Geo.WKB do
         :line_string
       3 ->
         :polygon
+      4 ->
+        :multi_point
       true ->
         :geometry
     end
@@ -176,8 +210,10 @@ defmodule Geo.WKB do
         value + 0x02
       :polygon ->
         value + 0x03
-      true ->
+      :multi_point ->
         value + 0x04
+      true ->
+        value + 0x00
     end
   end
 end

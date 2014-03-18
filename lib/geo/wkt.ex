@@ -12,7 +12,7 @@ defmodule Geo.WKT do
     iex(3)> point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
     Geo.Geometry[type: :point, coordinates: [30, -90], srid: 4326]
 
-    Currently only supports points, line strings, and polygons
+    Currently only supports points, line strings, polygons, and mulipoints
   """
 
   def encode(Geometry[type: :point, coordinates: coordinates, srid: srid]) do
@@ -27,6 +27,11 @@ defmodule Geo.WKT do
   def encode(Geometry[type: :polygon, coordinates: coordinates, srid: srid]) do
     s = Enum.map(coordinates, fn(x) -> Enum.join(Enum.map(x, fn(y) -> Enum.join(y," ") end), ", ") end)
     get_srid_binary(srid) <> "POLYGON((#{Enum.join(s, "),(")}))"
+  end
+
+  def encode(Geometry[type: :multi_point, coordinates: coordinates, srid: srid]) do
+    s = Enum.map(coordinates, fn(x) -> Enum.join(x, " ") end)
+    get_srid_binary(srid) <> "MULTIPOINT(#{Enum.join(s, ", ")})"
   end
 
   defp get_srid_binary(srid) do
@@ -62,6 +67,11 @@ defmodule Geo.WKT do
     |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
 
     Geometry.new(type: :polygon, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid )
+  end
+
+  defp _decode({"MULTIPOINT", coordinates, srid}) do
+    coordinates = String.replace(coordinates, ")","") |> String.replace("(","")
+    Geometry.new(type: :multi_point, coordinates: create_line_string(coordinates), srid: srid )
   end
 
   defp create_point(coordinates) do
