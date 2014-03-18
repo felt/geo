@@ -70,4 +70,40 @@ defmodule Geo.WKT.Test do
     assert(point.srid == 4326)
   end
 
+  test "Encode MultiLineString to WKT" do
+    geom = Geo.Geometry.new(type: :multi_line_string, coordinates: [[[10, 10], [20, 20], [10, 40]], [[40, 40], [30, 30], [40, 20], [30, 10]]])
+    assert(Geo.WKT.encode(geom) == "MULTILINESTRING((10 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))")
+  end
+
+  test "Decode WKT to MultiLineString" do
+    point = Geo.WKT.decode("MULTILINESTRING((10 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))")
+    assert(point.type == :multi_line_string)
+    assert(point.coordinates == [[[10, 10], [20, 20], [10, 40]], [[40, 40], [30, 30], [40, 20], [30, 10]]])
+  end
+
+  test "Decode EWKT to MultiLineString" do
+    point = Geo.WKT.decode("SRID=4326;MULTILINESTRING((10 10, 20 20, 10 40),(40 40, 30 30, 40 20, 30 10))")
+    assert(point.type == :multi_line_string)
+    assert(point.coordinates == [[[10, 10], [20, 20], [10, 40]], [[40, 40], [30, 30], [40, 20], [30, 10]]])
+    assert(point.srid == 4326)
+  end
+
+  test "Encode MultiPolygon to WKT" do
+    geom = Geo.Geometry.new(type: :multi_polygon, coordinates: [ [ [[40, 40], [20, 45], [45, 30], [40, 40]] ], [ [[20, 35], [10, 30], [10, 10], [30, 5], [45, 20], [20, 35]], [[30, 20], [20, 15], [20, 25], [30, 20]] ] ])
+    assert(Geo.WKT.encode(geom) == "MULTIPOLYGON(((40 40, 20 45, 45 30, 40 40)),((20 35, 10 30, 10 10, 30 5, 45 20, 20 35),(30 20, 20 15, 20 25, 30 20)))")
+  end
+
+  test "Decode WKT to MultiPolygon" do
+    point = Geo.WKT.decode("MULTIPOLYGON(((40 40, 20 45, 45 30, 40 40)),((20 35, 10 30, 10 10, 30 5, 45 20, 20 35),(30 20, 20 15, 20 25, 30 20)))")
+    assert(point.type == :multi_polygon)
+    assert(point.coordinates == [ [ [[40, 40], [20, 45], [45, 30], [40, 40]] ], [ [[20, 35], [10, 30], [10, 10], [30, 5], [45, 20], [20, 35]], [[30, 20], [20, 15], [20, 25], [30, 20]] ] ])
+  end
+
+  test "Decode EWKT to MultiPolygon" do
+    point = Geo.WKT.decode("SRID=4326;MULTIPOLYGON(((40 40, 20 45, 45 30, 40 40)),((20 35, 10 30, 10 10, 30 5, 45 20, 20 35),(30 20, 20 15, 20 25, 30 20)))")
+    assert(point.type == :multi_polygon)
+    assert(point.coordinates == [ [ [[40, 40], [20, 45], [45, 30], [40, 40]] ], [ [[20, 35], [10, 30], [10, 10], [30, 5], [45, 20], [20, 35]], [[30, 20], [20, 15], [20, 25], [30, 20]] ] ])
+    assert(point.srid == 4326)
+  end
+
 end
