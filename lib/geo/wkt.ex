@@ -15,6 +15,17 @@ defmodule Geo.WKT do
     Currently only supports points, line strings, polygons, and mulipoints
   """
 
+  def encode(geometry_collection) when is_list(geometry_collection) do
+      geometries = Enum.map(geometry_collection, fn(x) -> encode(x.update_srid(fn(x) -> nil end)) end)
+      srid = nil
+
+      if(Enum.count(geometry_collection) > 0) do
+        srid = hd(geometry_collection).srid
+      end
+
+      get_srid_binary(srid) <> "GEOMETRYCOLLECTION(#{Enum.join(geometries, ",")})"
+  end
+
   def encode(Geometry[type: :point, coordinates: coordinates, srid: srid]) do
     get_srid_binary(srid) <> "POINT(#{Enum.join(coordinates, " ")})"
   end
@@ -65,6 +76,18 @@ defmodule Geo.WKT do
       String.split(actual_wkt, "(", [global: false, trim: true]) ++ [srid]
       |> list_to_tuple
       |> do_decode
+  end
+
+  defp do_decode({"GEOMETRYCOLLECTION", coordinates, srid}) do
+    String.slice(coordinates,0..(String.length(coordinates)-2))
+    |> String.split(",", [global: false])
+    |> Enum.map(fn(x) -> 
+      if(srid == nil) do
+        decode(x)
+      else
+        decode("SRID=#{srid};#{x}") 
+      end
+    end)
   end
 
   defp do_decode({"POINT", coordinates, srid}) do

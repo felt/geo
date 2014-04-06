@@ -132,18 +132,18 @@ defmodule Geo.WKB.Test do
   test "Encode Geometry Collection to and from WKB" do
     wkb = "010700000002000000010100000000000000000010400000000000001840010200000002000000000000000000104000000000000018400000000000001C400000000000002440"
     collection = Geo.WKT.decode(wkb)
-    assert(Enum.length(collection) == 2)
-    assert(collection[0].type == :point)
+    assert(Enum.count(collection) == 2)
+    assert(hd(collection).type == :point)
     assert(Geo.WKT.encode(collection) == wkb)
   end
 
   test "Encode Geometry Collection to and from EWKB" do
     ewkb = "0107000020E610000002000000010100000000000000000010400000000000001840010200000002000000000000000000104000000000000018400000000000001C400000000000002440"
     collection = Geo.WKB.decode(ewkb)
-    assert(Enum.length(collection) == 2)
-    assert(collection[0].type == :point)
-    assert(collection[0].srid == 4326)
-    assert(collection[1].srid == 4326)
+    assert(Enum.count(collection) == 2)
+    assert(hd(collection).type == :point)
+    assert(hd(collection).srid == 4326)
+    assert(List.last(collection).srid == 4326)
     assert(Geo.WKB.encode(collection) == ewkb)
   end
 

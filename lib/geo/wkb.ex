@@ -195,7 +195,7 @@ defmodule Geo.WKB do
       6 ->
         :multi_polygon
       true ->
-        :geometry
+        :geometry_collection
     end
   end
 
@@ -216,7 +216,7 @@ defmodule Geo.WKB do
       :multi_polygon ->
         value + 0x06
       true ->
-        value + 0x00
+        value + 0x07
     end
   end
 

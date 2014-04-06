@@ -1,5 +1,5 @@
 defmodule Geo.WKT.Test do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   test "Encode Point to WKT" do
     geom = Geo.Geometry.new(type: :point, coordinates: [30, -90])
@@ -107,20 +107,21 @@ defmodule Geo.WKT.Test do
   end
 
   test "Encode Geometry Collection to and from WKT" do
-    wkt = "GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6,7 10))"
+    wkt = "GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6, 7 10))"
     collection = Geo.WKT.decode(wkt)
-    assert(Enum.length(collection) == 2)
-    assert(collection[0].type == :point)
+    assert(Enum.count(collection) == 2)
+    assert(hd(collection).type == :point)
     assert(Geo.WKT.encode(collection) == wkt)
   end
 
   test "Encode Geometry Collection to and from EWKT" do
-    ewkt = "SRID=4326;GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6,7 10))"
+    ewkt = "SRID=4326;GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6, 7 10))"
     collection = Geo.WKT.decode(ewkt)
-    assert(Enum.length(collection) == 2)
-    assert(collection[0].type == :point)
-    assert(collection[0].srid == 4326)
-    assert(collection[1].srid == 4326)
+    IO.inspect(collection)
+    assert(Enum.count(collection) == 2)
+    assert(hd(collection).type == :point)
+    assert(hd(collection).srid == 4326)
+    assert(List.last(collection).srid == 4326)
     assert(Geo.WKT.encode(collection) == ewkt)
   end
 end
