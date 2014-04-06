@@ -61,4 +61,14 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+  test "GeoJson to GeometryCollection and back" do
+  	json = "{ \"type\": \"GeometryCollection\",\"geometries\": [{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0]},{ \"type\": \"LineString\",\"coordinates\": [ [101.0, 0.0], [102.0, 1.0] ]}]}"
+  	exjson = JSON.decode!(json)
+    collection = Geo.JSON.decode(json)
+    assert(Enum.length(collection) == 2)
+    assert(collection[0].type == :point)
+    new_exjson = JSON.decode!(Geo.JSON.encode(collection))
+    assert(exjson == new_exjson)
+  end
+
 end
