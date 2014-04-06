@@ -31,3 +31,13 @@ A collection of GIS functions. Below is a list of currently implemented features
     iex(4)> Geo.WKB.encode(point)
     "0020000001000010E640427B633A61FB9EC05E73D350092CCF"
   ```
+
+* Encode and decode GeoJSON
+
+  ```
+    iex(1)> point = Geo.JSON.decode("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }")
+    Geo.Geometry[type: :point, coordinates: [100.0, 0.0], srid: nil]
+
+    iex(2)> Geo.JSON.encode(point)
+    "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
+  ```

@@ -1,1 +1,2 @@
-[ "hex": {:git, "git://github.com/rjsamson/hex.git", "48e3e0887153baa0a34879ebf649ae0af15ef386", []} ]
+[ "hex": {:git, "git://github.com/rjsamson/hex.git", "48e3e0887153baa0a34879ebf649ae0af15ef386", []},
+  "json": {:git, "git://github.com/cblage/elixir-json.git", "725ea02b992aba35c18d0e9c7c3da54689670baf", []} ]

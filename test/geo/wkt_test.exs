@@ -1,5 +1,5 @@
 defmodule Geo.WKT.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "Encode Point to WKT" do
     geom = Geo.Geometry.new(type: :point, coordinates: [30, -90])

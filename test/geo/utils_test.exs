@@ -1,5 +1,5 @@
 defmodule Geo.Utils.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "Hex String to Float Conversion" do
     assert_raise ArgumentError, "hex must be either 4 or 8 bytes long",
