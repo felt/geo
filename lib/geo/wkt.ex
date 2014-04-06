@@ -34,6 +34,21 @@ defmodule Geo.WKT do
     get_srid_binary(srid) <> "MULTIPOINT(#{Enum.join(s, ", ")})"
   end
 
+  def encode(Geometry[type: :multi_line_string, coordinates: coordinates, srid: srid]) do
+    s = Enum.map(coordinates, fn(x) -> Enum.join(Enum.map(x, fn(y) -> Enum.join(y," ") end), ", ") end)
+    get_srid_binary(srid) <> "MULTILINESTRING((#{Enum.join(s, "),(")}))"
+  end
+
+  def encode(Geometry[type: :multi_polygon, coordinates: coordinates, srid: srid]) do
+    s = Enum.map(coordinates, 
+      fn(c) -> Enum.join(Enum.map(c, 
+        fn(x) -> Enum.join(Enum.map(x, 
+          fn(y) -> Enum.join(y," ") end), ", ") 
+        end), "),(") 
+      end)
+    get_srid_binary(srid) <> "MULTIPOLYGON(((#{Enum.join(s, ")),((")})))"
+  end
+
   defp get_srid_binary(srid) do
     if srid, do: "SRID=#{srid};", else: ""
   end
@@ -49,29 +64,43 @@ defmodule Geo.WKT do
 
       String.split(actual_wkt, "(", [global: false, trim: true]) ++ [srid]
       |> list_to_tuple
-      |> _decode
+      |> do_decode
   end
 
-  defp _decode({"POINT", coordinates, srid}) do
+  defp do_decode({"POINT", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","")
     Geometry.new(type: :point, coordinates: create_point(coordinates), srid: srid)
   end
 
-  defp _decode({"LINESTRING", coordinates, srid}) do
+  defp do_decode({"LINESTRING", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","")
     Geometry.new(type: :line_string, coordinates: create_line_string(coordinates), srid: srid)
   end
 
-  defp _decode({"POLYGON", coordinates, srid}) do
+  defp do_decode({"POLYGON", coordinates, srid}) do
     coordinates = String.split(coordinates, "),(")
     |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
-
     Geometry.new(type: :polygon, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid )
   end
 
-  defp _decode({"MULTIPOINT", coordinates, srid}) do
+  defp do_decode({"MULTIPOINT", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","") |> String.replace("(","")
     Geometry.new(type: :multi_point, coordinates: create_line_string(coordinates), srid: srid )
+  end
+
+  defp do_decode({"MULTILINESTRING", coordinates, srid}) do
+    coordinates = String.split(coordinates, "),(")
+    |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
+
+    Geometry.new(type: :multi_line_string, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid )
+  end
+
+  defp do_decode({"MULTIPOLYGON", coordinates, srid}) do
+    coordinates = String.slice(coordinates,0..(String.length(coordinates)-2))
+    |> String.split(")),((")
+    |> Enum.map(fn(x) -> do_decode({"POLYGON", x, srid}).coordinates end)
+
+    Geometry.new(type: :multi_polygon, coordinates: coordinates, srid: srid )
   end
 
   defp create_point(coordinates) do

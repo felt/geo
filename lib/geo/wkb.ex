@@ -65,19 +65,20 @@ defmodule Geo.WKB do
     number_of_lines <> points
   end
 
-  defp encode_coordinates(:multi_point, endian, coordinates) do
-    number_of_points = integer_to_binary(length(coordinates), 16)
-                       |> Geo.Utils.pad_left(8)
+  defp encode_coordinates(type, endian, coordinates) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
+    number_of_geoms = integer_to_binary(length(coordinates), 16) |> Geo.Utils.pad_left(8)
 
     if endian == :ndr do
-      number_of_points = Geo.Utils.reverse_byte_order(number_of_points)
+      number_of_geoms = Geo.Utils.reverse_byte_order(number_of_geoms)
     end
 
-    points = Enum.map(coordinates, fn(pair) ->
-      "0101000000" <> encode_coordinates(:point, endian, pair)
+    {separator, single_type} = get_separator_and_single_type(type)
+
+    geoms = Enum.map(coordinates, fn(geom) ->
+      separator <> encode_coordinates(single_type, endian, geom)
     end) |> Enum.join
 
-    number_of_points <> points
+    number_of_geoms <> geoms
   end
 
   def decode(wkb) do
@@ -150,20 +151,14 @@ defmodule Geo.WKB do
     end)
   end
 
-  defp decode_coordinates(:multi_point, coordinate_binary, endian) do
-    number_of_points = String.slice(coordinate_binary, 0, 8)
+  defp decode_coordinates(type, coordinate_binary, endian) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
+    coordinate_binary = String.slice(coordinate_binary, 8, String.length(coordinate_binary))
 
-    if endian == :ndr do
-      number_of_points = Geo.Utils.reverse_byte_order(number_of_points)
-    end
+    {separator, single_type} = get_separator_and_single_type(type)
 
-    number_of_points = number_of_points |> binary_to_integer(16)
-
-    Enum.map(Enum.to_list(0..(number_of_points-1)), fn(x) ->
-      pair = String.slice(coordinate_binary, 8 + (42 * x), 42)
-      pair = String.slice(pair, 10, 32)
-      decode_coordinates(:point, pair, endian)
-    end)
+    String.split(coordinate_binary, separator) 
+    |> Enum.drop(1)
+    |> Enum.map(&decode_coordinates(single_type, &1, endian))
   end
 
   def get_line_strings(coordinate_binary, number_of_lines, endian, coordinates \\ []) do
@@ -195,6 +190,10 @@ defmodule Geo.WKB do
         :polygon
       4 ->
         :multi_point
+      5 ->
+        :multi_line_string
+      6 ->
+        :multi_polygon
       true ->
         :geometry
     end
@@ -212,8 +211,24 @@ defmodule Geo.WKB do
         value + 0x03
       :multi_point ->
         value + 0x04
+      :multi_line_string ->
+        value + 0x05
+      :multi_polygon ->
+        value + 0x06
       true ->
         value + 0x00
+    end
+  end
+
+
+  defp get_separator_and_single_type(multi_type) do
+    case multi_type do
+      :multi_point ->
+        {"0101000000", :point }
+      :multi_line_string ->
+        {"0102000000", :line_string }
+      _ ->
+        {"0103000000", :polygon }
     end
   end
 end
