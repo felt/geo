@@ -1,5 +1,5 @@
 defmodule Geo.WKB.Test do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   test "Decode WKB to Point" do
     point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
@@ -131,10 +131,10 @@ defmodule Geo.WKB.Test do
 
   test "Encode Geometry Collection to and from WKB" do
     wkb = "010700000002000000010100000000000000000010400000000000001840010200000002000000000000000000104000000000000018400000000000001C400000000000002440"
-    collection = Geo.WKT.decode(wkb)
+    collection = Geo.WKB.decode(wkb)
     assert(Enum.count(collection) == 2)
     assert(hd(collection).type == :point)
-    assert(Geo.WKT.encode(collection) == wkb)
+    assert(Geo.WKB.encode(collection, :ndr) == wkb)
   end
 
   test "Encode Geometry Collection to and from EWKB" do
@@ -144,7 +144,7 @@ defmodule Geo.WKB.Test do
     assert(hd(collection).type == :point)
     assert(hd(collection).srid == 4326)
     assert(List.last(collection).srid == 4326)
-    assert(Geo.WKB.encode(collection) == ewkb)
+    assert(Geo.WKB.encode(collection, :ndr) == ewkb)
   end
 
 end

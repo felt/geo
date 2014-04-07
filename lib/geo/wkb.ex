@@ -3,6 +3,60 @@ defmodule Geo.WKB do
   use Bitwise
 
   def encode(geom, endian \\ :xdr) do
+    if(is_list(geom)) do
+      encode_collection(geom, endian)
+    else
+      _encode(geom, endian)
+    end
+  end
+
+  def encode_collection(geom, endian) do
+    endian_hex = if endian == :ndr, do: "01", else: "00"
+    type =  type_to_hex(:geometry_collection, hd(geom).srid != nil)
+            |> integer_to_binary(16)
+            |> Geo.Utils.pad_left(8)
+
+    srid = ""
+    if hd(geom).srid do
+      srid = integer_to_binary(hd(geom).srid, 16) |> Geo.Utils.pad_left(8)
+    end
+
+    count = integer_to_binary(Enum.count(geom), 16) |> Geo.Utils.pad_left(8)
+
+    if endian == :ndr do
+      type = Geo.Utils.reverse_byte_order(type)
+      srid = Geo.Utils.reverse_byte_order(srid)
+      count = Geo.Utils.reverse_byte_order(count)
+    end
+
+    wkb = "#{endian_hex}#{type}#{srid}#{count}" 
+
+    coordinates = Enum.map(geom, 
+      fn(x) -> 
+        cond do
+          x.type == :point ->
+            "0101000000" <> encode_coordinates(:point, endian, x.coordinates)
+          x.type == :line_string ->
+            "0102000000" <> encode_coordinates(:line_string, endian, x.coordinates)
+          x.type == :polygon ->
+            "0103000000" <> encode_coordinates(:polygon, endian, x.coordinates)
+          x.type == :multi_point ->
+            "0104000000" <> encode_coordinates(:multi_point, endian, x.coordinates)
+          x.type == :multi_line_string ->
+            "0105000000" <> encode_coordinates(:multi_line_string, endian, x.coordinates)
+          x.type == :multi_polygon ->
+            "0106000000" <> encode_coordinates(:multi_polygon, endian, x.coordinates)
+          true ->
+            ""
+        end
+      end)
+
+    coordinates = Enum.join(coordinates, "")
+
+    wkb <> coordinates
+  end
+
+  def _encode(geom, endian) do
     endian_hex = if endian == :ndr, do: "01", else: "00"
     type =  type_to_hex(geom.type, geom.srid != nil)
             |> integer_to_binary(16)
@@ -111,9 +165,42 @@ defmodule Geo.WKB do
     type = hex_to_type(type &&& 0xff)
     coordinate_binary = String.slice(wkb, index, String.length(wkb))
 
-    coordinates = decode_coordinates(type, coordinate_binary, endian)
-    Geometry.new type: type, coordinates: coordinates, srid: srid
+    if(type == :geometry_collection) do
+      decode_geometry_collection(coordinate_binary, srid, endian)
+    else
+      coordinates = decode_coordinates(type, coordinate_binary, endian)
+      Geometry.new type: type, coordinates: coordinates, srid: srid
+    end
   end
+
+  defp decode_geometry_collection(coordinate_binary, srid, endian) do
+    {_, formatted_string} = Enum.map_reduce(["0101000000","0102000000","0103000000","0104000000", "0105000000","0106000000"],coordinate_binary,fn(x, acc) -> {nil, String.replace(acc, x, "-#{x}:")}end)
+    geometry_strings = String.split(formatted_string, "-") |> Enum.drop(1)
+    geometry_strings = Enum.map(geometry_strings, fn(x) -> 
+      geom = String.split(x,":")
+
+      {coordinates, type} = cond do
+        hd(geom) == "0101000000" ->
+          { decode_coordinates(:point, List.last(geom), endian), :point }
+        hd(geom) ==  "0102000000" ->
+          { decode_coordinates(:line_string, List.last(geom), endian), :line_string }
+        hd(geom) == "0103000000" ->
+          { decode_coordinates(:polygon, List.last(geom), endian), :polygon }
+        hd(geom) == "0104000000" ->
+          { decode_coordinates(:multi_point, List.last(geom), endian), :multi_point }
+        hd(geom) == "0105000000" ->
+          { decode_coordinates(:multi_line_string, List.last(geom), endian), :multi_line_string }
+        hd(geom) == "0106000000" ->
+          { decode_coordinates(:multi_polygon, List.last(geom), endian), :multi_polygon }
+        true ->
+          {[],:geometry}
+      end
+
+      Geometry.new type: type, coordinates: coordinates, srid: srid
+    end)
+
+  end
+
 
   defp decode_coordinates(:point, coordinate_binary, endian) do
     x = String.slice(coordinate_binary, 0,16) |> Geo.Utils.hex_to_float(endian)
@@ -194,7 +281,7 @@ defmodule Geo.WKB do
         :multi_line_string
       6 ->
         :multi_polygon
-      true ->
+      _ ->
         :geometry_collection
     end
   end
@@ -215,7 +302,7 @@ defmodule Geo.WKB do
         value + 0x05
       :multi_polygon ->
         value + 0x06
-      true ->
+      _ ->
         value + 0x07
     end
   end

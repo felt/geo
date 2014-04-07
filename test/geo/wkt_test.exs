@@ -117,7 +117,6 @@ defmodule Geo.WKT.Test do
   test "Encode Geometry Collection to and from EWKT" do
     ewkt = "SRID=4326;GEOMETRYCOLLECTION(POINT(4 6),LINESTRING(4 6, 7 10))"
     collection = Geo.WKT.decode(ewkt)
-    IO.inspect(collection)
     assert(Enum.count(collection) == 2)
     assert(hd(collection).type == :point)
     assert(hd(collection).srid == 4326)
