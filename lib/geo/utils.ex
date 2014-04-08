@@ -18,11 +18,8 @@ defmodule Geo.Utils do
   1.0
 
   """
-  def hex_to_float(hex, endian \\ :xdr) when is_integer(hex) or is_binary(hex) do
+  def hex_to_float(hex) when is_integer(hex) or is_binary(hex) do
     if is_integer(hex), do: hex = integer_to_binary(hex, 16)
-    if endian == :ndr do
-      hex = reverse_byte_order(hex)
-    end
 
     case bit_size(hex) do
       64 ->

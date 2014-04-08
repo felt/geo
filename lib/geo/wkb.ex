@@ -2,16 +2,66 @@ defmodule Geo.WKB do
   alias Geo.Geometry
   use Bitwise
 
-  def encode(geom, endian \\ :xdr) do
-    if(is_list(geom)) do
-      encode_collection(geom, endian)
+  defrecord WKBReader, wkb: nil, endian: :xdr
+  defrecord WKBWriter, wkb: nil, endian: :xdr
+
+  def reader_init(wkb) do
+    endian = if binary_to_integer(String.slice(wkb, 0,2), 16) > 0 do
+      :ndr
     else
-      _encode(geom, endian)
+      :xdr
+    end
+
+    WKBReader.new(wkb: String.slice(wkb, 2, String.length(wkb)), endian: endian)
+  end
+
+  def reader_read(count, reader) do
+    value = String.slice(reader.wkb, 0, count)
+
+    if reader.endian == :ndr do
+      value = Geo.Utils.reverse_byte_order(value)
+    end
+
+    { value, reader.update(wkb: String.slice(reader.wkb, count, String.length(reader.wkb))) }
+  end
+
+  def reader_eof?(reader) do
+    String.length(reader.wkb) == 0
+  end
+
+  def reader_size(reader) do
+    String.length(reader.wkb)
+  end
+
+
+  def writer_write(value, writer) do
+
+    if(writer.endian == :ndr)do
+      value = Geo.Utils.reverse_byte_order(value)
+    end
+
+    writer.update(wkb: writer.wkb <> value)
+  end
+
+  def writer_write_no_endian(value, writer) do
+    writer.update(wkb: writer.wkb <> value)
+  end
+
+
+
+  
+
+  def encode(geom, endian \\ :xdr) do
+    endian_hex = if endian == :ndr, do: "01", else: "00"
+    writer = WKBWriter.new(wkb: endian_hex, endian: endian)
+    if(is_list(geom)) do
+      encode_collection(geom, writer)
+    else
+      _encode(geom, writer)
     end
   end
 
-  def encode_collection(geom, endian) do
-    endian_hex = if endian == :ndr, do: "01", else: "00"
+  def encode_collection(geom, writer) do
     type =  type_to_hex(:geometry_collection, hd(geom).srid != nil)
             |> integer_to_binary(16)
             |> Geo.Utils.pad_left(8)
@@ -23,41 +73,21 @@ defmodule Geo.WKB do
 
     count = integer_to_binary(Enum.count(geom), 16) |> Geo.Utils.pad_left(8)
 
-    if endian == :ndr do
-      type = Geo.Utils.reverse_byte_order(type)
-      srid = Geo.Utils.reverse_byte_order(srid)
-      count = Geo.Utils.reverse_byte_order(count)
-    end
-
-    wkb = "#{endian_hex}#{type}#{srid}#{count}" 
+    writer = writer_write(type, writer)
+    writer = writer_write(srid, writer)
+    writer = writer_write(count, writer)
 
     coordinates = Enum.map(geom, 
-      fn(x) -> 
-        cond do
-          x.type == :point ->
-            "0101000000" <> encode_coordinates(:point, endian, x.coordinates)
-          x.type == :line_string ->
-            "0102000000" <> encode_coordinates(:line_string, endian, x.coordinates)
-          x.type == :polygon ->
-            "0103000000" <> encode_coordinates(:polygon, endian, x.coordinates)
-          x.type == :multi_point ->
-            "0104000000" <> encode_coordinates(:multi_point, endian, x.coordinates)
-          x.type == :multi_line_string ->
-            "0105000000" <> encode_coordinates(:multi_line_string, endian, x.coordinates)
-          x.type == :multi_polygon ->
-            "0106000000" <> encode_coordinates(:multi_polygon, endian, x.coordinates)
-          true ->
-            ""
-        end
+      fn(x) ->
+        encode(Geometry.new(type: x.type, coordinates: x.coordinates), writer.endian)       
       end)
 
     coordinates = Enum.join(coordinates, "")
 
-    wkb <> coordinates
+    writer.wkb <> coordinates
   end
 
-  def _encode(geom, endian) do
-    endian_hex = if endian == :ndr, do: "01", else: "00"
+  def _encode(geom, writer) do
     type =  type_to_hex(geom.type, geom.srid != nil)
             |> integer_to_binary(16)
             |> Geo.Utils.pad_left(8)
@@ -67,204 +97,153 @@ defmodule Geo.WKB do
       srid = integer_to_binary(geom.srid, 16) |> Geo.Utils.pad_left(8)
     end
 
-    if endian == :ndr do
-      type = Geo.Utils.reverse_byte_order(type)
-      srid = Geo.Utils.reverse_byte_order(srid)
-    end
+    writer = writer_write(type, writer)
+    writer = writer_write(srid, writer)
 
-    "#{endian_hex}#{type}#{srid}" <> encode_coordinates(geom.type, endian, geom.coordinates)
+    writer = encode_coordinates(geom.type, geom.coordinates, writer)
+    writer.wkb
   end
 
-  defp encode_coordinates(:point, endian, coordinates) do
+  defp encode_coordinates(:point, coordinates, writer) do
     if coordinates == [0,0] do
-      Geo.Utils.repeat("0", 32)
+      writer_write(Geo.Utils.repeat("0", 32), writer)
     else
       x = coordinates |> hd |> Geo.Utils.float_to_hex(64) |> integer_to_binary(16)
       y = coordinates |> List.last |> Geo.Utils.float_to_hex(64) |> integer_to_binary(16)
-      if endian == :ndr do
-        x = Geo.Utils.reverse_byte_order(x)
-        y = Geo.Utils.reverse_byte_order(y)
-      end
-      "#{x}#{y}"
+
+      writer = writer_write(x, writer)
+      writer_write(y, writer)
     end
   end
 
-  defp encode_coordinates(:line_string, endian, coordinates) do
+  defp encode_coordinates(:line_string, coordinates, writer) do
     number_of_points = integer_to_binary(length(coordinates), 16)
                        |> Geo.Utils.pad_left(8)
 
-    if endian == :ndr do
-      number_of_points = Geo.Utils.reverse_byte_order(number_of_points)
-    end
 
-    points = Enum.map(coordinates, fn(pair) ->
-      encode_coordinates(:point, endian, pair)
-    end) |> Enum.join
+    writer = writer_write(number_of_points, writer)    
 
-    number_of_points <> points
+    {_nils, writer} = Enum.map_reduce(coordinates, writer, fn(pair, acc) ->
+      acc = encode_coordinates(:point, pair, acc)
+      {nil, acc}
+    end)
+
+    writer
   end
 
-  defp encode_coordinates(:polygon, endian, coordinates) do
+  defp encode_coordinates(:polygon, coordinates, writer) do
     number_of_lines = integer_to_binary(length(coordinates), 16)
                        |> Geo.Utils.pad_left(8)
 
-    if endian == :ndr do
-      number_of_lines = Geo.Utils.reverse_byte_order(number_of_lines)
-    end
 
-    points = Enum.map(coordinates, fn(line) ->
-      encode_coordinates(:line_string, endian, line)
-    end) |> Enum.join
+    writer = writer_write(number_of_lines, writer)    
 
-    number_of_lines <> points
+    {_nils, writer} = Enum.map_reduce(coordinates, writer, fn(line, acc) ->
+      acc = encode_coordinates(:line_string, line, acc)
+      {nil, acc}
+    end)
+
+    writer
   end
 
-  defp encode_coordinates(type, endian, coordinates) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
-    number_of_geoms = integer_to_binary(length(coordinates), 16) |> Geo.Utils.pad_left(8)
+  defp encode_coordinates(type, coordinates, writer) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
 
-    if endian == :ndr do
-      number_of_geoms = Geo.Utils.reverse_byte_order(number_of_geoms)
+    writer = writer_write(integer_to_binary(length(coordinates), 16) |> Geo.Utils.pad_left(8), writer)
+
+    single_type = case type do
+      :multi_point ->
+        :point
+      :multi_line_string ->
+        :line_string
+      :multi_polygon ->
+        :polygon
     end
-
-    {separator, single_type} = get_separator_and_single_type(type)
 
     geoms = Enum.map(coordinates, fn(geom) ->
-      separator <> encode_coordinates(single_type, endian, geom)
-    end) |> Enum.join
+      encode(Geometry.new(type: single_type, coordinates: geom), writer.endian)
+    end) |> Enum.join 
 
-    number_of_geoms <> geoms
+    writer_write_no_endian(geoms, writer)
   end
 
-  def decode(wkb) do
-    endian = binary_to_integer(String.slice(wkb, 0,2), 16)
-    type = String.slice(wkb, 2,8)
-    srid = nil
+  def decode(wkb, geometries \\ []) do
+    wkb_reader = reader_init(wkb)
+    { type, wkb_reader } = reader_read(8, wkb_reader)
 
-    if endian > 0 do
-      endian = :ndr
-      type = Geo.Utils.reverse_byte_order(String.slice(wkb, 2,8))
-    else
-      endian = :xdr
-    end
+    srid = nil
 
     type = binary_to_integer(type, 16)
 
     if (type &&& 0x20000000) != 0 do
-      case endian do
-        :ndr ->
-          srid = Geo.Utils.reverse_byte_order(String.slice(wkb, 10,8))
-        _ ->
-          srid = String.slice(wkb, 10,8)
-      end
-
+      { srid, wkb_reader } = reader_read(8, wkb_reader)
       srid = binary_to_integer(srid, 16)
     end
 
-    index = if srid != nil, do: 18, else: 10
-
     type = hex_to_type(type &&& 0xff)
-    coordinate_binary = String.slice(wkb, index, String.length(wkb))
+
+    {coordinates, wkb_reader} = decode_coordinates(type, wkb_reader)
 
     if(type == :geometry_collection) do
-      decode_geometry_collection(coordinate_binary, srid, endian)
+      geometries = coordinates
+      geometries = Enum.map(geometries, fn(x) -> x.update(srid: srid) end)
     else
-      coordinates = decode_coordinates(type, coordinate_binary, endian)
-      Geometry.new type: type, coordinates: coordinates, srid: srid
+      geometries = geometries ++ [Geometry.new type: type, coordinates: coordinates, srid: srid]
     end
-  end
 
-  defp decode_geometry_collection(coordinate_binary, srid, endian) do
-    {_, formatted_string} = Enum.map_reduce(["0101000000","0102000000","0103000000","0104000000", "0105000000","0106000000"],coordinate_binary,fn(x, acc) -> {nil, String.replace(acc, x, "-#{x}:")}end)
-    geometry_strings = String.split(formatted_string, "-") |> Enum.drop(1)
-    geometry_strings = Enum.map(geometry_strings, fn(x) -> 
-      geom = String.split(x,":")
-
-      {coordinates, type} = cond do
-        hd(geom) == "0101000000" ->
-          { decode_coordinates(:point, List.last(geom), endian), :point }
-        hd(geom) ==  "0102000000" ->
-          { decode_coordinates(:line_string, List.last(geom), endian), :line_string }
-        hd(geom) == "0103000000" ->
-          { decode_coordinates(:polygon, List.last(geom), endian), :polygon }
-        hd(geom) == "0104000000" ->
-          { decode_coordinates(:multi_point, List.last(geom), endian), :multi_point }
-        hd(geom) == "0105000000" ->
-          { decode_coordinates(:multi_line_string, List.last(geom), endian), :multi_line_string }
-        hd(geom) == "0106000000" ->
-          { decode_coordinates(:multi_polygon, List.last(geom), endian), :multi_polygon }
-        true ->
-          {[],:geometry}
+    if(reader_eof?(wkb_reader)) do
+      if(length(geometries) == 1) do
+        hd(geometries)
+      else
+          geometries
       end
-
-      Geometry.new type: type, coordinates: coordinates, srid: srid
-    end)
-
-  end
-
-
-  defp decode_coordinates(:point, coordinate_binary, endian) do
-    x = String.slice(coordinate_binary, 0,16) |> Geo.Utils.hex_to_float(endian)
-    y = String.slice(coordinate_binary, 16,16) |> Geo.Utils.hex_to_float(endian)
-    [x,y]
-  end
-
-  defp decode_coordinates(:line_string, coordinate_binary, endian) do
-    number_of_points = String.slice(coordinate_binary, 0, 8)
-
-    if endian == :ndr do
-      number_of_points = Geo.Utils.reverse_byte_order(number_of_points)
+    else
+      decode(wkb_reader.wkb, geometries)
     end
+  end
 
+
+  defp decode_coordinates(:point, wkb_reader) do
+    {x, wkb_reader} = reader_read(16, wkb_reader)
+    x = Geo.Utils.hex_to_float(x)
+
+    {y, wkb_reader} = reader_read(16, wkb_reader)
+    y = Geo.Utils.hex_to_float(y)
+    { [x,y], wkb_reader }
+  end
+
+  defp decode_coordinates(:line_string, wkb_reader) do
+    {number_of_points, wkb_reader} = reader_read(8, wkb_reader)
     number_of_points = number_of_points |> binary_to_integer(16)
 
-    Enum.map(Enum.to_list(0..(number_of_points-1)), fn(x) ->
-      pair = String.slice(coordinate_binary, 8 + (32 * x), 32)
-      decode_coordinates(:point, pair, endian)
+    Enum.map_reduce(Enum.to_list(0..(number_of_points-1)), wkb_reader, fn(_x, acc) ->
+      decode_coordinates(:point, acc)
     end)
   end
 
-  defp decode_coordinates(:polygon, coordinate_binary, endian) do
-    number_of_lines = String.slice(coordinate_binary, 0, 8)
-
-    if endian == :ndr do
-      number_of_lines = Geo.Utils.reverse_byte_order(number_of_lines)
-    end
+  defp decode_coordinates(:polygon, wkb_reader) do
+    {number_of_lines, wkb_reader} = reader_read(8, wkb_reader)
 
     number_of_lines = number_of_lines |> binary_to_integer(16)
-    line_strings = get_line_strings(String.slice(coordinate_binary, 8, String.length(coordinate_binary)), number_of_lines, endian)
 
-    Enum.map(line_strings, fn(x) ->
-      decode_coordinates(:line_string, x, endian)
+    Enum.map_reduce(Enum.to_list(0..(number_of_lines-1)), wkb_reader, fn(_x, acc) ->
+      decode_coordinates(:line_string, acc)
     end)
   end
 
-  defp decode_coordinates(type, coordinate_binary, endian) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
-    coordinate_binary = String.slice(coordinate_binary, 8, String.length(coordinate_binary))
+  defp decode_coordinates(type, wkb_reader) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
+    {_number_of_items, wkb_reader} = reader_read(8, wkb_reader)
+    geometries = decode(wkb_reader.wkb)
 
-    {separator, single_type} = get_separator_and_single_type(type)
+    coordinates = Enum.map(geometries, fn(x) ->
+      x.coordinates
+    end)
 
-    String.split(coordinate_binary, separator) 
-    |> Enum.drop(1)
-    |> Enum.map(&decode_coordinates(single_type, &1, endian))
+    { coordinates, reader_init("00") }
   end
 
-  def get_line_strings(coordinate_binary, number_of_lines, endian, coordinates \\ []) do
-    if coordinate_binary == "" or number_of_lines <= 0 do
-      coordinates
-    else
-      number_of_points = String.slice(coordinate_binary, 0, 8)
-
-      if endian == :ndr do
-        number_of_points = Geo.Utils.reverse_byte_order(number_of_points)
-      end
-
-      number_of_points = number_of_points |> binary_to_integer(16)
-
-      string = String.slice(coordinate_binary, 0, 8 + (32 * number_of_points))
-      remaining = String.slice(coordinate_binary, 8 + (32 * number_of_points), String.length(coordinate_binary))
-
-      get_line_strings(remaining, number_of_lines - 1, endian, Enum.concat(coordinates, [string]))
-    end
+  defp decode_coordinates(:geometry_collection, wkb_reader) do
+    {_number_of_items, wkb_reader} = reader_read(8, wkb_reader)
+    { decode(wkb_reader.wkb), reader_init("00") }
   end
 
   defp hex_to_type(type) do
@@ -281,7 +260,7 @@ defmodule Geo.WKB do
         :multi_line_string
       6 ->
         :multi_polygon
-      _ ->
+      7 ->
         :geometry_collection
     end
   end
@@ -302,20 +281,8 @@ defmodule Geo.WKB do
         value + 0x05
       :multi_polygon ->
         value + 0x06
-      _ ->
+      :geometry_collection ->
         value + 0x07
-    end
-  end
-
-
-  defp get_separator_and_single_type(multi_type) do
-    case multi_type do
-      :multi_point ->
-        {"0101000000", :point }
-      :multi_line_string ->
-        {"0102000000", :line_string }
-      _ ->
-        {"0103000000", :polygon }
     end
   end
 end

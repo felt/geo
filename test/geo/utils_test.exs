@@ -15,7 +15,6 @@ defmodule Geo.Utils.Test do
     assert(Geo.Utils.hex_to_float("4000000000000000") == 2.0)
     assert(Geo.Utils.hex_to_float("C000000000000000") == -2.0)
     assert(Geo.Utils.hex_to_float("40DD4C0000000000") == 30000.0)
-    assert(Geo.Utils.hex_to_float("CF2C0950D3735EC0", :ndr) == -121.8097725)
   end
 
   test "Hex Integer to Float Conversion" do
@@ -30,7 +29,6 @@ defmodule Geo.Utils.Test do
     assert(Geo.Utils.hex_to_float(0x4000000000000000) == 2.0)
     assert(Geo.Utils.hex_to_float(0xC000000000000000) == -2.0)
     assert(Geo.Utils.hex_to_float(0x40DD4C0000000000) == 30000.0)
-    assert(Geo.Utils.hex_to_float(0xCF2C0950D3735EC0, :ndr) == -121.8097725)
   end
 
   test "Hex Float to Hex Conversion" do
