@@ -5,7 +5,7 @@ defmodule Geo.WKB do
   defrecord WKBReader, wkb: nil, endian: :xdr
   defrecord WKBWriter, wkb: nil, endian: :xdr
 
-  def reader_init(wkb) do
+  defp reader_init(wkb) do
     endian = if binary_to_integer(String.slice(wkb, 0,2), 16) > 0 do
       :ndr
     else
@@ -15,7 +15,7 @@ defmodule Geo.WKB do
     WKBReader.new(wkb: String.slice(wkb, 2, String.length(wkb)), endian: endian)
   end
 
-  def reader_read(count, reader) do
+  defp reader_read(count, reader) do
     value = String.slice(reader.wkb, 0, count)
 
     if reader.endian == :ndr do
@@ -25,16 +25,16 @@ defmodule Geo.WKB do
     { value, reader.update(wkb: String.slice(reader.wkb, count, String.length(reader.wkb))) }
   end
 
-  def reader_eof?(reader) do
+  defp reader_eof?(reader) do
     String.length(reader.wkb) == 0
   end
 
-  def reader_size(reader) do
+  defp reader_size(reader) do
     String.length(reader.wkb)
   end
 
 
-  def writer_write(value, writer) do
+  defp writer_write(value, writer) do
 
     if(writer.endian == :ndr)do
       value = Geo.Utils.reverse_byte_order(value)
@@ -43,7 +43,7 @@ defmodule Geo.WKB do
     writer.update(wkb: writer.wkb <> value)
   end
 
-  def writer_write_no_endian(value, writer) do
+  defp writer_write_no_endian(value, writer) do
     writer.update(wkb: writer.wkb <> value)
   end
 
@@ -54,14 +54,10 @@ defmodule Geo.WKB do
   def encode(geom, endian \\ :xdr) do
     endian_hex = if endian == :ndr, do: "01", else: "00"
     writer = WKBWriter.new(wkb: endian_hex, endian: endian)
-    if(is_list(geom)) do
-      encode_collection(geom, writer)
-    else
-      _encode(geom, writer)
-    end
+    do_encode(geom, writer)
   end
 
-  def encode_collection(geom, writer) do
+  def do_encode(geom, writer) when is_list(geom) do
     type =  type_to_hex(:geometry_collection, hd(geom).srid != nil)
             |> integer_to_binary(16)
             |> Geo.Utils.pad_left(8)
@@ -87,7 +83,7 @@ defmodule Geo.WKB do
     writer.wkb <> coordinates
   end
 
-  def _encode(geom, writer) do
+  def do_encode(geom, writer) do
     type =  type_to_hex(geom.type, geom.srid != nil)
             |> integer_to_binary(16)
             |> Geo.Utils.pad_left(8)

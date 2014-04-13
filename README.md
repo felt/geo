@@ -1,6 +1,19 @@
 # Geo
 
-A collection of GIS functions. Below is a list of currently implemented features:
+A collection of GIS functions. Handles conversions to and from WKT, WKB, and GeoJSON for the following geometries:
+
+* Point
+* LineString
+* Polygon
+* MultiPoint
+* MulitLineString
+* MultiPolygon
+* GeometryCollection
+
+
+## Examples
+
+
 
 * Encode and decode WKT and EWKT
 

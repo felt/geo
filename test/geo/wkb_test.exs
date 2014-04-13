@@ -1,5 +1,5 @@
 defmodule Geo.WKB.Test do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   test "Decode WKB to Point" do
     point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
