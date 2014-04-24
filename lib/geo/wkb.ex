@@ -29,10 +29,6 @@ defmodule Geo.WKB do
     String.length(reader.wkb) == 0
   end
 
-  defp reader_size(reader) do
-    String.length(reader.wkb)
-  end
-
 
   defp writer_write(value, writer) do
 

@@ -16,7 +16,7 @@ defmodule Geo.WKT do
   """
 
   def encode(geometry_collection) when is_list(geometry_collection) do
-      geometries = Enum.map(geometry_collection, fn(x) -> encode(x.update_srid(fn(x) -> nil end)) end)
+      geometries = Enum.map(geometry_collection, fn(x) -> encode(x.update_srid(fn(_x) -> nil end)) end)
       srid = nil
 
       if(Enum.count(geometry_collection) > 0) do
