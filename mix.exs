@@ -1,3 +1,5 @@
+Code.ensure_loaded?(Hex) and Hex.start
+
 defmodule Geo.Mixfile do
   use Mix.Project
 
@@ -6,6 +8,7 @@ defmodule Geo.Mixfile do
       version: "0.5.1",
       elixir: ">= 0.12.0",
       deps: deps,
+      package: package,
       source_url: "https://github.com/bryanjos/geo"    ]
   end
 
@@ -22,4 +25,12 @@ defmodule Geo.Mixfile do
   defp deps do
     [{ :json,   github: "cblage/elixir-json"}]
   end
+
+    defp package do
+    [ # These are the default files included in the package
+      files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
+      contributors: ["Bryan Joseph"],
+      licenses: ["MIT"],
+      links: [ { "GitHub", "https://github.com/bryanjos/geo" }] 
+    ]
 end
