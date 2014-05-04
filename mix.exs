@@ -8,6 +8,7 @@ defmodule Geo.Mixfile do
       version: "0.5.1",
       elixir: ">= 0.12.0",
       deps: deps,
+      description: "A collection of GIS functions",
       package: package,
       source_url: "https://github.com/bryanjos/geo"    ]
   end
