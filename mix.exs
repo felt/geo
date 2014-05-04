@@ -27,11 +27,12 @@ defmodule Geo.Mixfile do
     [{ :json,   github: "cblage/elixir-json"}]
   end
 
-    defp package do
+  defp package do
     [ # These are the default files included in the package
       files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: [ { "GitHub", "https://github.com/bryanjos/geo" }] 
     ]
+  end
 end
