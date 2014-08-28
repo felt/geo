@@ -8,13 +8,7 @@ defmodule Geo.Mixfile do
       version: "0.7.0",
       elixir: "~> 0.15.1",
       deps: deps,
-      description: 
-      """
-      A collection of functions to convert to and from WKT, WKB, and GeoJSON.
-      Also includes an encoder, decoder, and formatter for using PostGIS data types with Postgrex.
-
-      """
-      ,
+      description: description,
       package: package,
       source_url: "https://github.com/bryanjos/geo"    ]
   end
@@ -22,6 +16,14 @@ defmodule Geo.Mixfile do
   # Configuration for the OTP application
   def application do
     []
+  end
+
+  defp description do
+    """
+    A collection of functions to convert to and from WKT, WKB, and GeoJSON.
+    Also includes an encoder, decoder, and formatter for using PostGIS data types with Postgrex.
+
+    """
   end
 
   defp deps do
