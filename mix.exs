@@ -8,7 +8,13 @@ defmodule Geo.Mixfile do
       version: "0.7.0",
       elixir: "~> 0.15.1",
       deps: deps,
-      description: "A collection of GIS functions",
+      description: 
+      """
+      A collection of functions to convert to and from WKT, WKB, and GeoJSON.
+      Also includes an encoder, decoder, and formatter for using PostGIS data types with Postgrex.
+
+      """
+      ,
       package: package,
       source_url: "https://github.com/bryanjos/geo"    ]
   end
