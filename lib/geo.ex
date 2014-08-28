@@ -1,3 +1,5 @@
 defmodule Geo do
-  defrecord Geometry, type: :geometry, coordinates: [], srid: nil
+  defmodule Geometry do
+    defstruct type: :geometry, coordinates: [], srid: nil
+  end
 end

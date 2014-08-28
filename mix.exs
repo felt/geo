@@ -5,8 +5,8 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.5.1",
-      elixir: ">= 0.12.0",
+      version: "0.6.1",
+      elixir: "~> 0.15.1",
       deps: deps,
       description: "A collection of GIS functions",
       package: package,
@@ -18,13 +18,8 @@ defmodule Geo.Mixfile do
     []
   end
 
-  # Returns the list of dependencies in the format:
-  # { :foobar, git: "https://github.com/elixir-lang/foobar.git", tag: "0.1" }
-  #
-  # To specify particular versions, regardless of the tag, do:
-  # { :barbat, "~> 0.1", github: "elixir-lang/barbat" }
   defp deps do
-    [{ :json,   github: "cblage/elixir-json"}]
+    [{:jsex, github: "talentdeficit/jsex"}]
   end
 
   defp package do
@@ -32,7 +27,7 @@ defmodule Geo.Mixfile do
       files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
-      links: [ { "GitHub", "https://github.com/bryanjos/geo" }] 
+      links: [ { "GitHub", "https://github.com/bryanjos/geo" }]
     ]
   end
 end

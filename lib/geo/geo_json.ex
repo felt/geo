@@ -3,22 +3,22 @@ defmodule Geo.JSON do
 
 
 	def decode(geo_json) do
-		decoded_json = JSON.decode!(geo_json)
+		decoded_json = JSEX.decode!(geo_json)
 
 		if(Dict.has_key?(decoded_json, "geometries")) do
-			Enum.map(decoded_json["geometries"], fn(x) -> Geometry.new(type: decode_type(x["type"]), coordinates: x["coordinates"])	  end)
+			Enum.map(decoded_json["geometries"], fn(x) -> %Geometry{ type: decode_type(x["type"]), coordinates: x["coordinates"] }	  end)
 		else
-			Geometry.new(type: decode_type(decoded_json["type"]), coordinates: decoded_json["coordinates"])			
+			%Geometry{ type: decode_type(decoded_json["type"]), coordinates: decoded_json["coordinates"] }
 		end
 	end
 
 
 	def encode(geom) when is_list(geom) do
-		JSON.encode!([type: "GeometryCollection", geometries: Enum.map(geom, fn(x) -> [type: encode_type(x.type), coordinates: x.coordinates] end)])	
+		JSEX.encode!([type: "GeometryCollection", geometries: Enum.map(geom, fn(x) -> [type: encode_type(x.type), coordinates: x.coordinates] end)])
 	end
 
 	def encode(geom) do
-		JSON.encode!([type: encode_type(geom.type), coordinates: geom.coordinates])	
+		JSEX.encode!([type: encode_type(geom.type), coordinates: geom.coordinates])
 	end
 
 	defp decode_type(geo_json_type) do

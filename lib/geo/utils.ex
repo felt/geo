@@ -19,14 +19,14 @@ defmodule Geo.Utils do
 
   """
   def hex_to_float(hex) when is_integer(hex) or is_binary(hex) do
-    if is_integer(hex), do: hex = integer_to_binary(hex, 16)
+    if is_integer(hex), do: hex = Integer.to_string(hex, 16)
 
     case bit_size(hex) do
       64 ->
-        << value :: [float, 32] >> = << binary_to_integer(hex, 16) :: [integer, 32] >>
+        << value :: float-32 >> = << String.to_integer(hex, 16) :: integer-32 >>
         value
       128 ->
-        << value :: [float, 64] >> = << binary_to_integer(hex, 16) :: [integer, 64] >>
+        << value :: float-64 >> = << String.to_integer(hex, 16) :: integer-64 >>
         value
       _ ->
         raise ArgumentError.new message: "hex must be either 4 or 8 bytes long"
@@ -36,10 +36,10 @@ defmodule Geo.Utils do
   def float_to_hex(float, size) do
     case size do
       32 ->
-        << value :: [integer, 32] >> = << float :: [float, 32] >>
+        << value :: integer-32 >> = << float :: float-32 >>
         value
       _ ->
-        << value :: [integer, 64] >> = << float :: [float, 64] >>
+        << value :: integer-64 >> = << float :: float-64 >>
         value
     end
   end

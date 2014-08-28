@@ -1,2 +1,4 @@
-[ "hex": {:git, "git://github.com/rjsamson/hex.git", "48e3e0887153baa0a34879ebf649ae0af15ef386", []},
-  "json": {:git, "git://github.com/cblage/elixir-json.git", "725ea02b992aba35c18d0e9c7c3da54689670baf", []} ]
+%{"hex": {:git, "git://github.com/rjsamson/hex.git", "48e3e0887153baa0a34879ebf649ae0af15ef386", []},
+  "jsex": {:git, "git://github.com/talentdeficit/jsex.git", "661ce8565aaea22aa3576d4ad5e9d11065fe60f9", []},
+  "json": {:git, "git://github.com/cblage/elixir-json.git", "f386b18431bbc0a0b6d38519ec2f256b5a040668", []},
+  "jsx": {:package, "2.0.4"}}

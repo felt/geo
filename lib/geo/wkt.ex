@@ -16,7 +16,7 @@ defmodule Geo.WKT do
   """
 
   def encode(geometry_collection) when is_list(geometry_collection) do
-      geometries = Enum.map(geometry_collection, fn(x) -> encode(x.update_srid(fn(_x) -> nil end)) end)
+      geometries = Enum.map(geometry_collection, fn(x) -> encode(%{ x | srid: nil }) end)
       srid = nil
 
       if(Enum.count(geometry_collection) > 0) do
@@ -26,36 +26,36 @@ defmodule Geo.WKT do
       get_srid_binary(srid) <> "GEOMETRYCOLLECTION(#{Enum.join(geometries, ",")})"
   end
 
-  def encode(Geometry[type: :point, coordinates: coordinates, srid: srid]) do
+  def encode(%Geometry{ type: :point, coordinates: coordinates, srid: srid }) do
     get_srid_binary(srid) <> "POINT(#{Enum.join(coordinates, " ")})"
   end
 
-  def encode(Geometry[type: :line_string, coordinates: coordinates, srid: srid]) do
+  def encode(%Geometry{ type: :line_string, coordinates: coordinates, srid: srid }) do
     s = Enum.map(coordinates, fn(x) -> Enum.join(x, " ") end)
     get_srid_binary(srid) <> "LINESTRING(#{Enum.join(s, ", ")})"
   end
 
-  def encode(Geometry[type: :polygon, coordinates: coordinates, srid: srid]) do
+  def encode(%Geometry{ type: :polygon, coordinates: coordinates, srid: srid }) do
     s = Enum.map(coordinates, fn(x) -> Enum.join(Enum.map(x, fn(y) -> Enum.join(y," ") end), ", ") end)
     get_srid_binary(srid) <> "POLYGON((#{Enum.join(s, "),(")}))"
   end
 
-  def encode(Geometry[type: :multi_point, coordinates: coordinates, srid: srid]) do
+  def encode(%Geometry{ type: :multi_point, coordinates: coordinates, srid: srid }) do
     s = Enum.map(coordinates, fn(x) -> Enum.join(x, " ") end)
     get_srid_binary(srid) <> "MULTIPOINT(#{Enum.join(s, ", ")})"
   end
 
-  def encode(Geometry[type: :multi_line_string, coordinates: coordinates, srid: srid]) do
+  def encode(%Geometry{ type: :multi_line_string, coordinates: coordinates, srid: srid }) do
     s = Enum.map(coordinates, fn(x) -> Enum.join(Enum.map(x, fn(y) -> Enum.join(y," ") end), ", ") end)
     get_srid_binary(srid) <> "MULTILINESTRING((#{Enum.join(s, "),(")}))"
   end
 
-  def encode(Geometry[type: :multi_polygon, coordinates: coordinates, srid: srid]) do
-    s = Enum.map(coordinates, 
-      fn(c) -> Enum.join(Enum.map(c, 
-        fn(x) -> Enum.join(Enum.map(x, 
-          fn(y) -> Enum.join(y," ") end), ", ") 
-        end), "),(") 
+  def encode(%Geometry{ type: :multi_polygon, coordinates: coordinates, srid: srid }) do
+    s = Enum.map(coordinates,
+      fn(c) -> Enum.join(Enum.map(c,
+        fn(x) -> Enum.join(Enum.map(x,
+          fn(y) -> Enum.join(y," ") end), ", ")
+        end), "),(")
       end)
     get_srid_binary(srid) <> "MULTIPOLYGON(((#{Enum.join(s, ")),((")})))"
   end
@@ -69,53 +69,52 @@ defmodule Geo.WKT do
       srid = nil
       actual_wkt = wkt
       if length(wkt_split) == 2 do
-        srid = hd(wkt_split) |> String.replace("SRID=","") |> binary_to_integer
+        srid = hd(wkt_split) |> String.replace("SRID=","") |> String.to_integer
         actual_wkt = List.last(wkt_split)
       end
 
-      String.split(actual_wkt, "(", [global: false, trim: true]) ++ [srid]
-      |> list_to_tuple
-      |> do_decode
+      a = String.split(actual_wkt, "(", [parts: 2, trim: true])
+      do_decode({ hd(a), hd(tl(a)) , srid })
   end
 
   defp do_decode({"GEOMETRYCOLLECTION", coordinates, srid}) do
     String.slice(coordinates,0..(String.length(coordinates)-2))
-    |> String.split(",", [global: false])
-    |> Enum.map(fn(x) -> 
+    |> String.split(",", [parts: 2])
+    |> Enum.map(fn(x) ->
       if(srid == nil) do
         decode(x)
       else
-        decode("SRID=#{srid};#{x}") 
+        decode("SRID=#{srid};#{x}")
       end
     end)
   end
 
   defp do_decode({"POINT", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","")
-    Geometry.new(type: :point, coordinates: create_point(coordinates), srid: srid)
+    %Geometry{ type: :point, coordinates: create_point(coordinates), srid: srid }
   end
 
   defp do_decode({"LINESTRING", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","")
-    Geometry.new(type: :line_string, coordinates: create_line_string(coordinates), srid: srid)
+    %Geometry{ type: :line_string, coordinates: create_line_string(coordinates), srid: srid }
   end
 
   defp do_decode({"POLYGON", coordinates, srid}) do
     coordinates = String.split(coordinates, "),(")
     |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
-    Geometry.new(type: :polygon, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid )
+    %Geometry{ type: :polygon, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid }
   end
 
   defp do_decode({"MULTIPOINT", coordinates, srid}) do
     coordinates = String.replace(coordinates, ")","") |> String.replace("(","")
-    Geometry.new(type: :multi_point, coordinates: create_line_string(coordinates), srid: srid )
+    %Geometry{ type: :multi_point, coordinates: create_line_string(coordinates), srid: srid }
   end
 
   defp do_decode({"MULTILINESTRING", coordinates, srid}) do
     coordinates = String.split(coordinates, "),(")
     |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
 
-    Geometry.new(type: :multi_line_string, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid )
+    %Geometry{ type: :multi_line_string, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid }
   end
 
   defp do_decode({"MULTIPOLYGON", coordinates, srid}) do
@@ -123,7 +122,7 @@ defmodule Geo.WKT do
     |> String.split(")),((")
     |> Enum.map(fn(x) -> do_decode({"POLYGON", x, srid}).coordinates end)
 
-    Geometry.new(type: :multi_polygon, coordinates: coordinates, srid: srid )
+    %Geometry{ type: :multi_polygon, coordinates: coordinates, srid: srid }
   end
 
   defp create_point(coordinates) do
@@ -135,6 +134,6 @@ defmodule Geo.WKT do
   end
 
   defp binary_to_number(binary) do
-    if String.contains?(binary,"."), do: binary_to_float(binary), else: binary_to_integer(binary)
+    if String.contains?(binary,"."), do: String.to_float(binary), else: String.to_integer(binary)
   end
 end

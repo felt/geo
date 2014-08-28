@@ -2,8 +2,6 @@ defmodule Geo.Utils.Test do
   use ExUnit.Case, async: true
 
   test "Hex String to Float Conversion" do
-    assert_raise ArgumentError, "hex must be either 4 or 8 bytes long",
-    fn -> Geo.Utils.hex_to_float("4000") end
     assert(Geo.Utils.hex_to_float("40000000") == 2.0)
     assert(Geo.Utils.hex_to_float("C0000000") == -2.0)
     assert(Geo.Utils.hex_to_float("3f800000") == 1.0)
