@@ -1,6 +1,6 @@
-%{"decimal": {:package, "0.2.4"},
+%{"decimal": {:package, "0.2.5"},
   "hex": {:git, "git://github.com/rjsamson/hex.git", "48e3e0887153baa0a34879ebf649ae0af15ef386", []},
-  "jsex": {:git, "git://github.com/talentdeficit/jsex.git", "661ce8565aaea22aa3576d4ad5e9d11065fe60f9", []},
+  "jsex": {:git, "git://github.com/talentdeficit/jsex.git", "91fbbb51ac18c5ecec45044af107cd079af2ff8b", []},
   "json": {:git, "git://github.com/cblage/elixir-json.git", "f386b18431bbc0a0b6d38519ec2f256b5a040668", []},
-  "jsx": {:package, "2.0.4"},
-  "postgrex": {:package, "0.5.5"}}
+  "jsx": {:package, "2.1.1"},
+  "postgrex": {:package, "0.6.0"}}
