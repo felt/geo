@@ -1,5 +1,6 @@
 %{"decimal": {:package, "0.2.5"},
   "hex": {:git, "git://github.com/rjsamson/hex.git", "48e3e0887153baa0a34879ebf649ae0af15ef386", []},
+  "jazz": {:package, "0.2.1"},
   "jsex": {:git, "git://github.com/talentdeficit/jsex.git", "91fbbb51ac18c5ecec45044af107cd079af2ff8b", []},
   "json": {:git, "git://github.com/cblage/elixir-json.git", "f386b18431bbc0a0b6d38519ec2f256b5a040668", []},
   "jsx": {:package, "2.1.1"},

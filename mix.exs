@@ -5,7 +5,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.7.2",
+      version: "0.8.0",
       elixir: "~> 1.0.0",
       deps: deps,
       description: description,
@@ -20,14 +20,12 @@ defmodule Geo.Mixfile do
 
   defp description do
     """
-    A collection of functions to convert to and from WKT, WKB, and GeoJSON.
-    Also includes an encoder, decoder, and formatter for using PostGIS data types with Postgrex.
-
+    A collection of encoders and decoders for WKB, WKT, and GeoJSON and PostGIS data type support for Postgrex.
     """
   end
 
   defp deps do
-    [{:jsex, github: "talentdeficit/jsex"},
+    [{:jazz, "~> 0.2.1"},
     { :postgrex, "~> 0.6.0" }]
   end
 

@@ -1,4 +1,4 @@
-defmodule Geo.Postgrex do
+defmodule Geo.PostGIS do
   alias Postgrex.TypeInfo
 
   @moduledoc """
@@ -6,11 +6,11 @@ defmodule Geo.Postgrex do
 
     iex(1)>     opts = [hostname: "localhost",
     ...(1)>     username: "postgres", database: "geo_postgrex_test",
-    ...(1)>     encoder: &Geo.Postgrex.encoder/3, decoder: &Geo.Postgrex.decoder/4,
-    ...(1)>     formatter: &Geo.Postgrex.formatter/1 ]
+    ...(1)>     encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
+    ...(1)>     formatter: &Geo.PostGIS.formatter/1 ]
     [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-     encoder: &Geo.Postgrex.encoder/3, decoder: &Geo.Postgrex.decoder/4,
-     formatter: &Geo.Postgrex.formatter/1]
+     encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
+     formatter: &Geo.PostGIS.formatter/1]
 
     iex(2)> {:ok, pid} = Postgrex.Connection.start_link(opts)
     {:ok, #PID<0.115.0>}
