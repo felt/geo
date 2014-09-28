@@ -25,8 +25,7 @@ defmodule Geo.Mixfile do
   end
 
   defp deps do
-    [{:jazz, "~> 0.2.1"},
-    { :postgrex, "~> 0.6.0" }]
+    [{:jazz, "~> 0.2.1"},{:postgrex, "~> 0.6.0" }]
   end
 
   defp package do
@@ -34,7 +33,7 @@ defmodule Geo.Mixfile do
       files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*"],
       contributors: ["Bryan Joseph"],
       licenses: ["MIT"],
-      links: [ { "GitHub", "https://github.com/bryanjos/geo" }]
+      links: %{ "GitHub" => "https://github.com/bryanjos/geo" }
     ]
   end
 end
