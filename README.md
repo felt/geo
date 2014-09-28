@@ -13,6 +13,12 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 
 Also includes an encoder, decoder, and formatter for using PostGIS data types with Postgrex
 
+```
+  defp deps do
+    [{:geo, "~> 0.8.0"}]
+  end
+```
+
 
 ## Examples
 
@@ -63,11 +69,11 @@ Also includes an encoder, decoder, and formatter for using PostGIS data types wi
   ```
     iex(1)>     opts = [hostname: "localhost",
     ...(1)>     username: "postgres", database: "geo_postgrex_test",
-    ...(1)>     encoder: &Geo.Postgrex.encoder/3, decoder: &Geo.Postgrex.decoder/4,
-    ...(1)>     formatter: &Geo.Postgrex.formatter/1 ]
+    ...(1)>     encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
+    ...(1)>     formatter: &Geo.PostGIS.formatter/1 ]
     [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-     encoder: &Geo.Postgrex.encoder/3, decoder: &Geo.Postgrex.decoder/4,
-     formatter: &Geo.Postgrex.formatter/1]
+     encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
+     formatter: &Geo.PostGIS.formatter/1]
 
     iex(2)> {:ok, pid} = Postgrex.Connection.start_link(opts)
     {:ok, #PID<0.115.0>}
