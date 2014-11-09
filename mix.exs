@@ -5,7 +5,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.8.0",
+      version: "0.9.0",
       elixir: "~> 1.0.0",
       deps: deps,
       description: description,
@@ -25,7 +25,10 @@ defmodule Geo.Mixfile do
   end
 
   defp deps do
-    [{:jazz, "~> 0.2.1"},{:postgrex, "~> 0.6.0" }]
+    [ 
+      {:jazz, "~> 0.2.1"},
+      {:postgrex, "~> 0.6.0" }
+    ]
   end
 
   defp package do
