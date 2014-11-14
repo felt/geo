@@ -17,4 +17,12 @@ defmodule Geo.WKB.Writer do
   def write_no_endian(writer, value) do
     %{ writer | wkb: writer.wkb <> value }
   end
+
+  def get_wkb(writer) do
+    writer.wkb
+  end
+
+  def get_endian(writer) do
+    writer.endian
+  end
 end

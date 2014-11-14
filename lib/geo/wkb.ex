@@ -4,6 +4,10 @@ defmodule Geo.WKB do
   alias Geo.WKB.Writer
   use Bitwise
 
+  @hex_type_map %{point: 0x01, line_string: 0x02, polygon: 0x03, 
+                  multi_point: 0x04, multi_line_string: 0x05, 
+                  multi_polygon: 0x06, geometry_collection: 0x07}
+
   def encode(geom, endian \\ :xdr) do
     writer = Writer.start(endian)
     do_encode(geom, writer)
@@ -27,12 +31,12 @@ defmodule Geo.WKB do
 
     coordinates = Enum.map(geom,
       fn(x) ->
-        encode(%Geometry{ type: x.type, coordinates: x.coordinates }, writer.endian)
+        encode(%Geometry{ type: x.type, coordinates: x.coordinates }, Writer.get_endian(writer))
       end)
 
     coordinates = Enum.join(coordinates, "")
 
-    writer.wkb <> coordinates
+    Writer.get_wkb(writer) <> coordinates
   end
 
   def do_encode(geom, writer) do
@@ -49,7 +53,7 @@ defmodule Geo.WKB do
     writer = Writer.write(writer, srid)
 
     writer = encode_coordinates(geom.type, geom.coordinates, writer)
-    writer.wkb
+    Writer.get_wkb(writer)
   end
 
   defp encode_coordinates(:point, coordinates, writer) do
@@ -95,7 +99,8 @@ defmodule Geo.WKB do
   end
 
   defp encode_coordinates(type, coordinates, writer) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
-    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Geo.Utils.pad_left(8))
+    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) 
+            |> Geo.Utils.pad_left(8))
 
     single_type = case type do
       :multi_point ->
@@ -107,7 +112,7 @@ defmodule Geo.WKB do
     end
 
     geoms = Enum.map(coordinates, fn(geom) ->
-      encode(%Geometry{ type: single_type, coordinates: geom }, writer.endian)
+      encode(%Geometry{ type: single_type, coordinates: geom }, Writer.get_endian(writer))
     end) |> Enum.join
 
     Writer.write_no_endian(writer, geoms)
@@ -144,7 +149,7 @@ defmodule Geo.WKB do
           geometries
       end
     else
-      decode(wkb_reader.wkb, geometries)
+      Reader.get_wkb(wkb_reader) |> decode(geometries)
     end
   end
 
@@ -179,7 +184,7 @@ defmodule Geo.WKB do
 
   defp decode_coordinates(type, wkb_reader) when type == :multi_point or type == :multi_line_string or type == :multi_polygon do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
-    geometries = decode(wkb_reader.wkb)
+    geometries = Reader.get_wkb(wkb_reader) |> decode
 
     coordinates = Enum.map(geometries, fn(x) ->
       x.coordinates
@@ -190,46 +195,16 @@ defmodule Geo.WKB do
 
   defp decode_coordinates(:geometry_collection, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
-    { decode(wkb_reader.wkb), Reader.start("00") }
+    { decode(Reader.get_wkb(wkb_reader)), Reader.start("00") }
   end
 
   defp hex_to_type(type) do
-    case type do
-      1 ->
-        :point
-      2 ->
-        :line_string
-      3 ->
-        :polygon
-      4 ->
-        :multi_point
-      5 ->
-        :multi_line_string
-      6 ->
-        :multi_polygon
-      7 ->
-        :geometry_collection
-    end
+    { key, _value } = Enum.find(@hex_type_map, fn({_key, value}) -> value == type end)
+    key
   end
 
   defp type_to_hex(type, include_srid) do
     value = if include_srid, do: 0x20000000, else: 0x00000000
-
-    case type do
-      :point ->
-        value + 0x01
-      :line_string ->
-        value + 0x02
-      :polygon ->
-        value + 0x03
-      :multi_point ->
-        value + 0x04
-      :multi_line_string ->
-        value + 0x05
-      :multi_polygon ->
-        value + 0x06
-      :geometry_collection ->
-        value + 0x07
-    end
+    value + @hex_type_map[type]
   end
 end
