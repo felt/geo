@@ -1,25 +1,29 @@
 defmodule Geo.WKT do
   alias Geo.Geometry
   @moduledoc """
-    Converts to and from WKT and EWKT
+  Converts to and from WKT and EWKT
+  
+  ```
+  point = Geo.WKT.decode("POINT(30 -90)")
+  Geo.Geometry[type: :point, coordinates: [30, -90], srid: nil]
 
-    iex(1)> point = Geo.WKT.decode("POINT(30 -90)")
-    Geo.Geometry[type: :point, coordinates: [30, -90], srid: nil]
+  Geo.WKT.encode(point)
+  "POINT(30 -90)"
 
-    iex(2)> Geo.WKT.encode(point)
-    "POINT(30 -90)"
-
-    iex(3)> point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
-    Geo.Geometry[type: :point, coordinates: [30, -90], srid: 4326]
-
+  point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
+  Geo.Geometry[type: :point, coordinates: [30, -90], srid: 4326]
+  ```
   """
 
-  def encode(geometry_collection) when is_list(geometry_collection) do
-      geometries = Enum.map(geometry_collection, fn(x) -> encode(%{ x | srid: nil }) end)
+  @doc """
+  Takes a Geo.Geometry or list of Geo.Geometry and returns a WKT string
+  """
+  def encode(geometry) when is_list(geometry) do
+      geometries = Enum.map(geometry, fn(x) -> encode(%{ x | srid: nil }) end)
       srid = nil
 
-      if(Enum.count(geometry_collection) > 0) do
-        srid = hd(geometry_collection).srid
+      if(Enum.count(geometry) > 0) do
+        srid = hd(geometry).srid
       end
 
       get_srid_binary(srid) <> "GEOMETRYCOLLECTION(#{Enum.join(geometries, ",")})"
@@ -63,6 +67,9 @@ defmodule Geo.WKT do
     if srid, do: "SRID=#{srid};", else: ""
   end
 
+  @doc """
+  Takes a WKT string and returns a Geo.Geometry struct or list of Geo.Geometry
+  """
   def decode(wkt) do
       wkt_split = String.split(wkt, ";")
       srid = nil

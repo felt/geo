@@ -8,15 +8,19 @@ defmodule Geo.Utils do
   Takes an optional endian atom. Either :xdr for big endian or :ndr for little
   endian. Defaults to :xdr
 
-  iex(1)> Geo.Utils.hex_to_float("40000000")
+  ```
+  Geo.Utils.hex_to_float("40000000")
   2.0
-  iex(2)> Geo.Utils.hex_to_float(0x40000000)
+  
+  Geo.Utils.hex_to_float(0x40000000)
   2.0
-  iex(3)> Geo.Utils.hex_to_float("3ff0000000000000")
+  
+  Geo.Utils.hex_to_float("3ff0000000000000")
   1.0
-  iex(4)> Geo.Utils.hex_to_float(0x3ff0000000000000)
+  
+  Geo.Utils.hex_to_float(0x3ff0000000000000)
   1.0
-
+  ```
   """
   def hex_to_float(hex) when is_integer(hex) or is_binary(hex) do
     if is_integer(hex), do: hex = Integer.to_string(hex, 16)
@@ -33,24 +37,31 @@ defmodule Geo.Utils do
     end
   end
 
+
+  @doc """
+  Turns a float into a hex value. The size can either be 32 or 64.
+  """
   def float_to_hex(float, size) do
     case size do
       32 ->
         << value :: integer-32 >> = << float :: float-32 >>
         value
-      _ ->
+      64 ->
         << value :: integer-64 >> = << float :: float-64 >>
         value
     end
   end
 
   @doc """
-    Reverses the byte order of the given hex string.
+  Reverses the byte order of the given hex string.
 
-    iex(1)> Geo.Utils.reverse_byte_order("00000004")
-    "40000000"
-    iex(2)> Geo.Utils.reverse_byte_order("E6100000")
-    "000010E6"
+  ```
+  Geo.Utils.reverse_byte_order("00000004")
+  "40000000"
+  
+  Geo.Utils.reverse_byte_order("E6100000")
+  "000010E6"
+  ```
   """
   def reverse_byte_order(hex) do
     byte_range = Enum.to_list(0..(div(String.length(hex),2)-1))
@@ -59,6 +70,9 @@ defmodule Geo.Utils do
     |> Enum.join
   end
 
+  @doc """
+  Adds 0's to the right of hex string 
+  """
   def pad_right(hex, size) do
     if String.length(hex) == size do
       hex
@@ -67,6 +81,9 @@ defmodule Geo.Utils do
     end
   end
 
+  @doc """
+  Adds 0's to the left of hex string 
+  """
   def pad_left(hex, size) do
     if String.length(hex) == size do
       hex
@@ -75,12 +92,12 @@ defmodule Geo.Utils do
     end
   end
 
+
+  @doc """
+  Repeats the char count number of times
+  """
   def repeat(char, count) do
     Enum.map(1..count, fn(_x) -> char end) |> Enum.join
-  end
-
-  def ldexp(x, i) do
-    x * :math.pow(2, i)
   end
 
 end

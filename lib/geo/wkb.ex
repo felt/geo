@@ -4,16 +4,35 @@ defmodule Geo.WKB do
   alias Geo.WKB.Writer
   use Bitwise
 
+  @moduledoc """
+  Converts to and from WKB and EWKB
+  
+  ```
+  point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
+  Geo.Geometry[type: :point, coordinates: [1, 1], srid: nil]
+
+  Geo.WKT.encode(point)
+  "POINT(1 1)"
+
+  point = Geo.WKB.decode("0101000020E61000009EFB613A637B4240CF2C0950D3735EC0")
+  Geo.Geometry[type: :point, coordinates: [36.9639657, -121.8097725], srid: 4326]
+  ```
+  """
+
   @hex_type_map %{point: 0x01, line_string: 0x02, polygon: 0x03, 
                   multi_point: 0x04, multi_line_string: 0x05, 
                   multi_polygon: 0x06, geometry_collection: 0x07}
 
+  @doc """
+  Takes a Geo.Geometry or list of Geo.Geometry and returns a WKB string. The endian decides
+  what the byte order will be
+  """
   def encode(geom, endian \\ :xdr) do
     writer = Writer.start(endian)
     do_encode(geom, writer)
   end
 
-  def do_encode(geom, writer) when is_list(geom) do
+  defp do_encode(geom, writer) when is_list(geom) do
     type =  type_to_hex(:geometry_collection, hd(geom).srid != nil)
             |> Integer.to_string(16)
             |> Geo.Utils.pad_left(8)
@@ -39,7 +58,7 @@ defmodule Geo.WKB do
     Writer.get_wkb(writer) <> coordinates
   end
 
-  def do_encode(geom, writer) do
+  defp do_encode(geom, writer) do
     type =  type_to_hex(geom.type, geom.srid != nil)
             |> Integer.to_string(16)
             |> Geo.Utils.pad_left(8)
@@ -118,6 +137,9 @@ defmodule Geo.WKB do
     Writer.write_no_endian(writer, geoms)
   end
 
+  @doc """
+  Takes a WKB string and returns a Geo.Geometry struct or list of Geo.Geometry.
+  """
   def decode(wkb, geometries \\ []) do
     wkb_reader = Reader.start(wkb)
     { type, wkb_reader } = Reader.read(wkb_reader, 8)

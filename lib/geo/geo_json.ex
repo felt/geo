@@ -2,7 +2,22 @@ defmodule Geo.JSON do
 	alias Geo.Geometry
 	use Jazz
 
+  @moduledoc """
+  Converts to and from GeoJSON
+  
+  ```
+  json = "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
+  geom = Geo.JSON.decode(json)
+  Geo.Geometry[type: :point, coordinates: [100.0, 0.0], srid: nil]
 
+	Geo.JSON.encode(geom)
+  "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
+  ```
+  """
+
+	@doc """
+	Takes a GeoJSON string and returns a Geo.Geometry struct or list of Geo.Geometry
+	"""
 	def decode(geo_json) do
 		decoded_json = JSON.decode!(geo_json, keys: :atoms)
 
@@ -16,6 +31,9 @@ defmodule Geo.JSON do
 	end
 
 
+	@doc """
+	Takes a Geo.Geometry struct or a list of Geo.Geometry and returns a geoJSON string
+	"""
 	def encode(geom) when is_list(geom) do
 		JSON.encode!(%{
 			type: "GeometryCollection", 
