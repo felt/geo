@@ -7,16 +7,14 @@ defmodule Geo.WKB do
   @moduledoc """
   Converts to and from WKB and EWKB
   
-  ```
-  point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
-  Geo.Geometry[type: :point, coordinates: [1, 1], srid: nil]
+      point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
+      Geo.Geometry[type: :point, coordinates: [1, 1], srid: nil]
 
-  Geo.WKT.encode(point)
-  "POINT(1 1)"
+      Geo.WKT.encode(point)
+      "POINT(1 1)"
 
-  point = Geo.WKB.decode("0101000020E61000009EFB613A637B4240CF2C0950D3735EC0")
-  Geo.Geometry[type: :point, coordinates: [36.9639657, -121.8097725], srid: 4326]
-  ```
+      point = Geo.WKB.decode("0101000020E61000009EFB613A637B4240CF2C0950D3735EC0")
+      Geo.Geometry[type: :point, coordinates: [36.9639657, -121.8097725], srid: 4326]
   """
 
   @hex_type_map %{point: 0x01, line_string: 0x02, polygon: 0x03, 

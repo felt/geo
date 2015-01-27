@@ -1,4 +1,5 @@
 defmodule Geo.WKB.Reader do
+  @moduledoc false
   defstruct wkb: nil, endian: :xdr
 
   def start(wkb) do

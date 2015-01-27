@@ -1,4 +1,5 @@
 defmodule Geo.Utils do
+  @moduledoc false
   use Bitwise
 
   @doc """
@@ -8,19 +9,19 @@ defmodule Geo.Utils do
   Takes an optional endian atom. Either :xdr for big endian or :ndr for little
   endian. Defaults to :xdr
 
-  ```
-  Geo.Utils.hex_to_float("40000000")
-  2.0
-  
-  Geo.Utils.hex_to_float(0x40000000)
-  2.0
-  
-  Geo.Utils.hex_to_float("3ff0000000000000")
-  1.0
-  
-  Geo.Utils.hex_to_float(0x3ff0000000000000)
-  1.0
-  ```
+  `
+    Geo.Utils.hex_to_float("40000000")
+    2.0
+    
+    Geo.Utils.hex_to_float(0x40000000)
+    2.0
+    
+    Geo.Utils.hex_to_float("3ff0000000000000")
+    1.0
+    
+    Geo.Utils.hex_to_float(0x3ff0000000000000)
+    1.0
+  `
   """
   def hex_to_float(hex) when is_integer(hex) or is_binary(hex) do
     if is_integer(hex), do: hex = Integer.to_string(hex, 16)

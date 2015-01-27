@@ -1,4 +1,5 @@
 defmodule Geo.WKB.Writer do
+  @moduledoc false
   defstruct wkb: nil, endian: :xdr
 
   def start(endian) do

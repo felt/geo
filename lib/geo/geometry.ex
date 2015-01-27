@@ -1,5 +1,9 @@
 defmodule Geo.Geometry do
+  @moduledoc """
+  Defines the Geometry struct. Implements the Ecto.Type behaviour
+  """
 
+  @type t :: %Geo.Geometry{ type: Geo.type, coordinates: [number], srid: integer }
   @behaviour Ecto.Type
   defstruct type: :geometry, coordinates: [], srid: nil
 

@@ -91,4 +91,46 @@ end
   Postgrex.Connection.query(pid, "SELECT * FROM point_test")
   {:ok, %Postgrex.Result{columns: ["id", "geom"], command: :select, num_rows: 1,
   rows: [{42, %Geo.Geometry{coordinates: [30.0, -90.0], srid: 4326, type: :point}}]}}
+
+
+* Can now be used with Ecto as well
+
+  ```elixir
+
+  #Add encoder, decoder, and formatter to your repo config
+  config :thanks, Repo,
+    database: "geo_postgrex_test",
+    username: "postgres",
+    password: "postgres",
+    hostname: "localhost",
+    encoder:  &Geo.PostGIS.encoder/3, 
+    decoder:  &Geo.PostGIS.decoder/4,
+    formatter: &Geo.PostGIS.formatter/1
+
+
+  #Create a model
+  defmodule Test do
+    use Ecto.Model
+
+    schema "test" do
+      field :name,           :string
+      field :geom,           Geo.Geometry
+    end
+  end
+
+  #Geometry columns can be created in migrations too
+  defmodule Repo.Migrations.Init do
+    use Ecto.Migration
+
+    def up do
+      create table(:test) do
+        add :name,     :string
+        add :geom,     :geometry
+      end
+    end
+
+    def down do
+      drop table(:test)
+    end
+  end
   ```

@@ -3,16 +3,15 @@ defmodule Geo.WKT do
   @moduledoc """
   Converts to and from WKT and EWKT
   
-  ```
-  point = Geo.WKT.decode("POINT(30 -90)")
-  Geo.Geometry[type: :point, coordinates: [30, -90], srid: nil]
+      point = Geo.WKT.decode("POINT(30 -90)")
+      Geo.Geometry[type: :point, coordinates: [30, -90], srid: nil]
 
-  Geo.WKT.encode(point)
-  "POINT(30 -90)"
+      Geo.WKT.encode(point)
+      "POINT(30 -90)"
 
-  point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
-  Geo.Geometry[type: :point, coordinates: [30, -90], srid: 4326]
-  ```
+      point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
+      Geo.Geometry[type: :point, coordinates: [30, -90], srid: 4326]
+  
   """
 
   @doc """
