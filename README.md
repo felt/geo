@@ -91,8 +91,8 @@ end
   Postgrex.Connection.query(pid, "SELECT * FROM point_test")
   {:ok, %Postgrex.Result{columns: ["id", "geom"], command: :select, num_rows: 1,
   rows: [{42, %Geo.Geometry{coordinates: [30.0, -90.0], srid: 4326, type: :point}}]}}
-
-
+  ```
+  
 * Can now be used with Ecto as well
 
   ```elixir
