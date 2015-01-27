@@ -15,7 +15,7 @@ Also includes an encoder, decoder, and formatter for using PostGIS data types wi
 
 ```elixir
 defp deps do
-  [{:geo, "~> 0.9.2"}]
+  [{:geo, "~> 0.10.0"}]
 end
 ```
 
