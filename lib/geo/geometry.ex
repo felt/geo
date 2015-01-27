@@ -9,7 +9,7 @@ defmodule Geo.Geometry do
 
   def type, do: :geometry
 
-  def blank?, do: false
+  def blank?(_), do: false
 
   def load(%Geo.Geometry{} = geo), do: {:ok, geo}
   def load(_), do: :error
