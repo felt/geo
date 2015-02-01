@@ -5,7 +5,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.10.1",
+      version: "0.11.0",
       elixir: "~> 1.0.0",
       deps: deps,
       description: description,

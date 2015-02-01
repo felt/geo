@@ -64,9 +64,14 @@ defmodule Geo.Utils do
   "000010E6"
   ```
   """
+  def reverse_byte_order("") do
+    ""
+  end
+
   def reverse_byte_order(hex) do
-    byte_range = Enum.to_list(0..(div(String.length(hex),2)-1))
-    Enum.map(byte_range, fn(x) -> String.slice(hex, x*2, 2) end)
+    byte_range = Enum.to_list(0..(div( byte_size(hex) , 2) -1))
+    
+    Enum.map(byte_range, fn(x) -> :binary.part(hex, x * 2, 2) end)
     |> Enum.reverse
     |> Enum.join
   end
@@ -75,10 +80,10 @@ defmodule Geo.Utils do
   Adds 0's to the right of hex string 
   """
   def pad_right(hex, size) do
-    if String.length(hex) == size do
+    if byte_size(hex) == size do
       hex
     else
-      hex <> repeat("0", size - String.length(hex))
+      hex <> repeat("0", size - byte_size(hex))
     end
   end
 
@@ -86,10 +91,10 @@ defmodule Geo.Utils do
   Adds 0's to the left of hex string 
   """
   def pad_left(hex, size) do
-    if String.length(hex) == size do
+    if byte_size(hex) == size do
       hex
     else
-      repeat("0", size - String.length(hex)) <> hex
+      repeat("0", size - byte_size(hex)) <> hex
     end
   end
 

@@ -78,64 +78,77 @@ defmodule Geo.WKT do
         actual_wkt = List.last(wkt_split)
       end
 
-      a = String.split(actual_wkt, "(", [parts: 2, trim: true])
-      do_decode({ hd(a), hd(tl(a)) , srid })
+      do_decode(actual_wkt, srid)
   end
 
-  defp do_decode({"GEOMETRYCOLLECTION", coordinates, srid}) do
-    String.slice(coordinates,0..(String.length(coordinates)-2))
+  defp do_decode("GEOMETRYCOLLECTION" <> coordinates, srid) do
+    String.slice(coordinates, 0..(String.length(coordinates)-2))
     |> String.split(",", [parts: 2])
     |> Enum.map(fn(x) ->
-      if(srid == nil) do
-        decode(x)
-      else
-        decode("SRID=#{srid};#{x}")
+      case x do
+        "(" <> wkt ->
+          do_decode(wkt, srid)
+        _ ->
+          do_decode(x, srid)
       end
     end)
   end
 
-  defp do_decode({"POINT", coordinates, srid}) do
-    coordinates = String.replace(coordinates, ")","")
+  defp do_decode("POINT" <> coordinates, srid) do
     %Geometry{ type: :point, coordinates: create_point(coordinates), srid: srid }
   end
 
-  defp do_decode({"LINESTRING", coordinates, srid}) do
-    coordinates = String.replace(coordinates, ")","")
+  defp do_decode("LINESTRING" <> coordinates, srid) do
     %Geometry{ type: :line_string, coordinates: create_line_string(coordinates), srid: srid }
   end
 
-  defp do_decode({"POLYGON", coordinates, srid}) do
+  defp do_decode("POLYGON" <> coordinates, srid) do
     coordinates = String.split(coordinates, "),(")
     |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
+
     %Geometry{ type: :polygon, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid }
   end
 
-  defp do_decode({"MULTIPOINT", coordinates, srid}) do
+  defp do_decode("MULTIPOINT" <> coordinates, srid) do
     coordinates = String.replace(coordinates, ")","") |> String.replace("(","")
     %Geometry{ type: :multi_point, coordinates: create_line_string(coordinates), srid: srid }
   end
 
-  defp do_decode({"MULTILINESTRING", coordinates, srid}) do
+  defp do_decode("MULTILINESTRING" <> coordinates, srid) do
     coordinates = String.split(coordinates, "),(")
     |> Enum.map(fn(x) -> String.replace(x, ")", "") |> String.replace("(", "") end)
 
     %Geometry{ type: :multi_line_string, coordinates: Enum.map(coordinates, &create_line_string(&1)), srid: srid }
   end
 
-  defp do_decode({"MULTIPOLYGON", coordinates, srid}) do
+  defp do_decode("MULTIPOLYGON" <> coordinates, srid) do
+
+
     coordinates = String.slice(coordinates,0..(String.length(coordinates)-2))
     |> String.split(")),((")
-    |> Enum.map(fn(x) -> do_decode({"POLYGON", x, srid}).coordinates end)
+    |> Enum.map(fn(x) -> 
+      do_decode("POLYGON(#{x})", srid).coordinates 
+    end)
 
     %Geometry{ type: :multi_polygon, coordinates: coordinates, srid: srid }
   end
 
   defp create_point(coordinates) do
-    String.strip(coordinates) |> String.split |> Enum.map(fn(x) -> binary_to_number(x) end)
+    coordinates
+    |> String.strip
+    |> String.replace("(", "")
+    |> String.replace(")", "")
+    |> String.split
+    |> Enum.map(fn(x) -> binary_to_number(x) end)
   end
 
   defp create_line_string(coordinates) do
-    String.split(coordinates,",") |> Enum.map(fn(y) -> create_point(y) end)
+    coordinates
+    |> String.strip
+    |> String.replace("(", "")
+    |> String.replace(")", "")
+    |> String.split(",")
+    |> Enum.map(&create_point(&1))
   end
 
   defp binary_to_number(binary) do
