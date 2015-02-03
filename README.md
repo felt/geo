@@ -29,13 +29,13 @@ end
 
   ```elixir
   iex(1)> point = Geo.WKT.decode("POINT(30 -90)")
-  %Geo.Point{ coordinates: [30, -90], srid: nil}
+  %Geo.Point{ coordinates: {30, -90}, srid: nil}
 
   iex(2)> Geo.WKT.encode(point)
   "POINT(30 -90)"
 
   iex(3)> point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
-  %Geo.Point{coordinates: [30, -90], srid: 4326}
+  %Geo.Point{coordinates: {30, -90}, srid: 4326}
   ```
 
 
@@ -43,13 +43,13 @@ end
 
   ```elixir
   iex(1)> point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
-  %Geo.Point{ coordinates: [1.0, 1.0], srid: nil }
+  %Geo.Point{ coordinates: {1.0, 1.0}, srid: nil }
 
   iex(2)> Geo.WKB.encode(point)
   "00000000013FF00000000000003FF0000000000000"
 
   iex(3)> point = Geo.WKB.decode("0101000020E61000009EFB613A637B4240CF2C0950D3735EC0")
-  %Geo.Point{ coordinates: [36.9639657, -121.8097725], srid: 4326 }
+  %Geo.Point{ coordinates: {36.9639657, -121.8097725}, srid: 4326 }
 
   iex(4)> Geo.WKB.encode(point)
   "0020000001000010E640427B633A61FB9EC05E73D350092CCF"
@@ -59,7 +59,7 @@ end
 
   ```elixir
   iex(1)> point = Geo.JSON.decode("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }")
-  %Geo.Point{ coordinates: [100.0, 0.0], srid: nil }
+  %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
 
   iex(2)> Geo.JSON.encode(point)
   "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
@@ -79,8 +79,8 @@ end
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}
 
-  geo = %Geo.Point{coordinates: [30, -90], srid: 4326}
-  %Geo.Point{coordinates: [30, -90], srid: 4326}
+  geo = %Geo.Point{coordinates: {30, -90}, srid: 4326}
+  %Geo.Point{coordinates: {30, -90}, srid: 4326}
   
   {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE point_test (id int, geom geometry(Point, 4326))")
   {:ok, %Postgrex.Result{columns: nil, command: :create_table, num_rows: 0, rows: nil}}
@@ -90,7 +90,7 @@ end
   
   Postgrex.Connection.query(pid, "SELECT * FROM point_test")
   {:ok, %Postgrex.Result{columns: ["id", "geom"], command: :select, num_rows: 1,
-  rows: [{42, %Geo.Point{coordinates: [30.0, -90.0], srid: 4326 }}]}}
+  rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326 }}]}}
   ```
   
 * Can now be used with Ecto as well

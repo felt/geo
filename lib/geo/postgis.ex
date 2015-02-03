@@ -15,8 +15,8 @@ defmodule Geo.PostGIS do
       {:ok, pid} = Postgrex.Connection.start_link(opts)
       {:ok, #PID<0.115.0>}
 
-      geo = %Geo.Geometry{type: :point, coordinates: [30, -90], srid: 4326}
-      %Geo.Geometry{coordinates: [30, -90], srid: 4326, type: :point}
+      geo = %Geo.Point{coordinates: {30, -90}, srid: 4326}
+      %Geo.Point{coordinates: {30, -90}, srid: 4326}
       
       {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE point_test (id int, geom geometry(Point, 4326))")
       {:ok, %Postgrex.Result{columns: nil, command: :create_table, num_rows: 0, rows: nil}}
@@ -26,7 +26,7 @@ defmodule Geo.PostGIS do
       
       Postgrex.Connection.query(pid, "SELECT * FROM point_test")
       {:ok, %Postgrex.Result{columns: ["id", "geom"], command: :select, num_rows: 1,
-      rows: [{42, %Geo.Geometry{coordinates: [30.0, -90.0], srid: 4326, type: :point}}]}}
+      rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326}}]}}
 
   """
 

@@ -24,45 +24,46 @@ defmodule Geo.WKT do
   @doc """
   Takes a Geometry and returns a WKT string
   """
+  @spec encode(Geo.geometry) :: binary
   def encode(geom) do
     get_srid_binary(geom.srid) <> do_encode(geom)
   end
 
-  def do_encode(%Point{ coordinates: {x, y}}) do
+  defp do_encode(%Point{ coordinates: {x, y}}) do
     "POINT(#{x} #{y})"
   end
 
-  def do_encode(%LineString{ coordinates: coordinates}) do
+  defp do_encode(%LineString{ coordinates: coordinates}) do
     coordinate_string = create_line_string_str(coordinates)
 
     "LINESTRING#{coordinate_string}"
   end
 
-  def do_encode(%Polygon{ coordinates: coordinates}) do
+  defp do_encode(%Polygon{ coordinates: coordinates}) do
     coordinate_string = create_polygon_str(coordinates)
 
     "POLYGON#{coordinate_string}"
   end
 
-  def do_encode(%MultiPoint{ coordinates: coordinates}) do
+  defp do_encode(%MultiPoint{ coordinates: coordinates}) do
     coordinate_string = create_line_string_str(coordinates)
 
     "MULTIPOINT#{coordinate_string}"
   end
 
-  def do_encode(%MultiLineString{ coordinates: coordinates}) do
+  defp do_encode(%MultiLineString{ coordinates: coordinates}) do
     coordinate_string = create_polygon_str(coordinates)
 
     "MULTILINESTRING#{coordinate_string}"
   end
 
-  def do_encode(%MultiPolygon{ coordinates: coordinates}) do
+  defp do_encode(%MultiPolygon{ coordinates: coordinates}) do
     coordinate_string = create_multi_polygon_str(coordinates)
 
     "MULTIPOLYGON#{coordinate_string}"
   end
 
-  def do_encode(%GeometryCollection{ geometries: geometries}) do
+  defp do_encode(%GeometryCollection{ geometries: geometries}) do
     geom_str = Enum.map(geometries, &do_encode(&1)) |> Enum.join(",")
 
     "GEOMETRYCOLLECTION(#{geom_str})"
@@ -71,6 +72,7 @@ defmodule Geo.WKT do
   @doc """
   Takes a WKT string and returns a Geo.Geometry struct or list of Geo.Geometry
   """
+  @spec decode(binary) :: Geo.geometry
   def decode(wkt) do
       wkt_split = String.split(wkt, ";")
       srid = nil

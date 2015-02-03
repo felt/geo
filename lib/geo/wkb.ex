@@ -29,6 +29,7 @@ defmodule Geo.WKB do
   Takes a Geometry and returns a WKB string. The endian decides
   what the byte order will be
   """
+  @spec encode(binary, Geo.endian) :: binary
   def encode(geom, endian \\ :xdr) do
     writer = Writer.start(endian)
     do_encode(geom, writer)
@@ -151,6 +152,7 @@ defmodule Geo.WKB do
   @doc """
   Takes a WKB string and returns a Geometry
   """
+  @spec decode(binary, [Geo.geometry]) :: Geo.geometry
   def decode(wkb, geometries \\ []) do
     wkb_reader = Reader.start(wkb)
     { type, wkb_reader } = Reader.read(wkb_reader, 8)
@@ -229,7 +231,7 @@ defmodule Geo.WKB do
     { decode(Reader.get_wkb(wkb_reader)), Reader.start("00") }
   end
 
-  defp decode_coordinates(geom, wkb_reader) do
+  defp decode_coordinates(_geom, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
 
     geom_collection = Reader.get_wkb(wkb_reader) |> decode

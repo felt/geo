@@ -14,7 +14,7 @@ defmodule Geo.JSON do
   ```
   json = "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
   geom = Geo.JSON.decode(json)
-  Geo.Point[coordinates: [100.0, 0.0], srid: nil]
+  Geo.Point[coordinates: {100.0, 0.0}, srid: nil]
 
   Geo.JSON.encode(geom)
   "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
@@ -24,6 +24,7 @@ defmodule Geo.JSON do
   @doc """
   Takes a GeoJSON string and returns a Geometry
   """
+  @spec decode(binary) :: Geo.geometry
   def decode(geo_json) do
     decoded_json = JSON.decode!(geo_json, keys: :atoms)
 
@@ -84,64 +85,66 @@ defmodule Geo.JSON do
   @doc """
   Takes a Geometry and returns a geoJSON string
   """
-  def encode(%GeometryCollection{ geometries: geometries }) do
-    JSON.encode!(%{
-      type: "GeometryCollection", 
-      geometries: Enum.map(geometries, &do_encode(&1))
-    })
+  @spec encode(Geo.geometry) :: binary
+  def encode(%GeometryCollection{ geometries: geometries, srid: srid }) do
+    %{ type: "GeometryCollection",  geometries: Enum.map(geometries, &do_encode(&1))} 
+    |> add_crs(srid)
+    |> JSON.encode!
   end
 
   def encode(geom) do
-    JSON.encode!(do_encode(geom))
+    do_encode(geom)
+    |> add_crs(geom.srid)
+    |> JSON.encode!
   end
 
-  def do_encode(%Point{ coordinates: {x, y}, srid: srid }) do
-    %{ type: "Point", coordinates: [x, y] } |> add_crs(srid)
+  defp do_encode(%Point{ coordinates: {x, y} }) do
+    %{ type: "Point", coordinates: [x, y] }
   end
 
-  def do_encode(%LineString{ coordinates: coordinates, srid: srid }) do
+  defp do_encode(%LineString{ coordinates: coordinates }) do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
-    %{ type: "LineString", coordinates: coordinates } |> add_crs(srid)
+    %{ type: "LineString", coordinates: coordinates }
   end
 
-  def do_encode(%Polygon{ coordinates: coordinates, srid: srid }) do
+  defp do_encode(%Polygon{ coordinates: coordinates }) do
     coordinates = Enum.map(coordinates, fn(sub_coordinates) -> 
       Enum.map(sub_coordinates, &Tuple.to_list(&1))
     end)
 
-    %{ type: "Polygon", coordinates: coordinates } |> add_crs(srid)
+    %{ type: "Polygon", coordinates: coordinates }
   end
 
-  def do_encode(%MultiPoint{ coordinates: coordinates, srid: srid }) do
+  defp do_encode(%MultiPoint{ coordinates: coordinates }) do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
-    %{ type: "MultiPoint", coordinates: coordinates } |> add_crs(srid)
+    %{ type: "MultiPoint", coordinates: coordinates }
   end
 
-  def do_encode(%MultiLineString{ coordinates: coordinates, srid: srid }) do
+  defp do_encode(%MultiLineString{ coordinates: coordinates }) do
     coordinates = Enum.map(coordinates, fn(sub_coordinates) -> 
       Enum.map(sub_coordinates, &Tuple.to_list(&1))
     end)
 
-    %{ type: "MultiLineString", coordinates: coordinates } |> add_crs(srid)
+    %{ type: "MultiLineString", coordinates: coordinates }
   end
 
-  def do_encode(%MultiPolygon{ coordinates: coordinates, srid: srid }) do
+  defp do_encode(%MultiPolygon{ coordinates: coordinates }) do
     coordinates = Enum.map(coordinates, fn(sub_coordinates) -> 
       Enum.map(sub_coordinates, fn(third_sub_coordinates) -> 
         Enum.map(third_sub_coordinates, &Tuple.to_list(&1))
       end)
     end)
 
-    %{ type: "MultiPolygon", coordinates: coordinates } |> add_crs(srid)
+    %{ type: "MultiPolygon", coordinates: coordinates }
   end
 
-  def add_crs(map, nil) do
+  defp add_crs(map, nil) do
     map
   end
 
-  def add_crs(map, srid) do
+  defp add_crs(map, srid) do
     Map.put(map, :crs, %{type: "name", properties: %{name: "EPSG#{srid}"}})
   end
 
