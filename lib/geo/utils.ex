@@ -70,7 +70,7 @@ defmodule Geo.Utils do
 
   def reverse_byte_order(hex) do
     byte_range = Enum.to_list(0..(div( byte_size(hex) , 2) -1))
-    
+
     Enum.map(byte_range, fn(x) -> :binary.part(hex, x * 2, 2) end)
     |> Enum.reverse
     |> Enum.join
@@ -104,6 +104,83 @@ defmodule Geo.Utils do
   """
   def repeat(char, count) do
     Enum.map(1..count, fn(_x) -> char end) |> Enum.join
+  end
+
+  def endian_to_binary(:xdr) do
+    <<48,48>>
+  end
+
+  def endian_to_binary(:ndr) do
+    <<48,49>>
+  end
+
+  def binary_to_endian(<<48,49>>) do
+    :ndr
+  end
+
+  def binary_to_endian(<<48,48>>) do
+    :xdr
+  end
+
+  def hex_to_type(0x01) do
+    %Geo.Point{}
+  end
+
+  def hex_to_type(0x02) do
+    %Geo.LineString{}
+  end
+
+  def hex_to_type(0x03) do
+    %Geo.Polygon{}
+  end
+
+  def hex_to_type(0x04) do
+    %Geo.MultiPoint{}
+  end
+
+  def hex_to_type(0x05) do
+    %Geo.MultiLineString{}
+  end
+
+  def hex_to_type(0x06) do
+    %Geo.MultiPolygon{}
+  end
+
+  def hex_to_type(0x07) do
+    %Geo.GeometryCollection{}
+  end
+
+  def type_to_hex(geom, include_srid) do
+    value = if include_srid, do: 0x20000000, else: 0x00000000
+    value + do_type_to_hex(geom)
+  end
+
+  def do_type_to_hex(%Geo.Point{}) do
+    0x01
+  end
+
+  def do_type_to_hex(%Geo.LineString{}) do
+    0x02
+  end
+
+  def do_type_to_hex(%Geo.Polygon{}) do
+    0x03
+  end
+
+  def do_type_to_hex(%Geo.MultiPoint{}) do
+    0x04
+  end
+
+  def do_type_to_hex(%Geo.MultiLineString{}) do
+    0x05
+  end
+
+  def do_type_to_hex(%Geo.MultiPolygon{}) do
+    0x06
+  end
+
+  def do_type_to_hex(%Geo.GeometryCollection{}) do
+    0x07
   end
 
 end
