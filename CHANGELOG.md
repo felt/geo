@@ -1,3 +1,8 @@
+# v0.11.1
+
+* Bug fixes
+  * Fixed bug when decoding multi geometry wkb with one geometry inside would cause a crash
+
 # v0.11.0
 
 * Enhancements

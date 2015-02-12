@@ -234,11 +234,15 @@ defmodule Geo.WKB do
   defp decode_coordinates(_geom, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
 
-    geom_collection = Reader.get_wkb(wkb_reader) |> decode
+    decoded_geom = Reader.get_wkb(wkb_reader) |> decode
 
-    coordinates = Enum.map(geom_collection, fn(x) ->
-      x.coordinates
-    end)
+    coordinates = if is_list(decoded_geom) do
+        Enum.map(decoded_geom, fn(x) ->
+          x.coordinates
+        end)
+    else
+      decoded_geom.coordinates   
+    end
 
     { coordinates, Reader.start("00") }
   end
