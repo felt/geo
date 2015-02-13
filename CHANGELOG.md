@@ -1,3 +1,8 @@
+# v0.11.2
+
+* Bug fixes
+  * Correctly decoding WKB strings that caused invalid geometries to be produced when there is one element in a multi geometry
+
 # v0.11.1
 
 * Bug fixes

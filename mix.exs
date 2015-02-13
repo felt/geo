@@ -5,7 +5,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.11.1",
+      version: "0.11.2",
       elixir: "~> 1.0.0",
       deps: deps,
       description: description,
@@ -16,7 +16,7 @@ defmodule Geo.Mixfile do
   # Configuration for the OTP application
   def application do
     [
-      applications: [:jazz]
+      applications: [:jazz, :ecto, :logger]
     ]
   end
 

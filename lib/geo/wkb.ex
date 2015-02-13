@@ -241,7 +241,7 @@ defmodule Geo.WKB do
           x.coordinates
         end)
     else
-      decoded_geom.coordinates   
+      [decoded_geom.coordinates]
     end
 
     { coordinates, Reader.start("00") }
