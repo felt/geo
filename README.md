@@ -15,7 +15,7 @@ Also includes an encoder, decoder, and formatter for using PostGIS data types wi
 
 ```elixir
 defp deps do
-  [{:geo, "~> 0.11.2"}]
+  [{:geo, "~> 0.12.0"}]
 end
 ```
 
@@ -73,8 +73,7 @@ end
   formatter: &Geo.PostGIS.formatter/1 ]
 
   [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-   encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
-   formatter: &Geo.PostGIS.formatter/1]
+   extensions: [{Geo.PostGIS, library: Geo}]]
 
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}
@@ -103,9 +102,8 @@ end
     username: "postgres",
     password: "postgres",
     hostname: "localhost",
-    encoder:  &Geo.PostGIS.encoder/3, 
-    decoder:  &Geo.PostGIS.decoder/4,
-    formatter: &Geo.PostGIS.formatter/1
+    adapter: Ecto.Adapters.Postgres,
+    extensions: [{Geo.PostGIS, library: Geo}]
 
 
   #Create a model

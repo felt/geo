@@ -3,9 +3,8 @@ defmodule Geo.PostGIS.Test do
 
   setup do
     opts = [hostname: "localhost", 
-    username: "postgres", database: "geo_postgrex_test", 
-    encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4, 
-    formatter: &Geo.PostGIS.formatter/1 ]
+    username: "postgres", database: "geo_postgrex_test",
+    extensions: [{Geo.PostGIS, library: Geo}]]
 
     {:ok, pid} = Postgrex.Connection.start_link(opts)
     {:ok, _result} = Postgrex.Connection.query(pid, "DROP TABLE IF EXISTS point_test, linestring_test, polygon_test, multipoint_test, multilinestring_test, multipolygon_test, geometrycollection_test", [])

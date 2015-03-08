@@ -1,6 +1,8 @@
 defmodule Geo.PostGIS do
   alias Postgrex.TypeInfo
 
+  @behaviour Postgrex.Extension
+
   @moduledoc """
   Encoder, Decoder, and Formatter to be used with Postgrex for PostGIS data types
 
@@ -9,8 +11,7 @@ defmodule Geo.PostGIS do
       formatter: &Geo.PostGIS.formatter/1 ]
 
       [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-       encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
-       formatter: &Geo.PostGIS.formatter/1]
+       extensions: [{Geo.PostGIS, library: Geo}]]
 
       {:ok, pid} = Postgrex.Connection.start_link(opts)
       {:ok, #PID<0.115.0>}
@@ -29,23 +30,23 @@ defmodule Geo.PostGIS do
       rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326}}]}}
 
   """
-
-  def decoder(%TypeInfo{sender: "geometry", type: "geometry"}, _format , _, value) do
-    Geo.WKB.decode(value)
+  def init(_parameters, _opts) do
+    :ok
   end
 
-  def decoder(%TypeInfo{}, _format, default, bin) do
-    default.(bin)
+  def matching(_) do 
+    [send: "geometry_send"]
   end
 
-  def encoder(%TypeInfo{sender: "geometry", type: "geometry"}, _, value) do
-    Geo.WKT.encode(value)
+  def format(_) do
+    :text
   end
 
-  def encoder(%TypeInfo{}, default, value) do
-    default.(value)
+  def encode(%TypeInfo{type: "geometry"}, geom, _state, _library) do 
+    Geo.WKT.encode(geom)
   end
 
-  def formatter(%TypeInfo{sender: "geometry"}), do: :text
-  def formatter(%TypeInfo{}), do: nil
+  def decode(%TypeInfo{type: "geometry"}, wkb, _state, _library) do 
+    Geo.WKB.decode(wkb)
+  end
 end

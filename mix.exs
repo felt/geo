@@ -5,7 +5,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.11.2",
+      version: "0.12.0",
       elixir: "~> 1.0.0",
       deps: deps,
       description: description,
@@ -29,8 +29,8 @@ defmodule Geo.Mixfile do
   defp deps do
     [ 
       {:jazz, "~> 0.2.1"},
-      {:ecto, ">= 0.6.0" },
-      {:postgrex, "~> 0.7", optional: true },
+      {:ecto, ">= 0.9.0" },
+      {:postgrex, "~> 0.8", optional: true },
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.6", only: :dev}
     ]

@@ -1,3 +1,9 @@
+# v0.12.0
+
+* Enhancements
+  * Geo.PostGIS is now a Postgrex Extension
+  * Updated to work with latest version of Ecto
+
 # v0.11.2
 
 * Bug fixes
