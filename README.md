@@ -65,7 +65,7 @@ end
   "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
   ```
 
-* Encoder, Decoder, and Formatter to be used with Postgrex for PostGIS data types
+* A Postgrex Extension for PostGIS data types
 
   ```elixir
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
@@ -96,7 +96,7 @@ end
 
   ```elixir
 
-  #Add encoder, decoder, and formatter to your repo config
+  #Add extensions to your repo config
   config :thanks, Repo,
     database: "geo_postgrex_test",
     username: "postgres",

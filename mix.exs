@@ -22,7 +22,7 @@ defmodule Geo.Mixfile do
 
   defp description do
     """
-    A collection of encoders and decoders for WKB, WKT, and GeoJSON and PostGIS data type support for Postgrex.
+    PostGIS extension for Postgrex. Also encodes and decodes WKB, WKT, and GeoJSON.
     """
   end
 

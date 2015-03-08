@@ -55,16 +55,14 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
   "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
   ```
 
-* Encoder, Decoder, and Formatter to be used with Postgrex for PostGIS data types
+* Postgrex Extension for PostGIS data types
 
   ```elixir
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-  encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
-  formatter: &Geo.PostGIS.formatter/1 ]
+  extensions: [{Geo.PostGIS, library: Geo}] ]
 
   [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-   encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
-   formatter: &Geo.PostGIS.formatter/1]
+   extensions: [{Geo.PostGIS, library: Geo}]]
 
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}
@@ -93,9 +91,8 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
     username: "postgres",
     password: "postgres",
     hostname: "localhost",
-    encoder:  &Geo.PostGIS.encoder/3, 
-    decoder:  &Geo.PostGIS.decoder/4,
-    formatter: &Geo.PostGIS.formatter/1
+    adapter: Ecto.Adapters.Postgres,
+    extensions: [{Geo.PostGIS, library: Geo}]
 
 
   #Create a model
