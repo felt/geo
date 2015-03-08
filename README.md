@@ -69,8 +69,7 @@ end
 
   ```elixir
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-  encoder: &Geo.PostGIS.encoder/3, decoder: &Geo.PostGIS.decoder/4,
-  formatter: &Geo.PostGIS.formatter/1 ]
+  extensions: [{Geo.PostGIS, library: Geo}] ]
 
   [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
    extensions: [{Geo.PostGIS, library: Geo}]]
