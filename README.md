@@ -11,7 +11,7 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 * GeometryCollection
 
 
-Also includes an encoder, decoder, and formatter for using PostGIS data types with Postgrex
+Also includes a Postgrex extension for PostGIS data types
 
 ```elixir
 defp deps do
