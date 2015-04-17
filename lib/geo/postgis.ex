@@ -34,11 +34,15 @@ defmodule Geo.PostGIS do
   end
 
   def matching(_) do 
-    [send: "geometry_send"]
+    [type: "geometry", send: "textsend"]
   end
 
   def format(_) do
     :text
+  end
+
+  def encode(%TypeInfo{send: "textsend"}, geom, _state, _library) do 
+    Geo.WKT.encode(geom)
   end
 
   def encode(%TypeInfo{type: "geometry"}, geom, _state, _library) do 

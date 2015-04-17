@@ -2,6 +2,7 @@ defmodule Geo.Ecto.Test do
   use ExUnit.Case, async: true
   use Ecto.Migration
   import Ecto.Query
+  import Geo.PostGIS.Functions
 
   defmodule Repo do
     use Ecto.Repo,

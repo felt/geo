@@ -1,3 +1,8 @@
+# v0.13.0-dev
+
+* Enhancements
+  * Added PostGIS function macros for use in Ecto Queries
+
 # v0.12.0
 
 * Enhancements
