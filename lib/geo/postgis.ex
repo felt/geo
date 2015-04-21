@@ -1,55 +1,23 @@
 defmodule Geo.PostGIS do
-  alias Postgrex.TypeInfo
-
-  @behaviour Postgrex.Extension
 
   @moduledoc """
-  PostGIS extension for Postgrex
+    Postgis functions that can used in ecto queries
+    [PostGIS Function Documentation](http://postgis.net/docs/manual-1.3/ch06.html)
 
-      opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-      extensions: [{Geo.PostGIS, library: Geo}] ]
+    ex.
+      defmodule Example do
+        import Ecto.Query
+        use Geo.PostGIS
 
-      [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-       extensions: [{Geo.PostGIS, library: Geo}]]
+        def example_query(geom) do
+          from location in Location, limit: 5, select: st_distance(location.geom, ^geom)  
+        end
 
-      {:ok, pid} = Postgrex.Connection.start_link(opts)
-      {:ok, #PID<0.115.0>}
-
-      geo = %Geo.Point{coordinates: {30, -90}, srid: 4326}
-      %Geo.Point{coordinates: {30, -90}, srid: 4326}
-      
-      {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE point_test (id int, geom geometry(Point, 4326))")
-      {:ok, %Postgrex.Result{columns: nil, command: :create_table, num_rows: 0, rows: nil}}
-      
-      {:ok, _} = Postgrex.Connection.query(pid, "INSERT INTO point_test VALUES ($1, $2)", [42, geo])
-      {:ok, %Postgrex.Result{columns: nil, command: :insert, num_rows: 1, rows: nil}}
-      
-      Postgrex.Connection.query(pid, "SELECT * FROM point_test")
-      {:ok, %Postgrex.Result{columns: ["id", "geom"], command: :select, num_rows: 1,
-      rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326}}]}}
-
+      end  
   """
-  def init(_parameters, _opts) do
-    :ok
+
+  defmacro __using__(_opts) do
+    import Geo.PostGIS.OpenGIS
   end
 
-  def matching(_) do 
-    [type: "geometry", send: "textsend"]
-  end
-
-  def format(_) do
-    :text
-  end
-
-  def encode(%TypeInfo{send: "textsend"}, geom, _state, _library) do 
-    Geo.WKT.encode(geom)
-  end
-
-  def encode(%TypeInfo{type: "geometry"}, geom, _state, _library) do 
-    Geo.WKT.encode(geom)
-  end
-
-  def decode(%TypeInfo{type: "geometry"}, wkb, _state, _library) do 
-    Geo.WKB.decode(wkb)
-  end
 end

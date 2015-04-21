@@ -69,10 +69,10 @@ end
 
   ```elixir
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-  extensions: [{Geo.PostGIS, library: Geo}] ]
+  extensions: [{Geo.PostGIS.Extension, library: Geo}] ]
 
   [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-   extensions: [{Geo.PostGIS, library: Geo}]]
+   extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}

@@ -2,7 +2,7 @@ defmodule Geo.Ecto.Test do
   use ExUnit.Case, async: true
   use Ecto.Migration
   import Ecto.Query
-  import Geo.PostGIS.Functions
+  use Geo.PostGIS
 
   defmodule Repo do
     use Ecto.Repo,
@@ -22,7 +22,7 @@ defmodule Geo.Ecto.Test do
   setup context do
     opts = [hostname: "localhost", 
     username: "postgres", database: "geo_postgrex_test",
-    extensions: [{Geo.PostGIS, library: Geo}]]
+    extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
     {:ok, pid} = Postgrex.Connection.start_link(opts)
     {:ok, _} = Postgrex.Connection.query(pid, "DROP TABLE IF EXISTS locations", [])

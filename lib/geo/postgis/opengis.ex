@@ -1,18 +1,6 @@
-defmodule Geo.PostGIS.Functions do
+defmodule Geo.PostGIS.OpenGIS do
   @moduledoc """
-    Postgis functions that can used in ecto queries
-    [PostGIS Function Documentation](http://postgis.net/docs/manual-1.3/ch06.html)
-
-    ex.
-      defmodule Example do
-        import Ecto.Query
-        import Geo.PostGIS.Functions
-
-        def example_query(geom) do
-          from location in Location, limit: 5, select: st_distance(location.geom, ^geom)  
-        end
-
-      end  
+  Macros for the [OpenGIS functions](http://postgis.net/docs/manual-1.3/ch06.html#id437708) in PostGIS
   """
 
 
@@ -222,6 +210,94 @@ defmodule Geo.PostGIS.Functions do
 
   defmacro st_m(geometry) do
     quote do: fragment("ST_M(?)", unquote(geometry))
+  end
+
+  defmacro st_geom_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_GeomFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_point_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_PointFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_line_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_LineFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_linestring_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_LinestringFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_polygon_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_PolygonFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_m_point_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_MPointFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_m_line_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_MLineFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_m_poly_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_MPolyFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_m_geom_coll_from_text(text, srid \\ -1) do
+    quote do: fragment("ST_GeomCollFromText(?, ?)", unquote(text), unquote(srid))
+  end
+
+  defmacro st_m_geom_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_GeomFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_m_geometry_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_GeometryFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_point_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_PointFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_line_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_LineFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_linestring_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_LinestringFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_poly_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_PolyFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_polygon_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_PolygonFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_m_point_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_MPointFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_m_line_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_MLineFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_m_poly_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_MPolyFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_geom_coll_from_wkb(bytea, srid \\ -1) do
+    quote do: fragment("ST_GeomCollFromWKB(?, ?)", unquote(bytea), unquote(srid))
+  end
+
+  defmacro st_bd_poly_from_text(wkt, srid) do
+    quote do: fragment("ST_BdPolyFromText(?, ?)", unquote(wkt), unquote(srid))
+  end
+
+  defmacro st_bd_m_poly_from_text(wkt, srid) do
+    quote do: fragment("ST_BdMPolyFromText(?, ?)", unquote(wkt), unquote(srid))
   end
 
 end
