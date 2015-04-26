@@ -3,6 +3,10 @@
 * Enhancements
   * Added PostGIS function macros for use in Ecto Queries
 
+* Breaking
+  * `Geo.PostGIS` is now `Geo.PostGIS.Extension`
+  * Changed from Jazz to Poison for JSON encoding and decoding
+
 # v0.12.0
 
 * Enhancements

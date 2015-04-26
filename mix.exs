@@ -16,7 +16,7 @@ defmodule Geo.Mixfile do
   # Configuration for the OTP application
   def application do
     [
-      applications: [:jazz, :ecto, :logger]
+      applications: [:poison, :ecto, :logger]
     ]
   end
 
@@ -28,7 +28,7 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [ 
-      {:jazz, "~> 0.2.1"},
+      {:poison, "~> 1.3"},
       {:ecto, ">= 0.9.0" },
       {:postgrex, "~> 0.8", optional: true },
       {:earmark, "~> 0.1", only: :dev},

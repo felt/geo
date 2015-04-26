@@ -7,5 +7,6 @@
   "jsex": {:git, "git://github.com/talentdeficit/jsex.git", "91fbbb51ac18c5ecec45044af107cd079af2ff8b", []},
   "json": {:git, "git://github.com/cblage/elixir-json.git", "f386b18431bbc0a0b6d38519ec2f256b5a040668", []},
   "jsx": {:hex, :jsx, "2.1.1"},
+  "poison": {:hex, :poison, "1.4.0"},
   "poolboy": {:hex, :poolboy, "1.4.2"},
   "postgrex": {:hex, :postgrex, "0.8.0"}}

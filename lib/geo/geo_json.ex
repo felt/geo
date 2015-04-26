@@ -6,7 +6,6 @@ defmodule Geo.JSON do
   alias Geo.MultiLineString
   alias Geo.MultiPolygon
   alias Geo.GeometryCollection
-  use Jazz
 
   @moduledoc """
   Converts to and from GeoJSON
@@ -26,7 +25,7 @@ defmodule Geo.JSON do
   """
   @spec decode(binary) :: Geo.geometry
   def decode(geo_json) do
-    decoded_json = JSON.decode!(geo_json, keys: :atoms)
+    decoded_json = json_decode(geo_json)
 
     case Map.has_key?(decoded_json, :geometries) do
       true ->
@@ -89,13 +88,13 @@ defmodule Geo.JSON do
   def encode(%GeometryCollection{ geometries: geometries, srid: srid }) do
     %{ type: "GeometryCollection",  geometries: Enum.map(geometries, &do_encode(&1))} 
     |> add_crs(srid)
-    |> JSON.encode!
+    |> json_encode
   end
 
   def encode(geom) do
     do_encode(geom)
     |> add_crs(geom.srid)
-    |> JSON.encode!
+    |> json_encode
   end
 
   defp do_encode(%Point{ coordinates: {x, y} }) do
@@ -146,6 +145,15 @@ defmodule Geo.JSON do
 
   defp add_crs(map, srid) do
     Map.put(map, :crs, %{type: "name", properties: %{name: "EPSG#{srid}"}})
+  end
+
+
+  defp json_encode(data) do
+    Poison.encode!(data)
+  end
+
+  defp json_decode(json) do
+    Poison.decode!(json, keys: :atoms)
   end
 
 end
