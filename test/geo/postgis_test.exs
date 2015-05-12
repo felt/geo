@@ -7,7 +7,7 @@ defmodule Geo.PostGIS.Test do
     extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
     {:ok, pid} = Postgrex.Connection.start_link(opts)
-    {:ok, _result} = Postgrex.Connection.query(pid, "DROP TABLE IF EXISTS point_test, linestring_test, polygon_test, multipoint_test, multilinestring_test, multipolygon_test, geometrycollection_test", [])
+    {:ok, _result} = Postgrex.Connection.query(pid, "DROP TABLE IF EXISTS text_test, point_test, linestring_test, polygon_test, multipoint_test, multilinestring_test, multipolygon_test, geometrycollection_test", [])
     {:ok, [pid: pid]}
   end
 

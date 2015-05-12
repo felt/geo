@@ -1,6 +1,18 @@
 defmodule Geo.PostGIS.OpenGIS do
   @moduledoc """
-  Macros for the [OpenGIS functions](http://postgis.net/docs/manual-1.3/ch06.html#id437708) in PostGIS
+    Postgis functions that can used in ecto queries
+    [PostGIS Function Documentation](http://postgis.net/docs/manual-1.3/ch06.html)
+
+    ex.
+      defmodule Example do
+        import Ecto.Query
+        import Geo.PostGIS.OpenGIS
+
+        def example_query(geom) do
+          from location in Location, limit: 5, select: st_distance(location.geom, ^geom)  
+        end
+
+      end  
   """
 
 
