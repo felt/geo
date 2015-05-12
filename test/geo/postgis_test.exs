@@ -2,7 +2,7 @@ defmodule Geo.PostGIS.Test do
   use ExUnit.Case, async: true
 
   setup do
-    opts = [hostname: "localhost", 
+    opts = [hostname: "localhost",
     username: "postgres", database: "geo_postgrex_test",
     extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
@@ -18,6 +18,15 @@ defmodule Geo.PostGIS.Test do
     {:ok, _} = Postgrex.Connection.query(pid, "INSERT INTO point_test VALUES ($1, $2)", [42, geo])
     {:ok, result} = Postgrex.Connection.query(pid, "SELECT * FROM point_test", [])
     assert(result.rows == [{42, geo}])
+  end
+
+  test "insert with text column", context do
+    pid = context[:pid]
+    geo = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+    {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE text_test (id int, t text, geom geometry(Point, 4326))", [])
+    {:ok, _} = Postgrex.Connection.query(pid, "INSERT INTO text_test (id, t, geom) VALUES ($1, $2, $3)", [42, "test", geo])
+    {:ok, result} = Postgrex.Connection.query(pid, "SELECT id, t, geom FROM text_test", [])
+    assert(result.rows == [{42, "test", geo}])
   end
 
   test "insert linestring", context do
