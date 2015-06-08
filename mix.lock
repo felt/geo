@@ -1,12 +1,12 @@
 %{"decimal": {:hex, :decimal, "1.1.0"},
-  "earmark": {:hex, :earmark, "0.1.15"},
-  "ecto": {:hex, :ecto, "0.10.1"},
-  "ex_doc": {:hex, :ex_doc, "0.7.2"},
+  "earmark": {:hex, :earmark, "0.1.17"},
+  "ecto": {:hex, :ecto, "0.12.0-rc"},
+  "ex_doc": {:hex, :ex_doc, "0.7.3"},
   "hex": {:git, "git://github.com/rjsamson/hex.git", "48e3e0887153baa0a34879ebf649ae0af15ef386", []},
   "jazz": {:hex, :jazz, "0.2.1"},
   "jsex": {:git, "git://github.com/talentdeficit/jsex.git", "91fbbb51ac18c5ecec45044af107cd079af2ff8b", []},
   "json": {:git, "git://github.com/cblage/elixir-json.git", "f386b18431bbc0a0b6d38519ec2f256b5a040668", []},
   "jsx": {:hex, :jsx, "2.1.1"},
   "poison": {:hex, :poison, "1.4.0"},
-  "poolboy": {:hex, :poolboy, "1.4.2"},
-  "postgrex": {:hex, :postgrex, "0.8.0"}}
+  "poolboy": {:hex, :poolboy, "1.5.1"},
+  "postgrex": {:hex, :postgrex, "0.8.2"}}

@@ -1,7 +1,5 @@
 defmodule Geo do
   @moduledoc """
-# Geo
-
 A collection of GIS functions. Handles conversions to and from WKT, WKB, and GeoJSON for the following geometries:
 
 * Point
@@ -118,6 +116,23 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 
     def down do
       drop table(:test)
+    end
+  end
+  ```
+
+  Be sure to enable the Postgis extension if you haven't already done so:
+  
+  ```elixir
+  
+  defmodule MyApp.Repo.Migrations.EnablePostgis do
+    use Ecto.Migration
+
+    def up do
+      execute "CREATE EXTENSION IF NOT EXISTS postgis"
+    end
+
+    def down do
+      execute "DROP EXTENSION IF EXISTS postgis"
     end
   end
   ```

@@ -1,12 +1,14 @@
-defmodule Geo.PostGIS.OpenGIS do
+defmodule Geo.PostGIS do
   @moduledoc """
     Postgis functions that can used in ecto queries
     [PostGIS Function Documentation](http://postgis.net/docs/manual-1.3/ch06.html)
 
+    Currently only the OpenGIS functions are implemented
+
     ex.
       defmodule Example do
         import Ecto.Query
-        import Geo.PostGIS.OpenGIS
+        import Geo.PostGIS
 
         def example_query(geom) do
           from location in Location, limit: 5, select: st_distance(location.geom, ^geom)  

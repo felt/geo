@@ -5,12 +5,13 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.13.0-dev",
+      version: "0.13.0",
       elixir: "~> 1.0.0",
       deps: deps,
       description: description,
       package: package,
-      source_url: "https://github.com/bryanjos/geo"    ]
+      name: "Geo",
+      source_url: "https://github.com/bryanjos/geo"]
   end
 
   # Configuration for the OTP application

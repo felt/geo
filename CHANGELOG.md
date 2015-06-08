@@ -1,7 +1,7 @@
-# v0.13.0-dev
+# v0.13.0
 
 * Enhancements
-  * Added PostGIS function macros for use in Ecto Queries
+  * Added PostGIS function macros for use in Ecto Queries. Currently only the OpenGIS ones
 
 * Breaking
   * `Geo.PostGIS` is now `Geo.PostGIS.Extension`

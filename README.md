@@ -15,7 +15,7 @@ Also includes a Postgrex extension for PostGIS data types
 
 ```elixir
 defp deps do
-  [{:geo, "~> 0.12.0"}]
+  [{:geo, "~> 0.13.0"}]
 end
 ```
 
@@ -147,3 +147,4 @@ end
       execute "DROP EXTENSION IF EXISTS postgis"
     end
   end
+  ```
