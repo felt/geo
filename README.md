@@ -102,7 +102,7 @@ end
     password: "postgres",
     hostname: "localhost",
     adapter: Ecto.Adapters.Postgres,
-    extensions: [{Geo.PostGIS, library: Geo}]
+    extensions: [{Geo.PostGIS.Extension, library: Geo}]
 
 
   #Create a model
