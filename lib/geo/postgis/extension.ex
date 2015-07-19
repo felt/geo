@@ -4,7 +4,7 @@ defmodule Geo.PostGIS.Extension do
   @behaviour Postgrex.Extension
 
   @moduledoc """
-  PostGIS extension for Postgrex
+  PostGIS extension for Postgrex. Supports Geometry and Geography data types
 
       opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
       extensions: [{Geo.PostGIS.Extension, library: Geo}] ]

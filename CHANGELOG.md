@@ -1,4 +1,4 @@
-# v0.14.0-dev
+# v0.14.0
 * Enhancements
   * Basic Support for Geography datatype
 

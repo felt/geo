@@ -11,11 +11,11 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 * GeometryCollection
 
 
-Also includes a Postgrex extension for PostGIS data types
+Also includes a Postgrex extension for the PostGIS data types, Geometry and Geography
 
 ```elixir
 defp deps do
-  [{:geo, "~> 0.13.0"}]
+  [{:geo, "~> 0.14.0"}]
 end
 ```
 
@@ -65,7 +65,7 @@ end
   "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
   ```
 
-* A Postgrex Extension for PostGIS data types
+* A Postgrex Extension for the PostGIS data types, Geometry and Geography
 
   ```elixir
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
@@ -115,7 +115,7 @@ end
     end
   end
 
-  #Geometry columns can be created in migrations too
+  #Geometry or Geometry columns can be created in migrations too
   defmodule Repo.Migrations.Init do
     use Ecto.Migration
 
