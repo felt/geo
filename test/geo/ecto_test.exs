@@ -21,14 +21,24 @@ defmodule Geo.Ecto.Test do
     end
   end
 
+  defmodule Geographies do
+    use Ecto.Model
+
+    schema "geographies" do
+      field :name,           :string
+      field :geom,           Geo.Point
+    end
+  end
+
   setup context do
     opts = [hostname: "localhost", 
     username: "postgres", database: "geo_postgrex_test",
     extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
     {:ok, pid} = Postgrex.Connection.start_link(opts)
-    {:ok, _} = Postgrex.Connection.query(pid, "DROP TABLE IF EXISTS locations", [])
+    {:ok, _} = Postgrex.Connection.query(pid, "DROP TABLE IF EXISTS locations, geographies", [])
     {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE locations (id serial primary key, name varchar, geom geometry(MultiPolygon))", [])
+    {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE geographies (id serial primary key, name varchar, geom geography(Point))", [])
 
     {:ok, _} = Repo.start_link()
 
@@ -86,5 +96,15 @@ defmodule Geo.Ecto.Test do
     query = Example.example_query(geom)
     results = Repo.one(query)
     assert results == 0
+  end
+
+  test "geography" do
+    geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+
+    geographies = Repo.insert(%Geographies{name: "hello", geom: geom})
+    query = from location in Geographies, limit: 5, select: location
+    results = Repo.all(query)
+
+    assert geom == hd(results).geom
   end
 end

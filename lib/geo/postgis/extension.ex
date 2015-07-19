@@ -34,7 +34,7 @@ defmodule Geo.PostGIS.Extension do
   end
 
   def matching(_) do
-    [type: "geometry"]
+    [type: "geometry", type: "geography"]
   end
 
   def format(_) do
@@ -45,7 +45,15 @@ defmodule Geo.PostGIS.Extension do
     Geo.WKT.encode(geom)
   end
 
+  def encode(%TypeInfo{type: "geography"}, geom, _state, _library) do
+    Geo.WKT.encode(geom)
+  end
+
   def decode(%TypeInfo{type: "geometry"}, wkb, _state, _library) do
+    Geo.WKB.decode(wkb)
+  end
+
+  def decode(%TypeInfo{type: "geography"}, wkb, _state, _library) do
     Geo.WKB.decode(wkb)
   end
 end
