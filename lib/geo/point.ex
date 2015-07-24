@@ -19,6 +19,8 @@ defmodule Geo.Point do
   def dump(_), do: :error
 
   def cast(%Geo.Point{} = point), do: {:ok, point}
+  def cast(point) when is_map(point), do: { :ok, Geo.JSON.decode(point) }
+  def cast(point) when is_binary(point), do: { :ok, Geo.JSON.decode(point) }
   def cast(_), do: :error
 
 end

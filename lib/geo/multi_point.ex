@@ -19,6 +19,8 @@ defmodule Geo.MultiPoint do
   def dump(_), do: :error
 
   def cast(%Geo.MultiPoint{} = multi_point), do: {:ok, multi_point}
+  def cast(multi_point) when is_map(multi_point), do: { :ok, Geo.JSON.decode(multi_point) }
+  def cast(multi_point) when is_binary(multi_point), do: { :ok, Geo.JSON.decode(multi_point) }
   def cast(_), do: :error
 
 end

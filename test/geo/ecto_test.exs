@@ -107,4 +107,36 @@ defmodule Geo.Ecto.Test do
 
     assert geom == hd(results).geom
   end
+
+  test "cast point" do
+    geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+
+    geographies = Repo.insert(%Geographies{name: "hello", geom: geom})
+    query = from location in Geographies, limit: 5, select: location
+    results = Repo.all(query)
+
+    result = hd(results)
+
+    json = Geo.JSON.encode(%Geo.Point{ coordinates: {31, -90}, srid: 4326})
+
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())  
+    assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
+  end
+
+  test "cast point from map" do
+    geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+
+    geographies = Repo.insert(%Geographies{name: "hello", geom: geom})
+    query = from location in Geographies, limit: 5, select: location
+    results = Repo.all(query)
+
+    result = hd(results)
+
+    json = %{ "type" => "Point", 
+              "crs" => %{ "type" => "name", "properties" => %{"name" => "EPSG4326" } },
+              "coordinates" => [31, -90] }
+
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())  
+    assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
+  end
 end

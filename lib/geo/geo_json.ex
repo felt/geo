@@ -24,60 +24,67 @@ defmodule Geo.JSON do
   Takes a GeoJSON string and returns a Geometry
   """
   @spec decode(binary) :: Geo.geometry
-  def decode(geo_json) do
+  def decode(geo_json) when is_binary(geo_json) do
     decoded_json = json_decode(geo_json)
+    decode(decoded_json)
+  end
 
-    case Map.has_key?(decoded_json, :geometries) do
+  @spec decode(Dict.t) :: Geo.geometry
+  def decode(geo_json) when is_map(geo_json) do
+    crs = Dict.get(geo_json, "crs")
+    case Dict.has_key?(geo_json, "geometries") do
       true ->
-        geometries = Enum.map(decoded_json.geometries, 
-          fn(x) -> do_decode(x.type, x.coordinates)   end)
+        geometries = Enum.map(Dict.get(geo_json, "geometries"), 
+          fn(x) -> 
+            do_decode(Dict.get(x, "type"), Dict.get(x, "coordinates"), crs)
+          end)
 
         %GeometryCollection{ geometries: geometries }
       false ->
-        do_decode(decoded_json.type, decoded_json.coordinates)
-    end 
+        do_decode(Dict.get(geo_json, "type"), Dict.get(geo_json, "coordinates"), crs)
+    end
   end
 
-  defp do_decode("Point", [x, y]) do
-    %Point{ coordinates: {x, y}}
+  defp do_decode("Point", [x, y], crs) do
+    %Point{ coordinates: {x, y}, srid: get_srid(crs)}
   end
 
-  defp do_decode("LineString", coordinates) do
+  defp do_decode("LineString", coordinates, crs) do
     coordinates = Enum.map(coordinates, &List.to_tuple(&1))
 
-    %LineString{ coordinates: coordinates }
+    %LineString{ coordinates: coordinates, srid: get_srid(crs) }
   end
 
-  defp do_decode("Polygon", coordinates) do
+  defp do_decode("Polygon", coordinates, crs) do
     coordinates = Enum.map(coordinates, fn(sub_coordinates) -> 
       Enum.map(sub_coordinates, &List.to_tuple(&1))
     end)
 
-    %Polygon{ coordinates: coordinates }
+    %Polygon{ coordinates: coordinates, srid: get_srid(crs) }
   end
 
-  defp do_decode("MultiPoint", coordinates) do
+  defp do_decode("MultiPoint", coordinates, crs) do
     coordinates = Enum.map(coordinates, &List.to_tuple(&1))
 
-    %MultiPoint{ coordinates: coordinates }
+    %MultiPoint{ coordinates: coordinates, srid: get_srid(crs)}
   end
 
-  defp do_decode("MultiLineString", coordinates) do
+  defp do_decode("MultiLineString", coordinates, crs) do
     coordinates = Enum.map(coordinates, fn(sub_coordinates) -> 
       Enum.map(sub_coordinates, &List.to_tuple(&1))
     end)
 
-    %MultiLineString{ coordinates: coordinates }
+    %MultiLineString{ coordinates: coordinates, srid: get_srid(crs) }
   end
 
-  defp do_decode("MultiPolygon", coordinates) do
+  defp do_decode("MultiPolygon", coordinates, crs) do
     coordinates = Enum.map(coordinates, fn(sub_coordinates) -> 
       Enum.map(sub_coordinates, fn(third_sub_coordinates) -> 
         Enum.map(third_sub_coordinates, &List.to_tuple(&1))
       end)
     end)
 
-    %MultiPolygon{ coordinates: coordinates }
+    %MultiPolygon{ coordinates: coordinates, srid: get_srid(crs) }
   end
 
 
@@ -144,7 +151,7 @@ defmodule Geo.JSON do
   end
 
   defp add_crs(map, srid) do
-    Map.put(map, :crs, %{type: "name", properties: %{name: "EPSG#{srid}"}})
+    Dict.put(map, :crs, %{type: "name", properties: %{name: "EPSG#{srid}"}})
   end
 
 
@@ -153,7 +160,20 @@ defmodule Geo.JSON do
   end
 
   defp json_decode(json) do
-    Poison.decode!(json, keys: :atoms)
+    Poison.decode!(json)
+  end
+
+  defp get_srid(%{"type" => "name", "properties" => %{ "name" => "EPSG" <> srid } }) do
+    {srid, _} = Integer.parse(srid)
+    srid
+  end
+
+  defp get_srid(%{"type" => "name", "properties" => %{ "name" => srid } }) do
+    srid
+  end
+
+  defp get_srid(nil) do
+    nil
   end
 
 end
