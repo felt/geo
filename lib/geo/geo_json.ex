@@ -21,7 +21,7 @@ defmodule Geo.JSON do
   """
 
   @doc """
-  Takes a GeoJSON string and returns a Geometry
+  Takes a GeoJSON string or map and returns a Geometry
   """
   @spec decode(binary) :: Geo.geometry
   def decode(geo_json) when is_binary(geo_json) do
@@ -29,7 +29,7 @@ defmodule Geo.JSON do
     decode(decoded_json)
   end
 
-  @spec decode(Dict.t) :: Geo.geometry
+  @spec decode(Map.t) :: Geo.geometry
   def decode(geo_json) when is_map(geo_json) do
     crs = Dict.get(geo_json, "crs")
     case Dict.has_key?(geo_json, "geometries") do

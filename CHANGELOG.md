@@ -1,4 +1,4 @@
-# v0.15.0-dev
+# v0.15.0
 * Enhancements
   * Updated cast function on structs to handle maps and strings
   * Now reading the srid from geo json
