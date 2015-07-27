@@ -1,3 +1,7 @@
+# v0.15.1
+* Enhancements
+  * Fixed st_dwithin macro
+
 # v0.15.0
 * Enhancements
   * Updated cast function on structs to handle maps and strings

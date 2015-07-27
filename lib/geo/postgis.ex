@@ -23,7 +23,7 @@ defmodule Geo.PostGIS do
   end
 
   defmacro st_dwithin(geometryA, geometryB, float) do
-    quote do: fragment("ST_Distance(?,?,?)", unquote(geometryA), unquote(geometryB), unquote(float))
+    quote do: fragment("ST_DWithin(?,?,?)", unquote(geometryA), unquote(geometryB), unquote(float))
   end
 
   defmacro st_equals(geometryA, geometryB) do

@@ -17,6 +17,6 @@ defmodule Geo.Geography.Test do
     {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE geography_test (id int, geom geography(Point, 4326))", [])
     {:ok, _} = Postgrex.Connection.query(pid, "INSERT INTO geography_test VALUES ($1, $2)", [42, geo])
     {:ok, result} = Postgrex.Connection.query(pid, "SELECT * FROM geography_test", [])
-    assert(result.rows == [{42, geo}])
+    assert(result.rows == [[42, geo]])
   end
 end
