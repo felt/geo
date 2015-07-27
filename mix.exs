@@ -31,7 +31,7 @@ defmodule Geo.Mixfile do
     [ 
       {:poison, "~> 1.4"},
       {:ecto, ">= 0.9.0" },
-      {:postgrex, "~> 0.8", optional: true },
+      {:postgrex, "~> 0.9", optional: true },
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.6", only: :dev}
     ]
