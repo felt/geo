@@ -63,6 +63,9 @@ end
 
   iex(2)> Geo.JSON.encode(point)
   "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
+
+  iex(3)> Geo.JSON.encode(point, [skip_json: true])
+  %{ type: "Point", coordinates: [100.0, 0.0] }
   ```
 
 * A Postgrex Extension for the PostGIS data types, Geometry and Geography

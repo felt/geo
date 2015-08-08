@@ -1,3 +1,7 @@
+# v0.15.2
+* Enhancements
+  * Added an `opts` parameter to `Geo.JSON.encode` to allow for skipping JSON encoding
+
 # v0.15.1
 * Enhancements
   * Fixed st_dwithin macro

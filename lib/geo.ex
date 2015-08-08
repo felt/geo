@@ -46,11 +46,14 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 * Encode and decode GeoJSON
 
   ```elixir
-  iex(1)> point = Geo.JSON.decode("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }")
+  iex(1)> point = Geo.JSON.decode("{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }")
   %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
 
   iex(2)> Geo.JSON.encode(point)
-  "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
+  "{\\"type\\":\\"Point\\",\\"coordinates\\":[100.0,0.0]}"
+
+  iex(2)> Geo.JSON.encode(point, [skip_json: true])
+  %{ type: "Point", coordinates: [100.0, 0.0] }
   ```
 
 * Postgrex Extension for PostGIS data types, Geometry and Geography
