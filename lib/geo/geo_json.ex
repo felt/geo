@@ -11,26 +11,30 @@ defmodule Geo.JSON do
   Converts to and from GeoJSON
   
   ```
-  json = "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
+  json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
   geom = Geo.JSON.decode(json)
   Geo.Point[coordinates: {100.0, 0.0}, srid: nil]
 
   Geo.JSON.encode(geom)
-  "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
+  "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
+
+  Geo.JSON.encode(geom, [skip_json: true])
+  %{ type: "Point", coordinates: [100.0, 0.0] }
   ```
   """
 
   @doc """
-  Takes a GeoJSON string or map and returns a Geometry
+  Takes a GeoJSON string or map representing GeoJSON and returns a Geometry
   """
-  @spec decode(binary) :: Geo.geometry
-  def decode(geo_json) when is_binary(geo_json) do
-    decoded_json = json_decode(geo_json)
-    decode(decoded_json)
-  end
+  @spec decode(Map.t | String.t) :: Geo.geometry
+  def decode(geo_json) do
+    geo_json = case geo_json do
+      json when is_binary(json) ->
+        json_decode(json)
+      json when is_map(json) ->
+        json
+    end
 
-  @spec decode(Map.t) :: Geo.geometry
-  def decode(geo_json) when is_map(geo_json) do
     crs = Dict.get(geo_json, "crs")
     case Dict.has_key?(geo_json, "geometries") do
       true ->
@@ -87,21 +91,45 @@ defmodule Geo.JSON do
     %MultiPolygon{ coordinates: coordinates, srid: get_srid(crs) }
   end
 
-
-  @doc """
-  Takes a Geometry and returns a geoJSON string
-  """
-  @spec encode(Geo.geometry) :: binary
-  def encode(%GeometryCollection{ geometries: geometries, srid: srid }) do
-    %{ type: "GeometryCollection",  geometries: Enum.map(geometries, &do_encode(&1))} 
-    |> add_crs(srid)
-    |> json_encode
+  defp get_srid(%{"type" => "name", "properties" => %{ "name" => "EPSG" <> srid } }) do
+    {srid, _} = Integer.parse(srid)
+    srid
   end
 
-  def encode(geom) do
-    do_encode(geom)
-    |> add_crs(geom.srid)
-    |> json_encode
+  defp get_srid(%{"type" => "name", "properties" => %{ "name" => srid } }) do
+    srid
+  end
+
+  defp get_srid(nil) do
+    nil
+  end
+
+  defp json_decode(json) do
+    Poison.decode!(json)
+  end
+
+
+  @doc """
+  Takes a Geometry and returns a GeoJSON string or a map representing the GeoJSON
+  if `:skip_json` is giving in the opts.
+  """
+  @spec encode(Geo.geometry, Dict.t) :: binary | Map.t
+  def encode(geom, opts \\ []) do
+    json_map = case geom do
+      %GeometryCollection{ geometries: geometries, srid: srid } ->
+        %{ type: "GeometryCollection",  geometries: Enum.map(geometries, &do_encode(&1))} 
+        |> add_crs(srid)
+      _ ->
+        do_encode(geom) 
+        |> add_crs(geom.srid)              
+    end
+
+    case Dict.get(opts, :skip_json, false) do
+      true ->
+        json_map
+      false ->
+        json_encode(json_map)
+    end
   end
 
   defp do_encode(%Point{ coordinates: {x, y} }) do
@@ -157,23 +185,6 @@ defmodule Geo.JSON do
 
   defp json_encode(data) do
     Poison.encode!(data)
-  end
-
-  defp json_decode(json) do
-    Poison.decode!(json)
-  end
-
-  defp get_srid(%{"type" => "name", "properties" => %{ "name" => "EPSG" <> srid } }) do
-    {srid, _} = Integer.parse(srid)
-    srid
-  end
-
-  defp get_srid(%{"type" => "name", "properties" => %{ "name" => srid } }) do
-    srid
-  end
-
-  defp get_srid(nil) do
-    nil
   end
 
 end

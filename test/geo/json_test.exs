@@ -1,6 +1,13 @@
 defmodule Geo.JSON.Test do
   use ExUnit.Case, async: true
 
+  test "Point to GeoJson Map" do
+    geom = %Geo.Point{ coordinates: {100.0, 0.0} }
+    json = Geo.JSON.encode(geom, [skip_json: true])
+
+    assert json == %{ type: "Point", coordinates: [100.0, 0.0] }
+  end
+
   test "Point to GeoJson" do
     geom = %Geo.Point{ coordinates: {100.0, 0.0} }
     json = Geo.JSON.encode(geom)
