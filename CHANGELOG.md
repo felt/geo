@@ -1,3 +1,7 @@
+# v0.16.1
+* Enhancements
+  * Made Postgrex a required dependency
+
 # v0.16.0
 * Enhancements
   * Updated to Ecto 1.0
