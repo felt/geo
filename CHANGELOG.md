@@ -1,3 +1,7 @@
+# v0.16.0
+* Enhancements
+  * Updated to Ecto 1.0
+
 # v0.15.2
 * Enhancements
   * Added an `opts` parameter to `Geo.JSON.encode` to allow for skipping JSON encoding
