@@ -1,3 +1,6 @@
+# v1.0.0-dev
+* Enhancements
+
 # v0.16.1
 * Enhancements
   * Made Postgrex a required dependency

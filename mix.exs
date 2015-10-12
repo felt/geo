@@ -3,7 +3,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.16.1",
+      version: "1.0.0-dev",
       elixir: "~> 1.0",
       deps: deps,
       description: description,
@@ -38,7 +38,7 @@ defmodule Geo.Mixfile do
   defp package do
     [ # These are the default files included in the package
       files: ["lib", "mix.exs", "README*", "readme*", "LICENSE*", "license*", "CHANGELOG*"],
-      contributors: ["Bryan Joseph"],
+      maintainers: ["Bryan Joseph"],
       licenses: ["MIT"],
       links: %{ "GitHub" => "https://github.com/bryanjos/geo" }
     ]
