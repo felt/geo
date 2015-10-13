@@ -10,7 +10,7 @@ defmodule Geo.JSON do
   @moduledoc """
   Converts Geo structs to and from a map representing GeoJSON.
 
-  
+
   You are responsible to encoding and decoding of JSON. This is so
   that you can use any JSON parser you want as well as making it
   so that you can use the resulting GeoJSON structure as a property
@@ -18,7 +18,6 @@ defmodule Geo.JSON do
   
   ```
   #Using Poison as the JSON parser for these examples
-
 
   json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
   geom = Poison.decode!(json) |> Geo.JSON.decode(json)
@@ -28,7 +27,7 @@ defmodule Geo.JSON do
   "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
 
   Geo.JSON.encode(geom)
-  %{ type: "Point", coordinates: [100.0, 0.0] }
+  %{ "type" => "Point", "coordinates" => [100.0, 0.0] }
   ```
   """
 

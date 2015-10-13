@@ -51,7 +51,7 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
   #Examples using Poison as the JSON parser
 
   iex(1)> Geo.JSON.encode(point)
-  %{ type: "Point", coordinates: [100.0, 0.0] }
+  %{ "type" => "Point", "coordinates" => [100.0, 0.0] }
 
   iex(2)> point = Poison.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
   %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
