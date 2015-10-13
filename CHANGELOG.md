@@ -1,4 +1,4 @@
-# v0.17.0-dev
+# v0.17.0
 * Breaking
   * Geo.JSON.encode and Geo.JSON.decode now do not do any JSON parsing at all and
     instead work on a map representation of GeoJSON. All JSON encoding and decoding
