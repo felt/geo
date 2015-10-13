@@ -20,7 +20,7 @@ defmodule Geo.MultiPolygon do
 
   def cast(%Geo.MultiPolygon{} = multi_polygon), do: {:ok, multi_polygon}
   def cast(multi_polygon) when is_map(multi_polygon), do: { :ok, Geo.JSON.decode(multi_polygon) }
-  def cast(multi_polygon) when is_binary(multi_polygon), do: { :ok, Geo.JSON.decode(multi_polygon) }
+  def cast(multi_polygon) when is_binary(multi_polygon), do: { :ok, Poison.decode!(multi_polygon) |> Geo.JSON.decode }
   def cast(_), do: :error
 
 end

@@ -8,33 +8,35 @@ defmodule Geo.JSON do
   alias Geo.GeometryCollection
 
   @moduledoc """
-  Converts to and from GeoJSON
+  Converts Geo structs to and from a map representing GeoJSON.
+
+  
+  You are responsible to encoding and decoding of JSON. This is so
+  that you can use any JSON parser you want as well as making it
+  so that you can use the resulting GeoJSON structure as a property
+  in larger JSON structures.
   
   ```
+  #Using Poison as the JSON parser for these examples
+
+
   json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
-  geom = Geo.JSON.decode(json)
+  geom = Poison.decode!(json) |> Geo.JSON.decode(json)
   Geo.Point[coordinates: {100.0, 0.0}, srid: nil]
 
-  Geo.JSON.encode(geom)
+  Geo.JSON.encode(geom) |> Poison.encode!
   "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
 
-  Geo.JSON.encode(geom, [skip_json: true])
+  Geo.JSON.encode(geom)
   %{ type: "Point", coordinates: [100.0, 0.0] }
   ```
   """
 
   @doc """
-  Takes a GeoJSON string or map representing GeoJSON and returns a Geometry
+  Takes a map representing GeoJSON and returns a Geometry
   """
-  @spec decode(Map.t | String.t) :: Geo.geometry
+  @spec decode(Map.t) :: Geo.geometry
   def decode(geo_json) do
-    geo_json = case geo_json do
-      json when is_binary(json) ->
-        json_decode(json)
-      json when is_map(json) ->
-        json
-    end
-
     crs = Dict.get(geo_json, "crs")
     case Dict.has_key?(geo_json, "geometries") do
       true ->
@@ -104,42 +106,30 @@ defmodule Geo.JSON do
     nil
   end
 
-  defp json_decode(json) do
-    Poison.decode!(json)
-  end
-
 
   @doc """
-  Takes a Geometry and returns a GeoJSON string or a map representing the GeoJSON
-  if `:skip_json` is giving in the opts.
+  Takes a Geometry and returns a map representing the GeoJSON
   """
-  @spec encode(Geo.geometry, Dict.t) :: binary | Map.t
-  def encode(geom, opts \\ []) do
-    json_map = case geom do
+  @spec encode(Geo.geometry) :: Map.t
+  def encode(geom) do
+    case geom do
       %GeometryCollection{ geometries: geometries, srid: srid } ->
-        %{ type: "GeometryCollection",  geometries: Enum.map(geometries, &do_encode(&1))} 
+        %{ "type" => "GeometryCollection",  "geometries" => Enum.map(geometries, &do_encode(&1))} 
         |> add_crs(srid)
       _ ->
         do_encode(geom) 
         |> add_crs(geom.srid)              
     end
-
-    case Dict.get(opts, :skip_json, false) do
-      true ->
-        json_map
-      false ->
-        json_encode(json_map)
-    end
   end
 
   defp do_encode(%Point{ coordinates: {x, y} }) do
-    %{ type: "Point", coordinates: [x, y] }
+    %{ "type" => "Point", "coordinates" => [x, y] }
   end
 
   defp do_encode(%LineString{ coordinates: coordinates }) do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
-    %{ type: "LineString", coordinates: coordinates }
+    %{ "type" => "LineString", "coordinates" => coordinates }
   end
 
   defp do_encode(%Polygon{ coordinates: coordinates }) do
@@ -147,13 +137,13 @@ defmodule Geo.JSON do
       Enum.map(sub_coordinates, &Tuple.to_list(&1))
     end)
 
-    %{ type: "Polygon", coordinates: coordinates }
+    %{ "type" => "Polygon", "coordinates" => coordinates }
   end
 
   defp do_encode(%MultiPoint{ coordinates: coordinates }) do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
-    %{ type: "MultiPoint", coordinates: coordinates }
+    %{ "type" => "MultiPoint", "coordinates" => coordinates }
   end
 
   defp do_encode(%MultiLineString{ coordinates: coordinates }) do
@@ -161,7 +151,7 @@ defmodule Geo.JSON do
       Enum.map(sub_coordinates, &Tuple.to_list(&1))
     end)
 
-    %{ type: "MultiLineString", coordinates: coordinates }
+    %{ "type" => "MultiLineString", "coordinates" => coordinates }
   end
 
   defp do_encode(%MultiPolygon{ coordinates: coordinates }) do
@@ -171,7 +161,7 @@ defmodule Geo.JSON do
       end)
     end)
 
-    %{ type: "MultiPolygon", coordinates: coordinates }
+    %{ "type" => "MultiPolygon", "coordinates" => coordinates }
   end
 
   defp add_crs(map, nil) do
@@ -179,12 +169,7 @@ defmodule Geo.JSON do
   end
 
   defp add_crs(map, srid) do
-    Dict.put(map, :crs, %{type: "name", properties: %{name: "EPSG#{srid}"}})
-  end
-
-
-  defp json_encode(data) do
-    Poison.encode!(data)
+    Dict.put(map, "crs", %{"type" => "name", "properties" => %{"name" => "EPSG#{srid}"}})
   end
 
 end

@@ -20,7 +20,7 @@ defmodule Geo.Polygon do
 
   def cast(%Geo.Polygon{} = polygon), do: {:ok, polygon}
   def cast(polygon) when is_map(polygon), do: { :ok, Geo.JSON.decode(polygon) }
-  def cast(polygon) when is_binary(polygon), do: { :ok, Geo.JSON.decode(polygon) }
+  def cast(polygon) when is_binary(polygon), do: { :ok, Poison.decode!(polygon) |> Geo.JSON.decode }
   def cast(_), do: :error
 
 end

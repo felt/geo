@@ -1,5 +1,8 @@
-# v1.0.0-dev
-* Enhancements
+# v0.17.0-dev
+* Breaking
+  * Geo.JSON.encode and Geo.JSON.decode now do not do any JSON parsing at all and
+    instead work on a map representation of GeoJSON. All JSON encoding and decoding
+    must be done before or after calling those functions.
 
 # v0.16.1
 * Enhancements

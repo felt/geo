@@ -44,16 +44,20 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
   ```
 
 * Encode and decode GeoJSON
+  Geo only encodes and decodes maps shaped as GeoJSON. JSON encoding and decoding must
+  be done before and after.
 
   ```elixir
-  iex(1)> point = Geo.JSON.decode("{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }")
+  #Examples using Poison as the JSON parser
+
+  iex(1)> Geo.JSON.encode(point)
+  %{ type: "Point", coordinates: [100.0, 0.0] }
+
+  iex(2)> point = Poison.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
   %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
 
-  iex(2)> Geo.JSON.encode(point)
-  "{\\"type\\":\\"Point\\",\\"coordinates\\":[100.0,0.0]}"
-
-  iex(2)> Geo.JSON.encode(point, [skip_json: true])
-  %{ type: "Point", coordinates: [100.0, 0.0] }
+  iex(3)> Geo.JSON.encode(point) |> Poison.encode!
+  "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
   ```
 
 * Postgrex Extension for PostGIS data types, Geometry and Geography
