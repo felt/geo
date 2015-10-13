@@ -44,6 +44,7 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
   ```
 
 * Encode and decode GeoJSON
+
   Geo only encodes and decodes maps shaped as GeoJSON. JSON encoding and decoding must
   be done before and after.
 
