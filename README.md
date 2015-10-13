@@ -15,7 +15,7 @@ Also includes a Postgrex extension for the PostGIS data types, Geometry and Geog
 
 ```elixir
 defp deps do
-  [{:geo, "~> 0.15.0"}]
+  [{:geo, "~> 0.16.0"}]
 end
 ```
 
@@ -56,6 +56,8 @@ end
   ```
 
 * Encode and decode GeoJSON
+
+
   Geo only encodes and decodes maps shaped as GeoJSON. JSON encoding and decoding must
   be done before and after.
 
