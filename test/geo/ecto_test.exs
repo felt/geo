@@ -29,7 +29,7 @@ defmodule Geo.Ecto.Test do
   end
 
   setup context do
-    opts = [hostname: "localhost", 
+    opts = [hostname: "localhost",
     username: "postgres", database: "geo_postgrex_test",
     extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
@@ -86,10 +86,10 @@ defmodule Geo.Ecto.Test do
       import Geo.PostGIS
 
       def example_query(geom) do
-        from location in Location, select: st_distance(location.geom, ^geom)  
+        from location in Location, select: st_distance(location.geom, ^geom)
       end
 
-    end 
+    end
 
     query = Example.example_query(geom)
     results = Repo.one(query)
@@ -117,7 +117,7 @@ defmodule Geo.Ecto.Test do
 
     json = Geo.JSON.encode(%Geo.Point{ coordinates: {31, -90}, srid: 4326})
 
-    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())  
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())
     assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
   end
 
@@ -130,11 +130,26 @@ defmodule Geo.Ecto.Test do
 
     result = hd(results)
 
-    json = %{ "type" => "Point", 
+    json = %{ "type" => "Point",
               "crs" => %{ "type" => "name", "properties" => %{"name" => "EPSG4326" } },
               "coordinates" => [31, -90] }
 
-    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())  
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())
     assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
+  end
+
+  test "order by distance" do
+    geom1 = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+    geom2 = %Geo.Point{ coordinates: {30, -91}, srid: 4326}
+    geom3 = %Geo.Point{ coordinates: {60, -91}, srid: 4326}
+
+    Repo.insert(%Geographies{name: "there", geom: geom2})
+    Repo.insert(%Geographies{name: "here",  geom: geom1})
+    Repo.insert(%Geographies{name: "way over there",  geom: geom3})
+
+    query = from location in Geographies, limit: 5, select: location, order_by: st_distance(location.geom, ^geom1)
+    assert ["here", "there", "way over there"] ==
+      Repo.all(query)
+      |> Enum.map(fn x -> x.name end)
   end
 end
