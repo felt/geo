@@ -1,3 +1,7 @@
+# v1.0.0-dev
+* Enhancements
+  * Made Postgrex, Ecto, and Poison optional dependencies
+
 # v0.17.0
 * Breaking
   * Geo.JSON.encode and Geo.JSON.decode now do not do any JSON parsing at all and

@@ -5,22 +5,30 @@ defmodule Geo.Point do
   """
 
   @type t :: %Geo.Point{ coordinates: {number, number}, srid: integer }
-  @behaviour Ecto.Type
   defstruct coordinates: {0, 0}, srid: nil
 
-  def type, do: :geometry
+  if Code.ensure_loaded?(Ecto.Type) do
+    @behaviour Ecto.Type
 
-  def blank?(_), do: false
+    def type, do: :geometry
 
-  def load(%Geo.Point{} = point), do: {:ok, point}
-  def load(_), do: :error
+    def blank?(_), do: false
 
-  def dump(%Geo.Point{} = point), do: {:ok, point}
-  def dump(_), do: :error
+    def load(%Geo.Point{} = point), do: {:ok, point}
+    def load(_), do: :error
 
-  def cast(%Geo.Point{} = point), do: {:ok, point}
-  def cast(point) when is_map(point), do: { :ok, Geo.JSON.decode(point) }
-  def cast(point) when is_binary(point), do: { :ok, Poison.decode!(point) |> Geo.JSON.decode }
-  def cast(_), do: :error
+    def dump(%Geo.Point{} = point), do: {:ok, point}
+    def dump(_), do: :error
+
+    def cast(%Geo.Point{} = point), do: {:ok, point}
+    def cast(point) when is_map(point), do: { :ok, Geo.JSON.decode(point) }
+
+    if Code.ensure_loaded?(Poison) do
+      def cast(point) when is_binary(point), do: { :ok, Poison.decode!(point) |> Geo.JSON.decode }
+    end
+    
+    def cast(_), do: :error
+
+  end
 
 end

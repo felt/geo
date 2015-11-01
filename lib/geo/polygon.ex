@@ -5,22 +5,29 @@ defmodule Geo.Polygon do
   """
 
   @type t :: %Geo.Polygon{ coordinates: [[{number, number}]], srid: integer }
-  @behaviour Ecto.Type
   defstruct coordinates: [], srid: nil
 
-  def type, do: :geometry
+  if Code.ensure_loaded?(Ecto.Type) do
+    @behaviour Ecto.Type
 
-  def blank?(_), do: false
+    def type, do: :geometry
 
-  def load(%Geo.Polygon{} = polygon), do: {:ok, polygon}
-  def load(_), do: :error
+    def blank?(_), do: false
 
-  def dump(%Geo.Polygon{} = polygon), do: {:ok, polygon}
-  def dump(_), do: :error
+    def load(%Geo.Polygon{} = polygon), do: {:ok, polygon}
+    def load(_), do: :error
 
-  def cast(%Geo.Polygon{} = polygon), do: {:ok, polygon}
-  def cast(polygon) when is_map(polygon), do: { :ok, Geo.JSON.decode(polygon) }
-  def cast(polygon) when is_binary(polygon), do: { :ok, Poison.decode!(polygon) |> Geo.JSON.decode }
-  def cast(_), do: :error
+    def dump(%Geo.Polygon{} = polygon), do: {:ok, polygon}
+    def dump(_), do: :error
+
+    def cast(%Geo.Polygon{} = polygon), do: {:ok, polygon}
+    def cast(polygon) when is_map(polygon), do: { :ok, Geo.JSON.decode(polygon) }
+
+    if Code.ensure_loaded?(Poison) do
+      def cast(polygon) when is_binary(polygon), do: { :ok, Poison.decode!(polygon) |> Geo.JSON.decode }
+    end
+
+    def cast(_), do: :error
+  end
 
 end

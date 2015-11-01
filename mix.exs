@@ -3,7 +3,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "0.17.0",
+      version: "1.0.0-dev",
       elixir: "~> 1.0",
       deps: deps,
       description: description,
@@ -15,7 +15,7 @@ defmodule Geo.Mixfile do
   # Configuration for the OTP application
   def application do
     [
-      applications: [:poison, :ecto, :logger]
+      applications: [:logger]
     ]
   end
 
@@ -26,10 +26,10 @@ defmodule Geo.Mixfile do
   end
 
   defp deps do
-    [ 
-      {:ecto, "~> 1.0" },
-      {:postgrex, "~> 0.9"},
-      {:poison, "~> 1.0"},
+    [
+      {:ecto, "~> 1.0", optional: true },
+      {:postgrex, "~> 0.9", optional: true },
+      {:poison, "~> 1.0", optional: true},
       {:earmark, "~> 0.1", only: :dev},
       {:ex_doc, "~> 0.10", only: :dev}
     ]

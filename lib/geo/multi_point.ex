@@ -5,22 +5,30 @@ defmodule Geo.MultiPoint do
   """
 
   @type t :: %Geo.MultiPoint{ coordinates: [{number, number}], srid: integer }
-  @behaviour Ecto.Type
   defstruct coordinates: [], srid: nil
 
-  def type, do: :geometry
 
-  def blank?(_), do: false
+  if Code.ensure_loaded?(Ecto.Type) do
+    @behaviour Ecto.Type
 
-  def load(%Geo.MultiPoint{} = multi_point), do: {:ok, multi_point}
-  def load(_), do: :error
+    def type, do: :geometry
 
-  def dump(%Geo.MultiPoint{} = multi_point), do: {:ok, multi_point}
-  def dump(_), do: :error
+    def blank?(_), do: false
 
-  def cast(%Geo.MultiPoint{} = multi_point), do: {:ok, multi_point}
-  def cast(multi_point) when is_map(multi_point), do: { :ok, Geo.JSON.decode(multi_point) }
-  def cast(multi_point) when is_binary(multi_point), do: { :ok, Poison.decode!(multi_point) |> Geo.JSON.decode }
-  def cast(_), do: :error
+    def load(%Geo.MultiPoint{} = multi_point), do: {:ok, multi_point}
+    def load(_), do: :error
+
+    def dump(%Geo.MultiPoint{} = multi_point), do: {:ok, multi_point}
+    def dump(_), do: :error
+
+    def cast(%Geo.MultiPoint{} = multi_point), do: {:ok, multi_point}
+    def cast(multi_point) when is_map(multi_point), do: { :ok, Geo.JSON.decode(multi_point) }
+
+    if Code.ensure_loaded?(Poison) do
+      def cast(multi_point) when is_binary(multi_point), do: { :ok, Poison.decode!(multi_point) |> Geo.JSON.decode }
+    end
+    
+    def cast(_), do: :error
+  end
 
 end
