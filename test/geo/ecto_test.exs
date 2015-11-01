@@ -137,4 +137,19 @@ defmodule Geo.Ecto.Test do
     changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())
     assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
   end
+
+  test "order by distance" do
+    geom1 = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+    geom2 = %Geo.Point{ coordinates: {30, -91}, srid: 4326}
+    geom3 = %Geo.Point{ coordinates: {60, -91}, srid: 4326}
+
+    Repo.insert(%Geographies{name: "there", geom: geom2})
+    Repo.insert(%Geographies{name: "here",  geom: geom1})
+    Repo.insert(%Geographies{name: "way over there",  geom: geom3})
+
+    query = from location in Geographies, limit: 5, select: location, order_by: st_distance(location.geom, ^geom1)
+    assert ["here", "there", "way over there"] ==
+      Repo.all(query)
+      |> Enum.map(fn x -> x.name end)
+  end
 end
