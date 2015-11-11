@@ -1,4 +1,4 @@
-# v1.0.0-dev
+# v0.18.0
 * Enhancements
   * Made Postgrex, Ecto, and Poison optional dependencies
 
