@@ -28,7 +28,7 @@ defmodule Geo.Ecto.Test do
     end
   end
 
-  setup context do
+  setup _ do
     opts = [hostname: "localhost",
     username: "postgres", database: "geo_postgrex_test",
     extensions: [{Geo.PostGIS.Extension, library: Geo}]]
@@ -47,7 +47,7 @@ defmodule Geo.Ecto.Test do
   test "query multipoint" do
     geom = Geo.WKB.decode(@multipoint_wkb)
 
-    location = Repo.insert(%Location{name: "hello", geom: geom})
+    Repo.insert(%Location{name: "hello", geom: geom})
     query = from location in Location, limit: 5, select: location
     results = Repo.all(query)
 
@@ -99,7 +99,7 @@ defmodule Geo.Ecto.Test do
   test "geography" do
     geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
 
-    geographies = Repo.insert(%Geographies{name: "hello", geom: geom})
+    Repo.insert(%Geographies{name: "hello", geom: geom})
     query = from location in Geographies, limit: 5, select: location
     results = Repo.all(query)
 
@@ -109,7 +109,7 @@ defmodule Geo.Ecto.Test do
   test "cast point" do
     geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
 
-    geographies = Repo.insert(%Geographies{name: "hello", geom: geom})
+    Repo.insert(%Geographies{name: "hello", geom: geom})
     query = from location in Geographies, limit: 5, select: location
     results = Repo.all(query)
 
@@ -124,7 +124,7 @@ defmodule Geo.Ecto.Test do
   test "cast point from map" do
     geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
 
-    geographies = Repo.insert(%Geographies{name: "hello", geom: geom})
+    Repo.insert(%Geographies{name: "hello", geom: geom})
     query = from location in Geographies, limit: 5, select: location
     results = Repo.all(query)
 
