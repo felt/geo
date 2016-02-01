@@ -1,3 +1,7 @@
+# v1.0.1
+* Enhancements
+  * Updated Postgrex and Poison optional dependencies
+
 # v1.0.0
 
 # v0.18.0

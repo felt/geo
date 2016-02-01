@@ -33,10 +33,10 @@ defmodule Geo.Ecto.Test do
     username: "postgres", database: "geo_postgrex_test",
     extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
-    {:ok, pid} = Postgrex.Connection.start_link(opts)
-    {:ok, _} = Postgrex.Connection.query(pid, "DROP TABLE IF EXISTS locations, geographies", [])
-    {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE locations (id serial primary key, name varchar, geom geometry(MultiPolygon))", [])
-    {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE geographies (id serial primary key, name varchar, geom geography(Point))", [])
+    {:ok, pid} = Postgrex.start_link(opts)
+    {:ok, _} = Postgrex.query(pid, "DROP TABLE IF EXISTS locations, geographies", [])
+    {:ok, _} = Postgrex.query(pid, "CREATE TABLE locations (id serial primary key, name varchar, geom geometry(MultiPolygon))", [])
+    {:ok, _} = Postgrex.query(pid, "CREATE TABLE geographies (id serial primary key, name varchar, geom geography(Point))", [])
 
     {:ok, _} = Repo.start_link()
 
