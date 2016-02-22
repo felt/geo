@@ -11,7 +11,7 @@ defmodule Geo.Ecto.Test do
   end
 
   defmodule Location do
-    use Ecto.Model
+    use Ecto.Schema
 
     schema "locations" do
       field :name,           :string
@@ -20,7 +20,7 @@ defmodule Geo.Ecto.Test do
   end
 
   defmodule Geographies do
-    use Ecto.Model
+    use Ecto.Schema
 
     schema "geographies" do
       field :name,           :string
