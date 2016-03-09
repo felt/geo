@@ -140,7 +140,28 @@ end
     end
   end
   ```
+  
+* Ecto migrations can also use more elaborate [Postgis GIS Objects](http://postgis.net/docs/using_postgis_dbmanagement.html#RefObject). These types are useful for enforcing constraints on {Lng,Lat} (order matters), or ensuring that a particular projection/coordinate system/format is used.
 
+  ```elixir
+  defmodule Repo.Migrations.AdvancedInit do
+    use Ecto.Migration
+
+    def up do
+      create table(:test) do
+        add :name,     :string
+      end
+      # Add a field `lng_lat_point` with type `geometry(Point,4326)`.
+      # This can store a "standard GPS" (epsg4326) coordinate pair {longitude,latitude}.
+      execute("SELECT AddGeometryColumn ('test','lng_lat_point',4326,'POINT',2);")
+    end
+
+    def down do
+      drop table(:test)
+    end
+  end
+  ```
+  
   Be sure to enable the Postgis extension if you haven't already done so:
 
   ```elixir
