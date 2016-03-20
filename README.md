@@ -198,7 +198,6 @@ end
 After you got the dependencies via `mix deps.get` make sure that:
 
 * `postgis` is installed
-* the postgis extension is activated `"CREATE EXTENSION IF NOT EXISTS postgis"`
 * your `postgres` user has the database `"geo_postgrex_test"`
 * your `postgres` db user can login without a password or you set the `PGPASSWORD` environment variable appropriately
 
