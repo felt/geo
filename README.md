@@ -179,6 +179,20 @@ end
   end
   ```
 
+* [Postgis functions](http://postgis.net/docs/manual-1.3/ch06.html) can also be used in ecto queries. Currently only the OpenGIS functions are implemented. Have a look at `lib/geo/postgis.ex` for the implemented functions. You can use them like:
+
+  ```elixir
+  defmodule Example do
+    import Ecto.Query
+    import Geo.PostGIS
+
+    def example_query(geom) do
+      from location in Location, limit: 5, select: st_distance(location.geom, ^geom)
+    end
+
+  end
+  ```
+
 ## Development
 
 After you got the dependencies via `mix deps.get` make sure that:
