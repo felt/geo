@@ -140,7 +140,7 @@ end
     end
   end
   ```
-  
+
 * Ecto migrations can also use more elaborate [Postgis GIS Objects](http://postgis.net/docs/using_postgis_dbmanagement.html#RefObject). These types are useful for enforcing constraints on {Lng,Lat} (order matters), or ensuring that a particular projection/coordinate system/format is used.
 
   ```elixir
@@ -161,7 +161,7 @@ end
     end
   end
   ```
-  
+
   Be sure to enable the Postgis extension if you haven't already done so:
 
   ```elixir
@@ -178,3 +178,14 @@ end
     end
   end
   ```
+
+## Development
+
+After you got the dependencies via `mix deps.get` make sure that:
+
+* `postgis` is installed
+* the postgis extension is activated `"CREATE EXTENSION IF NOT EXISTS postgis"`
+* your `postgres` user has the database `"geo_postgrex_test"`
+* your `postgres` db user can login without a password or you set the `PGPASSWORD` environment variable appropriately
+
+Then you can run the tests as you are used to with `mix test`.
