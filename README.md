@@ -140,7 +140,7 @@ end
     end
   end
   ```
-  
+
 * Ecto migrations can also use more elaborate [Postgis GIS Objects](http://postgis.net/docs/using_postgis_dbmanagement.html#RefObject). These types are useful for enforcing constraints on {Lng,Lat} (order matters), or ensuring that a particular projection/coordinate system/format is used.
 
   ```elixir
@@ -161,7 +161,7 @@ end
     end
   end
   ```
-  
+
   Be sure to enable the Postgis extension if you haven't already done so:
 
   ```elixir
@@ -178,3 +178,27 @@ end
     end
   end
   ```
+
+* [Postgis functions](http://postgis.net/docs/manual-1.3/ch06.html) can also be used in ecto queries. Currently only the OpenGIS functions are implemented. Have a look at `lib/geo/postgis.ex` for the implemented functions. You can use them like:
+
+  ```elixir
+  defmodule Example do
+    import Ecto.Query
+    import Geo.PostGIS
+
+    def example_query(geom) do
+      from location in Location, limit: 5, select: st_distance(location.geom, ^geom)
+    end
+
+  end
+  ```
+
+## Development
+
+After you got the dependencies via `mix deps.get` make sure that:
+
+* `postgis` is installed
+* your `postgres` user has the database `"geo_postgrex_test"`
+* your `postgres` db user can login without a password or you set the `PGPASSWORD` environment variable appropriately
+
+Then you can run the tests as you are used to with `mix test`.
