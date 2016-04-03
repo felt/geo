@@ -3,7 +3,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "1.0.1",
+      version: "1.0.2",
       elixir: "~> 1.0",
       deps: deps,
       description: description,
@@ -21,17 +21,18 @@ defmodule Geo.Mixfile do
 
   defp description do
     """
-    PostGIS extension for Postgrex. Also encodes and decodes WKB, WKT, and GeoJSON.
+    PostGIS extension for Postgrex. Includes PostGIS types for Ecto.
+    Also encodes and decodes WKB, WKT, and GeoJSON formats.
     """
   end
 
   defp deps do
     [
       {:ecto, "~> 1.1 or ~> 2.0-beta", optional: true },
-      {:postgrex, "~> 0.11", optional: true },
+      {:postgrex, "~> 0.11.1", optional: true },
       {:poison, "~> 1.5 or ~> 2.0", optional: true},
-      {:earmark, "~> 0.1", only: :dev},
-      {:ex_doc, "~> 0.10", only: :dev}
+      {:earmark, "~> 0.2", only: :dev},
+      {:ex_doc, "~> 0.11", only: :dev}
     ]
   end
 

@@ -1,3 +1,7 @@
+# v1.0.2
+* Enhancements
+  * Updated dependencies to  allow for using ecto 2.0 beta versions
+
 # v1.0.1
 * Enhancements
   * Updated Postgrex and Poison optional dependencies
