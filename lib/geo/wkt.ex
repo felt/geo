@@ -147,7 +147,7 @@ defmodule Geo.WKT do
     coordinates
     |> String.strip
     |> remove_outer_parenthesis
-    |> String.split(~r{\), ?\(})
+    |> String.split(~r{\), *\(})
     |> Enum.map(&repair_str(&1, "(", ")"))
     |> Enum.map(&create_line_string(&1))
   end
@@ -156,7 +156,7 @@ defmodule Geo.WKT do
     coordinates
     |> String.strip
     |> remove_outer_parenthesis
-    |> String.split(~r{\)\), ?\(\(})
+    |> String.split(~r{\)\), *\(\(})
     |> Enum.map(&repair_str(&1, "((", "))"))
     |> Enum.map(&create_polygon(&1))
   end
