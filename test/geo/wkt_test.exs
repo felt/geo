@@ -47,6 +47,11 @@ defmodule Geo.WKT.Test do
     assert(geom.coordinates == [ [{35, 10}, {45, 45}, {15, 40}, {10, 20}, {35, 10}], [{20, 30}, {35, 35}, {30, 20}, {20, 30}] ])
   end
 
+  test "Decode WKT with spaces between exterior and holes to Polygon 2" do
+    geom = Geo.WKT.decode("POLYGON((35 10,45 45,15 40,10 20,35 10), (20 30,35 35,30 20,20 30))")
+    assert(geom.coordinates == [ [{35, 10}, {45, 45}, {15, 40}, {10, 20}, {35, 10}], [{20, 30}, {35, 35}, {30, 20}, {20, 30}] ])
+  end
+
   test "Encode MultiPoint to WKT" do
     geom = %Geo.MultiPoint{ coordinates: [{0, 0}, {20, 20}, {60, 60}] }
     assert(Geo.WKT.encode(geom) == "MULTIPOINT(0 0,20 20,60 60)")
@@ -73,6 +78,11 @@ defmodule Geo.WKT.Test do
     assert(geom.coordinates == [[{10, 10}, {20, 20}, {10, 40}], [{40, 40}, {30, 30}, {40, 20}, {30, 10}]])
   end
 
+  test "Decode WKT with spaces between LineStrings to MultiLineString" do
+    geom = Geo.WKT.decode("MULTILINESTRING((10 10,20 20,10 40), (40 40,30 30,40 20,30 10))")
+    assert(geom.coordinates == [[{10, 10}, {20, 20}, {10, 40}], [{40, 40}, {30, 30}, {40, 20}, {30, 10}]])
+  end
+
   test "Decode EWKT to MultiLineString" do
     geom = Geo.WKT.decode("SRID=4326;MULTILINESTRING((10 10,20 20,10 40),(40 40,30 30,40 20,30 10))")
     assert(geom.coordinates == [[{10, 10}, {20, 20}, {10, 40}], [{40, 40}, {30, 30}, {40, 20}, {30, 10}]])
@@ -86,6 +96,11 @@ defmodule Geo.WKT.Test do
 
   test "Decode WKT to MultiPolygon" do
     geom = Geo.WKT.decode("MULTIPOLYGON(((40 40,20 45,45 30,40 40)),((20 35,10 30,10 10,30 5,45 20,20 35),(30 20,20 15,20 25,30 20)))")
+    assert(geom.coordinates == [ [ [{40, 40}, {20, 45}, {45, 30}, {40, 40}] ], [ [{20, 35}, {10, 30}, {10, 10}, {30, 5}, {45, 20}, {20, 35}], [{30, 20}, {20, 15}, {20, 25}, {30, 20}] ] ] )
+  end
+
+  test "Decode WKT with spaces between polygons to MultiPolygon" do
+    geom = Geo.WKT.decode("MULTIPOLYGON(((40 40,20 45,45 30,40 40)), ((20 35,10 30,10 10,30 5,45 20,20 35), (30 20,20 15,20 25,30 20)))")
     assert(geom.coordinates == [ [ [{40, 40}, {20, 45}, {45, 30}, {40, 40}] ], [ [{20, 35}, {10, 30}, {10, 10}, {30, 5}, {45, 20}, {20, 35}], [{30, 20}, {20, 15}, {20, 25}, {30, 20}] ] ] )
   end
 
