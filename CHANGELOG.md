@@ -1,6 +1,10 @@
+# v1.0.3
+* Enhancements
+  * Updated dependencies to allow for using ecto 2.0 release candidate versions
+
 # v1.0.2
 * Enhancements
-  * Updated dependencies to  allow for using ecto 2.0 beta versions
+  * Updated dependencies to allow for using ecto 2.0 beta versions
 
 # v1.0.1
 * Enhancements
