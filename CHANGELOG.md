@@ -1,3 +1,7 @@
+# v1.0.4
+* Enhancements
+  * Ecto.Type: matching on geojson properties so that Ecto.DataType can be used by users
+
 # v1.0.3
 * Enhancements
   * Updated dependencies to allow for using ecto 2.0 release candidate versions

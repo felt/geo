@@ -152,4 +152,26 @@ defmodule Geo.Ecto.Test do
       Repo.all(query)
       |> Enum.map(fn x -> x.name end)
   end
+
+
+  defimpl Ecto.DataType, for: Map do
+    def cast(%{"latitude" => lat, "longitude" => long}, Geo.Point) do
+      {:ok, %Geo.Point{coordinates: {long, lat}, srid: 4326}}
+    end
+    def cast(_, _), do: :error
+  end
+
+
+  test "defimpl Ecto.DataType" do
+    geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+
+    Repo.insert(%Geographies{name: "hello", geom: geom})
+    query = from location in Geographies, limit: 5, select: location
+    results = Repo.all(query)
+
+    result = hd(results)
+
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: %{"latitude" => -90, "longitude" => 31 }}, ~w(name geom), ~w())
+    assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
+  end
 end

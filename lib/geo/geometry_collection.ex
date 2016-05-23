@@ -21,7 +21,7 @@ defmodule Geo.GeometryCollection do
     def dump(_), do: :error
 
     def cast(%Geo.GeometryCollection{} = geometry_collection), do: {:ok, geometry_collection}
-    def cast(geometry_collection) when is_map(geometry_collection), do: { :ok, Geo.JSON.decode(geometry_collection) }
+    def cast(%{"type" => _, "geometries" => _} = geometry_collection), do: { :ok, Geo.JSON.decode(geometry_collection) }
 
     if Code.ensure_loaded?(Poison) do
       def cast(geometry_collection) when is_binary(geometry_collection), do: { :ok, Poison.decode!(geometry_collection) |> Geo.JSON.decode }

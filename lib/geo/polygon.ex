@@ -21,7 +21,7 @@ defmodule Geo.Polygon do
     def dump(_), do: :error
 
     def cast(%Geo.Polygon{} = polygon), do: {:ok, polygon}
-    def cast(polygon) when is_map(polygon), do: { :ok, Geo.JSON.decode(polygon) }
+    def cast(%{"type" => _, "coordinates" => _} = polygon), do: { :ok, Geo.JSON.decode(polygon) }
 
     if Code.ensure_loaded?(Poison) do
       def cast(polygon) when is_binary(polygon), do: { :ok, Poison.decode!(polygon) |> Geo.JSON.decode }

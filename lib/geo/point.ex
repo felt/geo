@@ -21,12 +21,12 @@ defmodule Geo.Point do
     def dump(_), do: :error
 
     def cast(%Geo.Point{} = point), do: {:ok, point}
-    def cast(point) when is_map(point), do: { :ok, Geo.JSON.decode(point) }
+    def cast(%{"type" => _, "coordinates" => _} = point), do: { :ok, Geo.JSON.decode(point) }
 
     if Code.ensure_loaded?(Poison) do
       def cast(point) when is_binary(point), do: { :ok, Poison.decode!(point) |> Geo.JSON.decode }
     end
-    
+
     def cast(_), do: :error
 
   end

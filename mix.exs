@@ -3,12 +3,13 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "1.0.3",
+      version: "1.0.4",
       elixir: "~> 1.0",
       deps: deps,
       description: description,
       package: package,
       name: "Geo",
+      consolidate_protocols: Mix.env == :prod,
       source_url: "https://github.com/bryanjos/geo"]
   end
 

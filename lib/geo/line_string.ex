@@ -21,7 +21,7 @@ defmodule Geo.LineString do
     def dump(_), do: :error
 
     def cast(%Geo.LineString{} = line_string), do: {:ok, line_string}
-    def cast(line_string) when is_map(line_string), do: { :ok, Geo.JSON.decode(line_string) }
+    def cast(%{"type" => _, "coordinates" => _} = line_string), do: { :ok, Geo.JSON.decode(line_string) }
 
     if Code.ensure_loaded?(Poison) do
       def cast(line_string) when is_binary(line_string), do: { :ok, Poison.decode!(line_string) |> Geo.JSON.decode }
