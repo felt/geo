@@ -148,6 +148,14 @@ if Code.ensure_loaded?(Ecto.Query) do
       quote do: fragment("ST_SRID(?)", unquote(geometry))
     end
 
+    defmacro st_set_srid(geometry, srid) do
+      quote do: fragment("ST_SetSRID(?, ?)", unquote(geometry), unquote(srid))
+    end
+
+    defmacro st_make_box_2d(geometryA, geometryB) do
+      quote do: fragment("ST_MakeBox2D(?, ?)", unquote(geometryA), unquote(geometryB))
+    end
+
     defmacro st_dimension(geometry) do
       quote do: fragment("ST_Dimension(?)", unquote(geometry))
     end
