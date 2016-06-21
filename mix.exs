@@ -29,7 +29,7 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [
-      {:ecto, "~> 1.1 or ~> 2.0-rc", optional: true },
+      {:ecto, "~> 1.1 or ~> 2.0", optional: true },
       {:postgrex, "~> 0.11.1", optional: true },
       {:poison, "~> 1.5 or ~> 2.0", optional: true},
       {:earmark, "~> 0.2", only: :dev},
