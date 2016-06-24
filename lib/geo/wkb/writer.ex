@@ -8,9 +8,7 @@ defmodule Geo.WKB.Writer do
   end
 
   def write(writer, value) do
-    if(writer.endian == :ndr)do
-      value = Geo.Utils.reverse_byte_order(value)
-    end
+    value = if writer.endian == :ndr, do: Geo.Utils.reverse_byte_order(value), else: value
 
     %{ writer | wkb: writer.wkb <> value }
   end

@@ -15,9 +15,7 @@ defmodule Geo.WKB.Reader do
   def read(reader, count) do
     value = :binary.part(reader.wkb, 0, count)
 
-    if reader.endian == :ndr do
-      value = Geo.Utils.reverse_byte_order(value)
-    end
+    value = if reader.endian == :ndr, do: Geo.Utils.reverse_byte_order(value), else: value
 
     { value, %{ reader | wkb: :binary.part(reader.wkb, count, byte_size(reader.wkb) - count) } }
   end

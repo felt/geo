@@ -75,12 +75,13 @@ defmodule Geo.WKT do
   @spec decode(binary) :: Geo.geometry
   def decode(wkt) do
       wkt_split = String.split(wkt, ";")
-      srid = nil
-      actual_wkt = wkt
-      if length(wkt_split) == 2 do
-        srid = hd(wkt_split) |> String.replace("SRID=","") |> String.to_integer
-        actual_wkt = List.last(wkt_split)
-      end
+      {srid, actual_wkt} = 
+        if length(wkt_split) == 2 do
+          {hd(wkt_split) |> String.replace("SRID=","") |> String.to_integer,
+          actual_wkt = List.last(wkt_split)}
+        else
+          {nil, wkt}
+        end
 
       do_decode(actual_wkt, srid)
   end
@@ -207,13 +208,8 @@ defmodule Geo.WKT do
   end
 
   defp repair_str(str, starts, ends) do
-      if !String.starts_with?(str, starts) do
-        str = starts <> str
-      end
-
-      if !String.ends_with?(str, ends) do
-        str = str <> ends
-      end
+      str = if !String.starts_with?(str, starts), do: starts <> str, else: str
+      str = if !String.ends_with?(str, ends), do: str <> ends, else: str
 
       str
   end
