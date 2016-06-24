@@ -40,10 +40,7 @@ defmodule Geo.WKB do
             |> Integer.to_string(16)
             |> Utils.pad_left(8)
 
-    srid = ""
-    if geom.srid do
-      srid = Integer.to_string(geom.srid, 16) |>Utils.pad_left(8)
-    end
+    srid = if geom.srid, do: Integer.to_string(geom.srid, 16) |>Utils.pad_left(8), else: ""
 
     count = Integer.to_string(Enum.count(geom.geometries), 16) |>Utils.pad_left(8)
 
@@ -67,10 +64,7 @@ defmodule Geo.WKB do
             |> Integer.to_string(16)
             |> Utils.pad_left(8)
 
-    srid = ""
-    if geom.srid do
-      srid = Integer.to_string(geom.srid, 16) |>Utils.pad_left(8)
-    end
+    srid = if geom.srid, do: Integer.to_string(geom.srid, 16) |>Utils.pad_left(8), else: ""
 
     writer = Writer.write(writer, type)
     writer = Writer.write(writer, srid)
@@ -157,26 +151,28 @@ defmodule Geo.WKB do
     wkb_reader = Reader.start(wkb)
     { type, wkb_reader } = Reader.read(wkb_reader, 8)
 
-    srid = nil
-
     type = String.to_integer(type, 16)
 
-    if (type &&& 0x20000000) != 0 do
-      { srid, wkb_reader } = Reader.read(wkb_reader, 8)
-      srid = String.to_integer(srid, 16)
-    end
+    {srid, wkb_reader} =
+      if (type &&& 0x20000000) != 0 do
+        { srid, wkb_reader } = Reader.read(wkb_reader, 8)
+        {String.to_integer(srid, 16), wkb_reader}
+      else
+        {nil, wkb_reader}
+      end
 
     type = Utils.hex_to_type(type &&& 0xff)
 
     {coordinates, wkb_reader} = decode_coordinates(type, wkb_reader)
 
-    case type do
-      %Geo.GeometryCollection{} ->
-        coordinates = Enum.map(coordinates, fn(x) -> %{ x | srid: srid } end)
-        geometries = %{ type | geometries: coordinates, srid: srid  }
-      _ ->
-        geometries = geometries ++ [ %{ type | coordinates: coordinates, srid: srid  }]         
-    end  
+    geometries =
+      case type do
+        %Geo.GeometryCollection{} ->
+          coordinates = Enum.map(coordinates, fn(x) -> %{ x | srid: srid } end)
+          %{ type | geometries: coordinates, srid: srid  }
+        _ ->
+          geometries ++ [ %{ type | coordinates: coordinates, srid: srid  }]
+      end
 
     if(Reader.eof?(wkb_reader)) do
       return_geom(geometries)

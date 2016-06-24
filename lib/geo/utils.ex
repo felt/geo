@@ -24,7 +24,7 @@ defmodule Geo.Utils do
   `
   """
   def hex_to_float(hex) when is_integer(hex) or is_binary(hex) do
-    if is_integer(hex), do: hex = Integer.to_string(hex, 16)
+    hex = if is_integer(hex), do: Integer.to_string(hex, 16), else: hex
 
     case bit_size(hex) do
       64 ->
