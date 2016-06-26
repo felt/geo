@@ -1,3 +1,7 @@
+# v1.0.6
+* Enhancements
+  * Fixed warnings that appeared in Elixir 1.3
+
 # v1.0.5
 * Enhancements
   * Update to allow use with Ecto 2.0

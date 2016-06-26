@@ -12,13 +12,13 @@ defmodule Geo.Utils do
   `
     Geo.Utils.hex_to_float("40000000")
     2.0
-    
+
     Geo.Utils.hex_to_float(0x40000000)
     2.0
-    
+
     Geo.Utils.hex_to_float("3ff0000000000000")
     1.0
-    
+
     Geo.Utils.hex_to_float(0x3ff0000000000000)
     1.0
   `
@@ -34,7 +34,7 @@ defmodule Geo.Utils do
         << value :: float-64 >> = << String.to_integer(hex, 16) :: integer-64 >>
         value
       _ ->
-        raise ArgumentError.new message: "hex must be either 4 or 8 bytes long"
+        raise( ArgumentError, message: "hex must be either 4 or 8 bytes long")
     end
   end
 
@@ -59,7 +59,7 @@ defmodule Geo.Utils do
   ```
   Geo.Utils.reverse_byte_order("00000004")
   "40000000"
-  
+
   Geo.Utils.reverse_byte_order("E6100000")
   "000010E6"
   ```
@@ -77,7 +77,7 @@ defmodule Geo.Utils do
   end
 
   @doc """
-  Adds 0's to the right of hex string 
+  Adds 0's to the right of hex string
   """
   def pad_right(hex, size) do
     if byte_size(hex) == size do
@@ -88,7 +88,7 @@ defmodule Geo.Utils do
   end
 
   @doc """
-  Adds 0's to the left of hex string 
+  Adds 0's to the left of hex string
   """
   def pad_left(hex, size) do
     if byte_size(hex) == size do
