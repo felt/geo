@@ -179,7 +179,7 @@ end
   end
   ```
 
-* [Postgis functions](http://postgis.net/docs/manual-1.3/ch06.html) can also be used in ecto queries. Currently only the OpenGIS functions are implemented. Have a look at `lib/geo/postgis.ex` for the implemented functions. You can use them like:
+* [Postgis functions](http://postgis.net/docs/manual-1.3/ch06.html) can also be used in ecto queries. Currently only the OpenGIS functions are implemented. Have a look at [lib/geo/postgis.ex](lib/geo/postgis.ex) for the implemented functions. You can use them like:
 
   ```elixir
   defmodule Example do
