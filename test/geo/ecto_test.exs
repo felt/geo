@@ -28,15 +28,25 @@ defmodule Geo.Ecto.Test do
     end
   end
 
+  defmodule LocationMulti do
+    use Ecto.Schema
+
+    schema "location_multi" do
+      field :name,           :string
+      field :geom,           Geo.Geometry
+    end
+  end
+
   setup _ do
     opts = [hostname: "localhost",
     username: "postgres", database: "geo_postgrex_test",
     extensions: [{Geo.PostGIS.Extension, library: Geo}]]
 
     {:ok, pid} = Postgrex.start_link(opts)
-    {:ok, _} = Postgrex.query(pid, "DROP TABLE IF EXISTS locations, geographies", [])
+    {:ok, _} = Postgrex.query(pid, "DROP TABLE IF EXISTS locations, geographies, location_multi", [])
     {:ok, _} = Postgrex.query(pid, "CREATE TABLE locations (id serial primary key, name varchar, geom geometry(MultiPolygon))", [])
     {:ok, _} = Postgrex.query(pid, "CREATE TABLE geographies (id serial primary key, name varchar, geom geography(Point))", [])
+    {:ok, _} = Postgrex.query(pid, "CREATE TABLE location_multi (id serial primary key, name varchar, geom geometry)", [])
 
     {:ok, _} = Repo.start_link()
 
@@ -174,4 +184,19 @@ defmodule Geo.Ecto.Test do
     changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: %{"latitude" => -90, "longitude" => 31 }}, ~w(name geom), ~w())
     assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
   end
+
+
+  test "insert multiple geometry types" do
+    geom1 = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
+    geom2 = %Geo.LineString{ coordinates: [{30, -90}, {30, -91}], srid: 4326}
+
+    Repo.insert(%LocationMulti{name: "hello point", geom: geom1})
+    Repo.insert(%LocationMulti{name: "hello line", geom: geom2})
+    query = from location in LocationMulti, select: location
+    [m1, m2] = Repo.all(query)
+
+    assert m1.geom == geom1
+    assert m2.geom == geom2
+  end
+
 end

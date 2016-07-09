@@ -1,3 +1,7 @@
+# v1.1
+* Enhancements
+  * Add Geo.Geometry custom Ecto type to allow multiple geometries in a single field
+
 # v1.0.6
 * Enhancements
   * Fixed warnings that appeared in Elixir 1.3

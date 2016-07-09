@@ -120,7 +120,7 @@ end
 
     schema "test" do
       field :name,           :string
-      field :geom,           Geo.Point
+      field :geom,           Geo.Geometry
     end
   end
 
