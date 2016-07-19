@@ -94,4 +94,17 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+
+  test "Unable to encode non-geo type" do
+    assert_raise Geo.JSON.EncodeError, fn ->
+      Geo.JSON.encode(%{a: "b"})
+    end
+  end
+
+  test "Unable to decode invalid geojson map" do
+    assert_raise Geo.JSON.DecodeError, fn ->
+      Geo.JSON.decode(%{a: "b"})
+    end
+  end
+
 end
