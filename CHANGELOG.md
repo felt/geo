@@ -1,3 +1,8 @@
+# v1.1.1
+* Enhancements
+  * Added `Geo.JSON.EncodeError` and `Geo.JSON.DecodeError` thrown whenever `Geo.JSON.encode` or `Geo.JSON.decode` are given invalid data
+
+
 # v1.1
 * Enhancements
   * Add Geo.Geometry custom Ecto type to allow multiple geometries in a single field
