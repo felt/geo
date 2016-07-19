@@ -8,5 +8,5 @@ otp_release:
 services:
   - postgresql
 before_script:
-  - psql -c 'create database geo_test;' -U postgres
-  - psql -c 'create extension postgis;' -U postgres -d geo_test
+  - psql -c 'create database geo_postgrex_test;' -U postgres
+  - psql -c 'create extension postgis;' -U postgres -d geo_postgrex_test
