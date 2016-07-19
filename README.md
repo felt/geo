@@ -1,5 +1,7 @@
 # Geo
 
+[![Build Status](https://travis-ci.org/bryanjos/geo.svg?branch=master)](https://travis-ci.org/bryanjos/geo)
+
 A collection of GIS functions. Handles conversions to and from WKT, WKB, and GeoJSON for the following geometries:
 
 * Point
