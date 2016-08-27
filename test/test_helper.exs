@@ -5,11 +5,12 @@
 :ok = Application.ensure_started(:postgrex)
 :ok = Application.ensure_started(:ecto)
 
+defmodule Geo.Test.Helper do
+  def opts do
+    [hostname: "localhost",
+     username: "postgres", database: "geo_postgrex_test",
+     extensions: [{Geo.PostGIS.Extension, []}]]
+  end
+end
+
 ExUnit.start
-
-opts = [hostname: "localhost",
-   username: "postgres", database: "geo_postgrex_test",
-   extensions: [{Geo.PostGIS.Extension, library: Geo}]]
-
-{:ok, pid} = Postgrex.start_link(opts)
-{:ok, _} = Postgrex.query(pid, "CREATE EXTENSION IF NOT EXISTS postgis", [])

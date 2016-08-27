@@ -38,11 +38,7 @@ defmodule Geo.Ecto.Test do
   end
 
   setup _ do
-    opts = [hostname: "localhost",
-    username: "postgres", database: "geo_postgrex_test",
-    extensions: [{Geo.PostGIS.Extension, library: Geo}]]
-
-    {:ok, pid} = Postgrex.start_link(opts)
+    {:ok, pid} = Postgrex.start_link(Geo.Test.Helper.opts)
     {:ok, _} = Postgrex.query(pid, "DROP TABLE IF EXISTS locations, geographies, location_multi", [])
     {:ok, _} = Postgrex.query(pid, "CREATE TABLE locations (id serial primary key, name varchar, geom geometry(MultiPolygon))", [])
     {:ok, _} = Postgrex.query(pid, "CREATE TABLE geographies (id serial primary key, name varchar, geom geography(Point))", [])

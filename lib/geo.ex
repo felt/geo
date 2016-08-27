@@ -65,28 +65,28 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 
   ```elixir
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-  extensions: [{Geo.PostGIS, library: Geo}] ]
+  extensions: [{Geo.PostGIS, []}] ]
 
   [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-   extensions: [{Geo.PostGIS, library: Geo}]]
+   extensions: [{Geo.PostGIS, []}]]
 
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}
 
   geo = %Geo.Point{coordinates: {30, -90}, srid: 4326}
   %Geo.Point{coordinates: {30, -90}, srid: 4326}
-  
+
   {:ok, _} = Postgrex.Connection.query(pid, "CREATE TABLE point_test (id int, geom geometry(Point, 4326))")
   {:ok, %Postgrex.Result{columns: nil, command: :create_table, num_rows: 0, rows: nil}}
-  
+
   {:ok, _} = Postgrex.Connection.query(pid, "INSERT INTO point_test VALUES ($1, $2)", [42, geo])
   {:ok, %Postgrex.Result{columns: nil, command: :insert, num_rows: 1, rows: nil}}
-  
+
   Postgrex.Connection.query(pid, "SELECT * FROM point_test")
   {:ok, %Postgrex.Result{columns: ["id", "geom"], command: :select, num_rows: 1,
   rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326 }}]}}
   ```
-  
+
 * Can now be used with Ecto as well
 
   ```elixir
@@ -98,7 +98,7 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
     password: "postgres",
     hostname: "localhost",
     adapter: Ecto.Adapters.Postgres,
-    extensions: [{Geo.PostGIS, library: Geo}]
+    extensions: [{Geo.PostGIS, []}]
 
 
   #Create a model
@@ -129,9 +129,9 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
   ```
 
   Be sure to enable the Postgis extension if you haven't already done so:
-  
+
   ```elixir
-  
+
   defmodule MyApp.Repo.Migrations.EnablePostgis do
     use Ecto.Migration
 
@@ -151,43 +151,43 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 
   @type endian :: :ndr | :xdr
 
-  defimpl String.Chars, for: Geo.Point do  
+  defimpl String.Chars, for: Geo.Point do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end
   end
 
-  defimpl String.Chars, for: Geo.LineString do  
+  defimpl String.Chars, for: Geo.LineString do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end
   end
 
-  defimpl String.Chars, for: Geo.Polygon do  
+  defimpl String.Chars, for: Geo.Polygon do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end
   end
 
-  defimpl String.Chars, for: Geo.MultiPoint do  
+  defimpl String.Chars, for: Geo.MultiPoint do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end
   end
 
-  defimpl String.Chars, for: Geo.MultiLineString do  
+  defimpl String.Chars, for: Geo.MultiLineString do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end
   end
 
-  defimpl String.Chars, for: Geo.MultiPolygon do  
+  defimpl String.Chars, for: Geo.MultiPolygon do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end
   end
 
-  defimpl String.Chars, for: Geo.GeometryCollection do  
+  defimpl String.Chars, for: Geo.GeometryCollection do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end

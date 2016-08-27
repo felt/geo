@@ -9,10 +9,10 @@ if Code.ensure_loaded?(Postgrex.Extension) do
     PostGIS extension for Postgrex. Supports Geometry and Geography data types
 
         opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-        extensions: [{Geo.PostGIS.Extension, library: Geo}] ]
+        extensions: [{Geo.PostGIS.Extension, []}] ]
 
         [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-         extensions: [{Geo.PostGIS.Extension, library: Geo}]]
+         extensions: [{Geo.PostGIS.Extension, []}]]
 
         {:ok, pid} = Postgrex.Connection.start_link(opts)
         {:ok, #PID<0.115.0>}
@@ -43,19 +43,19 @@ if Code.ensure_loaded?(Postgrex.Extension) do
       :text
     end
 
-    def encode(%TypeInfo{type: "geometry"}, geom, _state, _library) do
+    def encode(%TypeInfo{type: "geometry"}, geom, _, _) do
       Geo.WKT.encode(geom)
     end
 
-    def encode(%TypeInfo{type: "geography"}, geom, _state, _library) do
+    def encode(%TypeInfo{type: "geography"}, geom, _, _) do
       Geo.WKT.encode(geom)
     end
 
-    def decode(%TypeInfo{type: "geometry"}, wkb, _state, _library) do
+    def decode(%TypeInfo{type: "geometry"}, wkb, _, _) do
       Geo.WKB.decode(wkb)
     end
 
-    def decode(%TypeInfo{type: "geography"}, wkb, _state, _library) do
+    def decode(%TypeInfo{type: "geography"}, wkb, _, _) do
       Geo.WKB.decode(wkb)
     end
   end

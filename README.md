@@ -80,10 +80,10 @@ end
 
   ```elixir
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-  extensions: [{Geo.PostGIS.Extension, library: Geo}] ]
+  extensions: [{Geo.PostGIS.Extension, []}] ]
 
   [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-   extensions: [{Geo.PostGIS.Extension, library: Geo}]]
+   extensions: [{Geo.PostGIS.Extension, []}]]
 
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}
@@ -113,7 +113,7 @@ end
     password: "postgres",
     hostname: "localhost",
     adapter: Ecto.Adapters.Postgres,
-    extensions: [{Geo.PostGIS.Extension, library: Geo}]
+    extensions: [{Geo.PostGIS.Extension, []}]
 
 
   #Create a model
