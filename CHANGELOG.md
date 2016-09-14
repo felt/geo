@@ -1,3 +1,7 @@
+# v1.1.2
+* Bug Fixes
+  * WKBs that are GeometryCollections with one element should now properly decode
+
 # v1.1.1
 * Enhancements
   * Added `Geo.JSON.EncodeError` and `Geo.JSON.DecodeError` thrown whenever `Geo.JSON.encode` or `Geo.JSON.decode` are given invalid data

@@ -14,7 +14,7 @@ defmodule Geo.WKB do
 
   @moduledoc """
   Converts to and from WKB and EWKB
-  
+
       point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
       Geo.Point[coordinates: {1, 1}, srid: nil]
 
@@ -168,7 +168,9 @@ defmodule Geo.WKB do
     geometries =
       case type do
         %Geo.GeometryCollection{} ->
-          coordinates = Enum.map(coordinates, fn(x) -> %{ x | srid: srid } end)
+          coordinates = coordinates
+          |> Enum.map(fn(x) -> %{ x | srid: srid } end)
+
           %{ type | geometries: coordinates, srid: srid  }
         _ ->
           geometries ++ [ %{ type | coordinates: coordinates, srid: srid  }]
@@ -224,7 +226,8 @@ defmodule Geo.WKB do
 
   defp decode_coordinates(%GeometryCollection{}, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
-    { decode(Reader.get_wkb(wkb_reader)), Reader.start("00") }
+    geometries = decode(Reader.get_wkb(wkb_reader))
+    { List.wrap(geometries), Reader.start("00") }
   end
 
   defp decode_coordinates(_geom, wkb_reader) do

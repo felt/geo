@@ -156,4 +156,22 @@ defmodule Geo.WKB.Test do
     {-8.91605728674111, 37.014786050505705}]]])
   end
 
+  test "Decoding of GeometryCollection with one geometry" do
+    geom = %Geo.GeometryCollection{geometries: [%Geo.Point{ coordinates: {54.1745659, 15.5398456}, srid: 4326 }], srid: 4326 }
+    wkb = Geo.WKB.encode(geom)
+    geodata = Geo.WKB.decode(wkb)
+
+    assert wkb == "0020000007000010E6000000010000000001404B16582CE7BF97402F1466A479C76C"
+    assert geom == geodata
+  end
+
+  test "Decoding of GeometryCollection with two geometries" do
+    geom = %Geo.GeometryCollection{geometries: [%Geo.Point{ coordinates: {54.1745659, 15.5398456}, srid: 4326 },
+                                                %Geo.Point{ coordinates: {54.1745659, 15.5398456}, srid: 4326 }], srid: 4326 }
+    wkb = Geo.WKB.encode(geom)
+    geodata = Geo.WKB.decode(wkb)
+
+    assert geom == geodata
+  end
+
 end
