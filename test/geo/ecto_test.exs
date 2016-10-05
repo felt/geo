@@ -162,7 +162,7 @@ defmodule Geo.Ecto.Test do
 
   defimpl Ecto.DataType, for: Map do
     def cast(%{"latitude" => lat, "longitude" => long}, Geo.Point) do
-      {:ok, %Geo.Point{coordinates: {long, lat}, srid: 4326}}
+      {:ok, %Geo.Point{coordinates: {lat, long}, srid: 4326}}
     end
     def cast(_, _), do: :error
   end
@@ -177,7 +177,7 @@ defmodule Geo.Ecto.Test do
 
     result = hd(results)
 
-    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: %{"latitude" => -90, "longitude" => 31 }}, ~w(name geom), ~w())
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: %{"latitude" => 31, "longitude" => -90 }}, ~w(name geom), ~w())
     assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
   end
 
