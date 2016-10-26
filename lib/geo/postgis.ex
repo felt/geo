@@ -24,6 +24,10 @@ if Code.ensure_loaded?(Ecto.Query) do
       quote do: fragment("ST_Distance(?,?)", unquote(geometryA), unquote(geometryB))
     end
 
+    defmacro st_distance_sphere(geometryA, geometryB) do
+      quote do: fragment("ST_Distance_Sphere(?,?)", unquote(geometryA), unquote(geometryB))
+    end
+
     defmacro st_dwithin(geometryA, geometryB, float) do
       quote do: fragment("ST_DWithin(?,?,?)", unquote(geometryA), unquote(geometryB), unquote(float))
     end

@@ -82,6 +82,17 @@ defmodule Geo.Ecto.Test do
     assert results == 0
   end
 
+  test "query sphere distance" do
+    geom = Geo.WKB.decode(@multipoint_wkb)
+
+    Repo.insert(%Location{name: "hello", geom: geom})
+
+    query = from location in Location, limit: 5, select: st_distance_sphere(location.geom, ^geom)
+    results = Repo.one(query)
+
+    assert results == 0
+  end
+
   test "example" do
     geom = Geo.WKB.decode(@multipoint_wkb)
     Repo.insert(%Location{name: "hello", geom: geom})
