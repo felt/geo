@@ -3,7 +3,7 @@ defmodule Geo.Mixfile do
 
   def project do
     [ app: :geo,
-      version: "1.1.2",
+      version: "1.2.0",
       elixir: "~> 1.0",
       deps: deps,
       description: description,
@@ -31,9 +31,9 @@ defmodule Geo.Mixfile do
     [
       {:ecto, "~> 1.1 or ~> 2.0", optional: true },
       {:postgrex, "~> 0.11", optional: true },
-      {:poison, "~> 1.5 or ~> 2.0", optional: true},
-      {:earmark, "~> 0.2", only: :dev},
-      {:ex_doc, "~> 0.12", only: :dev}
+      {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0", optional: true},
+      {:earmark, "~> 1.0", only: :dev},
+      {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
 
