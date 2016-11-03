@@ -19,6 +19,9 @@ if Code.ensure_loaded?(Ecto.Query) do
         end
     """
 
+    defmacro st_transform(wkt, srid) do
+      quote do: fragment("ST_Transform(?, ?)", unquote(wkt), unquote(srid))
+    end
 
     defmacro st_distance(geometryA, geometryB) do
       quote do: fragment("ST_Distance(?,?)", unquote(geometryA), unquote(geometryB))
