@@ -1,3 +1,7 @@
+# v1.2.1
+* Enhancements
+  * [add st_transform](https://github.com/bryanjos/geo/pull/51)
+
 # v1.2
 * Enhancements
   * [add st_distance_sphere](https://github.com/bryanjos/geo/pull/49)
