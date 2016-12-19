@@ -9,7 +9,8 @@ defmodule Geo.Test.Helper do
   def opts do
     [hostname: "localhost",
      username: "postgres", database: "geo_postgrex_test",
-     extensions: [{Geo.PostGIS.Extension, []}]]
+     types: Geo.PostGIS.PostgrexTypes
+    ]
   end
 end
 

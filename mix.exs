@@ -9,7 +9,7 @@ defmodule Geo.Mixfile do
       description: description,
       package: package,
       name: "Geo",
-      consolidate_protocols: Mix.env == :prod,
+      elixirc_paths: elixirc_paths(Mix.env),
       source_url: "https://github.com/bryanjos/geo"]
   end
 
@@ -20,6 +20,9 @@ defmodule Geo.Mixfile do
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]  
+
   defp description do
     """
     PostGIS extension for Postgrex. Includes PostGIS types for Ecto.
@@ -29,10 +32,9 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [
-      {:ecto, "~> 1.1 or ~> 2.0", optional: true },
-      {:postgrex, "~> 0.11", optional: true },
-      {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0", optional: true},
-      {:earmark, "~> 1.0", only: :dev},
+      {:ecto, "~> 2.1", optional: true },
+      {:postgrex, "~> 0.13", optional: true },
+      {:poison, "~> 3.0", optional: true},
       {:ex_doc, "~> 0.14", only: :dev}
     ]
   end
