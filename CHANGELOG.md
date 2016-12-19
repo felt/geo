@@ -1,6 +1,6 @@
 # v1.3.0-dev
 * Enhancements
-  * [Support new Postgrex 0.13 Extension API](https://github.com/bryanjos/geo/pull/51)
+  * [Support new Postgrex 0.13 Extension API](https://github.com/bryanjos/geo/pull/53)
 
 # v1.2.1
 * Enhancements
