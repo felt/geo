@@ -79,11 +79,7 @@ defmodule Geo.Ecto.Test do
     query = from location in Location, limit: 1, select: st_transform(location.geom, 3452)
     results = Repo.one(query)
 
-    assert results = %Geo.MultiPolygon{coordinates: [[[{25490891.87425425, 11454760.39286618}, {25490915.72503668, 11454756.622236678}, {25490940.521944612, 11454751.789483352},
-               {25490947.78999233, 11454739.051259525}, {25490945.122736573, 11454721.31933375}, {25490933.894902337, 11454701.716498088},
-               {25490918.661036905, 11454695.809277687}, {25490894.034267686, 11454702.74008471}, {25490879.34116009, 11454714.62020763}, {25490866.177257963, 11454720.207039082},
-               {25490858.15628082, 11454736.123776026}, {25490860.643045224, 11454740.24201736}, {25490867.112289257, 11454753.703846656},
-               {25490876.247982353, 11454761.838036865}, {25490891.87425425, 11454760.39286618}]]], srid: 3452}
+    assert results.srid == 3452
   end
 
   test "query distance" do
@@ -149,7 +145,8 @@ defmodule Geo.Ecto.Test do
 
     json = Geo.JSON.encode(%Geo.Point{ coordinates: {31, -90}, srid: 4326})
 
-    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, [:name, :geom])
+    |> Ecto.Changeset.validate_required([:name, :geom])
     assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
   end
 
@@ -166,7 +163,8 @@ defmodule Geo.Ecto.Test do
               "crs" => %{ "type" => "name", "properties" => %{"name" => "EPSG4326" } },
               "coordinates" => [31, -90] }
 
-    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, ~w(name geom), ~w())
+    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: json}, [:name, :geom])
+    |> Ecto.Changeset.validate_required([:name, :geom])
     assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
   end
 
@@ -184,29 +182,6 @@ defmodule Geo.Ecto.Test do
       Repo.all(query)
       |> Enum.map(fn x -> x.name end)
   end
-
-
-  defimpl Ecto.DataType, for: Map do
-    def cast(%{"latitude" => lat, "longitude" => long}, Geo.Point) do
-      {:ok, %Geo.Point{coordinates: {lat, long}, srid: 4326}}
-    end
-    def cast(_, _), do: :error
-  end
-
-
-  test "defimpl Ecto.DataType" do
-    geom = %Geo.Point{ coordinates: {30, -90}, srid: 4326}
-
-    Repo.insert(%Geographies{name: "hello", geom: geom})
-    query = from location in Geographies, limit: 5, select: location
-    results = Repo.all(query)
-
-    result = hd(results)
-
-    changeset = Ecto.Changeset.cast(result, %{title: "Hello", geom: %{"latitude" => 31, "longitude" => -90 }}, ~w(name geom), ~w())
-    assert changeset.changes == %{geom: %Geo.Point{coordinates: {31, -90}, srid: 4326}}
-  end
-
 
   test "insert multiple geometry types" do
     geom1 = %Geo.Point{ coordinates: {30, -90}, srid: 4326}

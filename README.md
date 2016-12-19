@@ -79,11 +79,10 @@ end
 * A Postgrex Extension for the PostGIS data types, Geometry and Geography
 
   ```elixir
-  opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-  extensions: [{Geo.PostGIS.Extension, []}] ]
+  Postgrex.Types.define(MyApp.PostgresTypes, [Geo.PostGIS.Extension], [])
 
-  [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-   extensions: [{Geo.PostGIS.Extension, []}]]
+  opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test", types: MyApp.PostgresTypes ]
+  [hostname: "localhost", username: "postgres", database: "geo_postgrex_test", types: MyApp.PostgresTypes]  
 
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}
@@ -106,6 +105,11 @@ end
 
   ```elixir
 
+  #If using with Ecto, you may want something like thing instead
+  Postgrex.Types.define(MyApp.PostgresTypes,
+                [Geo.PostGIS.Extension] ++ Ecto.Adapters.Postgres.extensions(),
+                json: Poison)  
+
   #Add extensions to your repo config
   config :thanks, Repo,
     database: "geo_postgrex_test",
@@ -113,7 +117,7 @@ end
     password: "postgres",
     hostname: "localhost",
     adapter: Ecto.Adapters.Postgres,
-    extensions: [{Geo.PostGIS.Extension, []}]
+    types: MyApp.PostgresTypes
 
 
   #Create a model

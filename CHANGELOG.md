@@ -1,3 +1,11 @@
+# v1.3.0-dev
+* Enhancements
+  * [Support new Postgrex 0.13 Extension API](https://github.com/bryanjos/geo/pull/53)
+
+* Breaking
+  * Now only supports Postgrex 0.13+
+  * Now only supports Ecto 2.1+
+
 # v1.2.1
 * Enhancements
   * [add st_transform](https://github.com/bryanjos/geo/pull/51)
