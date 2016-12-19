@@ -6,11 +6,19 @@ if Code.ensure_loaded?(Postgrex.Extension) do
     @moduledoc """
     PostGIS extension for Postgrex. Supports Geometry and Geography data types
 
+        #Create a new Postgrex Types module:
+        Postgrex.Types.define(MyApp.PostgresTypes, [Geo.PostGIS.Extension], [])
+
+        #If using with Ecto, you may want something like thing instead
+        Postgrex.Types.define(MyApp.PostgresTypes,
+                      [Geo.PostGIS.Extension] ++ Ecto.Adapters.Postgres.extensions(),
+                      json: Poison)
+
         opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-        types: Geo.PostGIS.PostgrexTypes ]
+        types: MyApp.PostgresTypes ]
 
         [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-         types: Geo.PostGIS.PostgrexTypes]
+         types: MyApp.PostgresTypes]
 
         {:ok, pid} = Postgrex.Connection.start_link(opts)
         {:ok, #PID<0.115.0>}
