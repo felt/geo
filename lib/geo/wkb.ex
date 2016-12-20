@@ -211,7 +211,7 @@ defmodule Geo.WKB do
         {nil, wkb_reader}
       end
 
-    type = Utils.hex_to_type(type &&& 0xff)
+    type = Utils.hex_to_type(type &&& 0xdf_ff_ff_ff)
 
     {coordinates, wkb_reader} = decode_coordinates(type, wkb_reader)
 
@@ -253,6 +253,45 @@ defmodule Geo.WKB do
     {y, wkb_reader} = Reader.read(wkb_reader, 16)
     y = Utils.hex_to_float(y)
     { {x,y}, wkb_reader }
+  end
+
+  defp decode_coordinates(%PointZ{}, wkb_reader) do
+    {x, wkb_reader} = Reader.read(wkb_reader, 16)
+    x = Utils.hex_to_float(x)
+
+    {y, wkb_reader} = Reader.read(wkb_reader, 16)
+    y = Utils.hex_to_float(y)
+
+    {z, wkb_reader} = Reader.read(wkb_reader, 16)
+    z = Utils.hex_to_float(z)
+    { {x,y,z}, wkb_reader }
+  end
+
+  defp decode_coordinates(%PointM{}, wkb_reader) do
+    {x, wkb_reader} = Reader.read(wkb_reader, 16)
+    x = Utils.hex_to_float(x)
+
+    {y, wkb_reader} = Reader.read(wkb_reader, 16)
+    y = Utils.hex_to_float(y)
+
+    {m, wkb_reader} = Reader.read(wkb_reader, 16)
+    m = Utils.hex_to_float(m)
+    { {x,y,m}, wkb_reader }
+  end
+
+  defp decode_coordinates(%PointZM{}, wkb_reader) do
+    {x, wkb_reader} = Reader.read(wkb_reader, 16)
+    x = Utils.hex_to_float(x)
+
+    {y, wkb_reader} = Reader.read(wkb_reader, 16)
+    y = Utils.hex_to_float(y)
+
+    {z, wkb_reader} = Reader.read(wkb_reader, 16)
+    z = Utils.hex_to_float(z)
+
+    {m, wkb_reader} = Reader.read(wkb_reader, 16)
+    m = Utils.hex_to_float(m)
+    { {x,y,z,m}, wkb_reader }
   end
 
   defp decode_coordinates(%LineString{}, wkb_reader) do
