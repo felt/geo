@@ -4,7 +4,7 @@ defmodule Geo.PointZM do
   Defines the PointZM struct. Implements the Ecto.Type behaviour
   """
 
-  @type t :: %Geo.PointZM{ coordinates: {number, number}, srid: integer }
+  @type t :: %Geo.PointZM{ coordinates: {number, number, number, number}, srid: integer }
   defstruct coordinates: {0, 0}, srid: nil
 
   if Code.ensure_loaded?(Ecto.Type) do

@@ -4,7 +4,7 @@ defmodule Geo.PointM do
   Defines the PointM struct. Implements the Ecto.Type behaviour
   """
 
-  @type t :: %Geo.PointM{ coordinates: {number, number}, srid: integer }
+  @type t :: %Geo.PointM{ coordinates: {number, number, number}, srid: integer }
   defstruct coordinates: {0, 0}, srid: nil
 
   if Code.ensure_loaded?(Ecto.Type) do
