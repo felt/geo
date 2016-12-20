@@ -1,5 +1,8 @@
 defmodule Geo.WKT do
   alias Geo.Point
+  alias Geo.PointZ
+  alias Geo.PointM
+  alias Geo.PointZM
   alias Geo.LineString
   alias Geo.Polygon
   alias Geo.MultiPoint
@@ -31,6 +34,18 @@ defmodule Geo.WKT do
 
   defp do_encode(%Point{ coordinates: {x, y}}) do
     "POINT(#{x} #{y})"
+  end
+
+  defp do_encode(%PointZ{ coordinates: {x, y, z}}) do
+    "POINT Z(#{x} #{y} #{z})"
+  end
+
+  defp do_encode(%PointM{ coordinates: {x, y, m}}) do
+    "POINT M(#{x} #{y} #{m})"
+  end
+
+  defp do_encode(%PointZM{ coordinates: {x, y, z, m}}) do
+    "POINT ZM(#{x} #{y} #{z} #{m})"
   end
 
   defp do_encode(%LineString{ coordinates: coordinates}) do
@@ -86,6 +101,18 @@ defmodule Geo.WKT do
       do_decode(actual_wkt, srid)
   end
 
+  defp do_decode("POINT ZM" <> coordinates, srid) do
+    %PointZM{ coordinates: create_point(coordinates), srid: srid }
+  end
+
+  defp do_decode("POINT Z" <> coordinates, srid) do
+    %PointZ{ coordinates: create_point(coordinates), srid: srid }
+  end
+
+  defp do_decode("POINT M" <> coordinates, srid) do
+    %PointM{ coordinates: create_point(coordinates), srid: srid }
+  end
+
   defp do_decode("POINT" <> coordinates, srid) do
     %Point{ coordinates: create_point(coordinates), srid: srid }
   end
@@ -127,7 +154,6 @@ defmodule Geo.WKT do
   end
 
   defp create_point(coordinates) do
-
     coordinates
     |> String.strip
     |> remove_outer_parenthesis

@@ -1,5 +1,8 @@
 defmodule Geo.WKB do
   alias Geo.Point
+  alias Geo.PointZ
+  alias Geo.PointM
+  alias Geo.PointZM
   alias Geo.LineString
   alias Geo.Polygon
   alias Geo.MultiPoint
@@ -74,15 +77,62 @@ defmodule Geo.WKB do
   end
 
   defp encode_coordinates(writer, %Point{coordinates: {0, 0}}) do
-      Writer.write(writer,Utils.repeat("0", 32))
+    Writer.write(writer,Utils.repeat("0", 32))
   end
 
   defp encode_coordinates(writer, %Point{coordinates: {x, y}}) do
-      x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
-      y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
 
-      writer = Writer.write(writer, x)
-      Writer.write(writer, y)
+    writer = Writer.write(writer, x)
+    Writer.write(writer, y)
+  end
+
+  defp encode_coordinates(writer, %PointZ{coordinates: {0, 0, 0}}) do
+    Writer.write(writer,Utils.repeat("0", 48))
+  end
+
+  defp encode_coordinates(writer, %PointZ{coordinates: {x, y, z}}) do
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16)
+
+    writer
+    |> Writer.write(x)
+    |> Writer.write(y)
+    |> Writer.write(z)
+  end
+
+  defp encode_coordinates(writer, %PointM{coordinates: {0, 0, 0}}) do
+    Writer.write(writer,Utils.repeat("0", 48))
+  end
+
+  defp encode_coordinates(writer, %PointM{coordinates: {x, y, m}}) do
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16)
+
+    writer
+    |> Writer.write(x)
+    |> Writer.write(y)
+    |> Writer.write(m)
+  end
+
+  defp encode_coordinates(writer, %PointZM{coordinates: {0, 0, 0, 0}}) do
+    Writer.write(writer,Utils.repeat("0", 64))
+  end
+
+  defp encode_coordinates(writer, %PointZM{coordinates: {x, y, z, m}}) do
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16)
+
+    writer
+    |> Writer.write(x)
+    |> Writer.write(y)
+    |> Writer.write(z)
+    |> Writer.write(m)
   end
 
   defp encode_coordinates(writer, %LineString{coordinates: coordinates}) do
