@@ -1,3 +1,7 @@
+# v1.3.1
+* Enhancements
+  * Relax Poison dependency requirement
+
 # v1.3.0
 * Enhancements
   * [Support new Postgrex 0.13 Extension API](https://github.com/bryanjos/geo/pull/53)
