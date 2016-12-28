@@ -37,6 +37,20 @@ if Code.ensure_loaded?(Postgrex.Extension) do
         rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326}}]}}
 
     """
+
+    @geo_types [
+      Geo.GeometryCollection,
+      Geo.LineString,
+      Geo.MultiLineString,
+      Geo.MultiPoint,
+      Geo.MultiPolygon,
+      Geo.Point,
+      Geo.PointZ,
+      Geo.PointM,
+      Geo.PointZM,
+      Geo.Polygon
+    ]
+
     def init(opts) do
       Keyword.get(opts, :decode_binary, :reference)
     end
@@ -52,7 +66,7 @@ if Code.ensure_loaded?(Postgrex.Extension) do
 
     def encode(_opts) do
       quote location: :keep do
-        %x{} = geom when x in [Geo.GeometryCollection, Geo.LineString, Geo.MultiLineString, Geo.MultiPoint, Geo.MultiPolygon, Geo.Point, Geo.Polygon] ->
+        %x{} = geom when x in unquote(@geo_types) ->
           data = Geo.WKT.encode(geom)
           [<<IO.iodata_length(data) :: int32>> | data]
       end
