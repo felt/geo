@@ -1,18 +1,24 @@
 if Code.ensure_loaded?(Postgrex.Extension) do
 
   defmodule Geo.PostGIS.Extension do
-    alias Postgrex.TypeInfo
-
     @behaviour Postgrex.Extension
 
     @moduledoc """
     PostGIS extension for Postgrex. Supports Geometry and Geography data types
 
+        #Create a new Postgrex Types module:
+        Postgrex.Types.define(MyApp.PostgresTypes, [Geo.PostGIS.Extension], [])
+
+        #If using with Ecto, you may want something like thing instead
+        Postgrex.Types.define(MyApp.PostgresTypes,
+                      [Geo.PostGIS.Extension] ++ Ecto.Adapters.Postgres.extensions(),
+                      json: Poison)
+
         opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-        extensions: [{Geo.PostGIS.Extension, []}] ]
+        types: MyApp.PostgresTypes ]
 
         [hostname: "localhost", username: "postgres", database: "geo_postgrex_test",
-         extensions: [{Geo.PostGIS.Extension, []}]]
+         types: MyApp.PostgresTypes]
 
         {:ok, pid} = Postgrex.Connection.start_link(opts)
         {:ok, #PID<0.115.0>}
@@ -31,9 +37,10 @@ if Code.ensure_loaded?(Postgrex.Extension) do
         rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326}}]}}
 
     """
-    def init(_parameters, _opts) do
-      :ok
+    def init(opts) do
+      Keyword.get(opts, :decode_binary, :reference)
     end
+
 
     def matching(_) do
       [type: "geometry", type: "geography"]
@@ -43,20 +50,25 @@ if Code.ensure_loaded?(Postgrex.Extension) do
       :text
     end
 
-    def encode(%TypeInfo{type: "geometry"}, geom, _, _) do
-      Geo.WKT.encode(geom)
+    def encode(_opts) do
+      quote location: :keep do
+        %x{} = geom when x in [Geo.GeometryCollection, Geo.LineString, Geo.MultiLineString, Geo.MultiPoint, Geo.MultiPolygon, Geo.Point, Geo.Polygon] ->
+          data = Geo.WKT.encode(geom)
+          [<<IO.iodata_length(data) :: int32>> | data]
+      end
     end
 
-    def encode(%TypeInfo{type: "geography"}, geom, _, _) do
-      Geo.WKT.encode(geom)
+    def decode(:reference) do
+      quote location: :keep do
+        <<len :: int32, wkb :: binary-size(len)>> ->
+          Geo.WKB.decode(wkb)
+      end
     end
-
-    def decode(%TypeInfo{type: "geometry"}, wkb, _, _) do
-      Geo.WKB.decode(wkb)
-    end
-
-    def decode(%TypeInfo{type: "geography"}, wkb, _, _) do
-      Geo.WKB.decode(wkb)
+    def decode(:copy) do
+      quote location: :keep do
+        <<len :: int32, wkb :: binary-size(len)>> ->
+          Geo.WKB.decode(:binary.copy(wkb))
+      end
     end
   end
 

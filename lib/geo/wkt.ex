@@ -92,8 +92,7 @@ defmodule Geo.WKT do
       wkt_split = String.split(wkt, ";")
       {srid, actual_wkt} = 
         if length(wkt_split) == 2 do
-          {hd(wkt_split) |> String.replace("SRID=","") |> String.to_integer,
-          actual_wkt = List.last(wkt_split)}
+          {hd(wkt_split) |> String.replace("SRID=","") |> String.to_integer, List.last(wkt_split)}
         else
           {nil, wkt}
         end

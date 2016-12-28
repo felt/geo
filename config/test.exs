@@ -6,7 +6,7 @@ config :geo, Geo.Ecto.Test.Repo,
   password: "postgres",
   hostname: "localhost",
   adapter: Ecto.Adapters.Postgres,
-  extensions: [{Geo.PostGIS.Extension, []}]
+  types: Geo.PostGIS.PostgrexTypes
 
 # Print only warnings and errors during test
 config :logger, level: :warn
