@@ -146,12 +146,31 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
   ```
   """
 
-  @type geometry :: Geo.Point.t | Geo.LineString.t | Geo.Polygon.t |
-  Geo.MultiPoint.t | Geo.MultiLineString.t | Geo.MultiPolygon.t | Geo.GeometryCollection.t
+  @type geometry :: Geo.Point.t | Geo.PointZ.t | Geo.PointM.t | Geo.PointZM.t |
+  Geo.LineString.t | Geo.Polygon.t | Geo.MultiPoint.t | Geo.MultiLineString.t |
+  Geo.MultiPolygon.t | Geo.GeometryCollection.t
 
   @type endian :: :ndr | :xdr
 
   defimpl String.Chars, for: Geo.Point do
+    def to_string(geo) do
+      Geo.WKT.encode(geo)
+    end
+  end
+
+  defimpl String.Chars, for: Geo.PointZ do
+    def to_string(geo) do
+      Geo.WKT.encode(geo)
+    end
+  end
+
+  defimpl String.Chars, for: Geo.PointM do
+    def to_string(geo) do
+      Geo.WKT.encode(geo)
+    end
+  end
+
+  defimpl String.Chars, for: Geo.PointZM do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end
