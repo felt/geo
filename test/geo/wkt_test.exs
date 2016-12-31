@@ -11,6 +11,36 @@ defmodule Geo.WKT.Test do
     assert(point.coordinates == { 30, -90 })
   end
 
+  test "Encode PointZ to WKT" do
+    geom = %Geo.PointZ{ coordinates: { 30, -90, 0 } }
+    assert(Geo.WKT.encode(geom) == "POINT Z(30 -90 0)")
+  end
+
+  test "Decode WKT to PointZ" do
+    point = Geo.WKT.decode("POINT Z(30 -90 0)")
+    assert(point.coordinates == { 30, -90, 0 })
+  end
+
+  test "Encode PointM to WKT" do
+    geom = %Geo.PointM{ coordinates: { 30, -90, 0 } }
+    assert(Geo.WKT.encode(geom) == "POINT M(30 -90 0)")
+  end
+
+  test "Decode WKT to PointM" do
+    point = Geo.WKT.decode("POINT M(30 -90 0)")
+    assert(point.coordinates == { 30, -90, 0 })
+  end
+
+  test "Encode PointZM to WKT" do
+    geom = %Geo.PointZM{ coordinates: { 30, -90, 0, 45} }
+    assert(Geo.WKT.encode(geom) == "POINT ZM(30 -90 0 45)")
+  end
+
+  test "Decode WKT to PointZM" do
+    point = Geo.WKT.decode("POINT ZM(30 -90 0 45)")
+    assert(point.coordinates == { 30, -90, 0, 45})
+  end
+
   test "Decode EWKT to Point" do
     point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
     assert(point.coordinates == { 30, -90 })

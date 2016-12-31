@@ -1,5 +1,8 @@
 defmodule Geo.WKB do
   alias Geo.Point
+  alias Geo.PointZ
+  alias Geo.PointM
+  alias Geo.PointZM
   alias Geo.LineString
   alias Geo.Polygon
   alias Geo.MultiPoint
@@ -74,15 +77,62 @@ defmodule Geo.WKB do
   end
 
   defp encode_coordinates(writer, %Point{coordinates: {0, 0}}) do
-      Writer.write(writer,Utils.repeat("0", 32))
+    Writer.write(writer,Utils.repeat("0", 32))
   end
 
   defp encode_coordinates(writer, %Point{coordinates: {x, y}}) do
-      x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
-      y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
 
-      writer = Writer.write(writer, x)
-      Writer.write(writer, y)
+    writer = Writer.write(writer, x)
+    Writer.write(writer, y)
+  end
+
+  defp encode_coordinates(writer, %PointZ{coordinates: {0, 0, 0}}) do
+    Writer.write(writer,Utils.repeat("0", 48))
+  end
+
+  defp encode_coordinates(writer, %PointZ{coordinates: {x, y, z}}) do
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16)
+
+    writer
+    |> Writer.write(x)
+    |> Writer.write(y)
+    |> Writer.write(z)
+  end
+
+  defp encode_coordinates(writer, %PointM{coordinates: {0, 0, 0}}) do
+    Writer.write(writer,Utils.repeat("0", 48))
+  end
+
+  defp encode_coordinates(writer, %PointM{coordinates: {x, y, m}}) do
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16)
+
+    writer
+    |> Writer.write(x)
+    |> Writer.write(y)
+    |> Writer.write(m)
+  end
+
+  defp encode_coordinates(writer, %PointZM{coordinates: {0, 0, 0, 0}}) do
+    Writer.write(writer,Utils.repeat("0", 64))
+  end
+
+  defp encode_coordinates(writer, %PointZM{coordinates: {x, y, z, m}}) do
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16)
+
+    writer
+    |> Writer.write(x)
+    |> Writer.write(y)
+    |> Writer.write(z)
+    |> Writer.write(m)
   end
 
   defp encode_coordinates(writer, %LineString{coordinates: coordinates}) do
@@ -161,7 +211,7 @@ defmodule Geo.WKB do
         {nil, wkb_reader}
       end
 
-    type = Utils.hex_to_type(type &&& 0xff)
+    type = Utils.hex_to_type(type &&& 0xdf_ff_ff_ff)
 
     {coordinates, wkb_reader} = decode_coordinates(type, wkb_reader)
 
@@ -203,6 +253,45 @@ defmodule Geo.WKB do
     {y, wkb_reader} = Reader.read(wkb_reader, 16)
     y = Utils.hex_to_float(y)
     { {x,y}, wkb_reader }
+  end
+
+  defp decode_coordinates(%PointZ{}, wkb_reader) do
+    {x, wkb_reader} = Reader.read(wkb_reader, 16)
+    x = Utils.hex_to_float(x)
+
+    {y, wkb_reader} = Reader.read(wkb_reader, 16)
+    y = Utils.hex_to_float(y)
+
+    {z, wkb_reader} = Reader.read(wkb_reader, 16)
+    z = Utils.hex_to_float(z)
+    { {x,y,z}, wkb_reader }
+  end
+
+  defp decode_coordinates(%PointM{}, wkb_reader) do
+    {x, wkb_reader} = Reader.read(wkb_reader, 16)
+    x = Utils.hex_to_float(x)
+
+    {y, wkb_reader} = Reader.read(wkb_reader, 16)
+    y = Utils.hex_to_float(y)
+
+    {m, wkb_reader} = Reader.read(wkb_reader, 16)
+    m = Utils.hex_to_float(m)
+    { {x,y,m}, wkb_reader }
+  end
+
+  defp decode_coordinates(%PointZM{}, wkb_reader) do
+    {x, wkb_reader} = Reader.read(wkb_reader, 16)
+    x = Utils.hex_to_float(x)
+
+    {y, wkb_reader} = Reader.read(wkb_reader, 16)
+    y = Utils.hex_to_float(y)
+
+    {z, wkb_reader} = Reader.read(wkb_reader, 16)
+    z = Utils.hex_to_float(z)
+
+    {m, wkb_reader} = Reader.read(wkb_reader, 16)
+    m = Utils.hex_to_float(m)
+    { {x,y,z,m}, wkb_reader }
   end
 
   defp decode_coordinates(%LineString{}, wkb_reader) do

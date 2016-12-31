@@ -6,6 +6,21 @@ defmodule Geo.WKB.Test do
     assert(point.coordinates == { 1, 1 })
   end
 
+  test "Decode WKB to PointM" do
+    point = Geo.WKB.decode("0101000040000000000000F03F000000000000F03F000000000000F03F")
+    assert(point.coordinates == { 1, 1, 1 })
+  end
+
+  test "Decode WKB to PointZ" do
+    point = Geo.WKB.decode("0101000080000000000000F03F000000000000F03F000000000000F03F")
+    assert(point.coordinates == { 1, 1, 1 })
+  end
+
+  test "Decode WKB to PointZM" do
+    point = Geo.WKB.decode("01010000C0000000000000F03F000000000000F03F000000000000F03F000000000000F03F")
+    assert(point.coordinates == { 1, 1, 1, 1 })
+  end
+
   test "Decode EWKB to Point" do
     point = Geo.WKB.decode("0101000020E61000009EFB613A637B4240CF2C0950D3735EC0")
     assert(point.coordinates == { 36.9639657, -121.8097725 })
@@ -15,6 +30,21 @@ defmodule Geo.WKB.Test do
   test "Encode Point to WKB" do
     geom = %Geo.Point{ coordinates: { 1, 1 } }
     assert(Geo.WKB.encode(geom, :ndr) == "0101000000000000000000F03F000000000000F03F")
+  end
+
+  test "Encode PointM to WKB" do
+    geom = %Geo.PointM{ coordinates: { 1, 1, 1 } }
+    assert(Geo.WKB.encode(geom, :ndr) == "0101000040000000000000F03F000000000000F03F000000000000F03F")
+  end
+
+  test "Encode PointZ to WKB" do
+    geom = %Geo.PointZ{ coordinates: { 1, 1, 1 } }
+    assert(Geo.WKB.encode(geom, :ndr) == "0101000080000000000000F03F000000000000F03F000000000000F03F")
+  end
+
+  test "Encode PointZM to WKB" do
+    geom = %Geo.PointZM{ coordinates: { 1, 1, 1, 1 } }
+    assert(Geo.WKB.encode(geom, :ndr) == "01010000C0000000000000F03F000000000000F03F000000000000F03F000000000000F03F")
   end
 
   test "Encode Point to EWKB" do

@@ -126,6 +126,18 @@ defmodule Geo.Utils do
     %Geo.Point{}
   end
 
+  def hex_to_type(0x40_00_00_01) do
+    %Geo.PointM{}
+  end
+
+  def hex_to_type(0x80_00_00_01) do
+    %Geo.PointZ{}
+  end
+
+  def hex_to_type(0xC0_00_00_01) do
+    %Geo.PointZM{}
+  end
+
   def hex_to_type(0x02) do
     %Geo.LineString{}
   end
@@ -157,6 +169,18 @@ defmodule Geo.Utils do
 
   def do_type_to_hex(%Geo.Point{}) do
     0x01
+  end
+
+  def do_type_to_hex(%Geo.PointM{}) do
+    0x40_00_00_01
+  end
+
+  def do_type_to_hex(%Geo.PointZ{}) do
+    0x80_00_00_01
+  end
+
+  def do_type_to_hex(%Geo.PointZM{}) do
+    0xC0_00_00_01
   end
 
   def do_type_to_hex(%Geo.LineString{}) do
