@@ -5,9 +5,9 @@ defmodule Geo.Mixfile do
     [ app: :geo,
       version: "1.3.1",
       elixir: "~> 1.0",
-      deps: deps,
-      description: description,
-      package: package,
+      deps: deps(),
+      description: description(),
+      package: package(),
       name: "Geo",
       elixirc_paths: elixirc_paths(Mix.env),
       source_url: "https://github.com/bryanjos/geo"]
