@@ -35,6 +35,13 @@ if Code.ensure_loaded?(Ecto.Query) do
       quote do: fragment("ST_DWithin(?,?,?)", unquote(geometryA), unquote(geometryB), unquote(float))
     end
 
+    @doc"""
+    Casts the 2 geometries given to geographies in order to check for distance in meters
+    """
+    defmacro st_dwithin_in_meters(geometryA, geometryB, float) do
+      quote do: fragment("ST_DWithin(?::geography, ?::geography, ?)", unquote(geometryA), unquote(geometryB), unquote(float))
+    end
+
     defmacro st_equals(geometryA, geometryB) do
       quote do: fragment("ST_Equals(?,?)", unquote(geometryA), unquote(geometryB))
     end
