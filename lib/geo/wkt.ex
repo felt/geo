@@ -12,7 +12,7 @@ defmodule Geo.WKT do
 
   @moduledoc """
   Converts to and from WKT and EWKT
-  
+
       point = Geo.WKT.decode("POINT(30 -90)")
       Geo.Point[coordinates: {30, -90}, srid: nil]
 
@@ -21,7 +21,7 @@ defmodule Geo.WKT do
 
       point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
       Geo.Point[coordinates: {30, -90}, srid: 4326]
-  
+
   """
 
   @doc """
@@ -90,7 +90,7 @@ defmodule Geo.WKT do
   @spec decode(binary) :: Geo.geometry
   def decode(wkt) do
       wkt_split = String.split(wkt, ";")
-      {srid, actual_wkt} = 
+      {srid, actual_wkt} =
         if length(wkt_split) == 2 do
           {hd(wkt_split) |> String.replace("SRID=","") |> String.to_integer, List.last(wkt_split)}
         else
@@ -228,8 +228,16 @@ defmodule Geo.WKT do
     "(#{coordinate_str})"
   end
 
+  defp get_srid_binary(nil) do
+    ""
+  end
+
+  defp get_srid_binary(0) do
+    ""
+  end
+
   defp get_srid_binary(srid) do
-    if srid, do: "SRID=#{srid};", else: ""
+    "SRID=#{srid};"
   end
 
   defp repair_str(str, starts, ends) do
