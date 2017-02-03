@@ -155,4 +155,9 @@ defmodule Geo.WKT.Test do
     assert(List.last(geom.geometries).srid == 4326)
     assert(Geo.WKT.encode(geom) == ewkt)
   end
+
+  test "make sure to not include SRID when srid is 0" do
+    geom = %Geo.Point{ coordinates: { 30, -90}, srid: 0 }
+    assert(Geo.WKT.encode(geom) == "POINT(30 -90)")
+  end
 end
