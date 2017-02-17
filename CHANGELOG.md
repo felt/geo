@@ -1,3 +1,8 @@
+# v1.4.0
+* Enhancements
+  * [Add `st_dwithin_in_meters\3`](https://github.com/bryanjos/geo/pull/64)
+  * [Make sure an srid of 0 does not show srid in WKT](https://github.com/bryanjos/geo/pull/63)
+
 # v1.3.1
 * Enhancements
   * Relax Poison dependency requirement

@@ -15,9 +15,11 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 
 Also includes a Postgrex extension for the PostGIS data types, Geometry and Geography
 
+*Note*: If you are looking to do geospatial calculations outside of PostGIS with Geo's structs, checkout [topo](https://github.com/pkinney/topo)
+
 ```elixir
 defp deps do
-  [{:geo, "~> 1.3"}]
+  [{:geo, "~> 1.4"}]
 end
 ```
 
@@ -82,7 +84,7 @@ end
   Postgrex.Types.define(MyApp.PostgresTypes, [Geo.PostGIS.Extension], [])
 
   opts = [hostname: "localhost", username: "postgres", database: "geo_postgrex_test", types: MyApp.PostgresTypes ]
-  [hostname: "localhost", username: "postgres", database: "geo_postgrex_test", types: MyApp.PostgresTypes]  
+  [hostname: "localhost", username: "postgres", database: "geo_postgrex_test", types: MyApp.PostgresTypes]
 
   {:ok, pid} = Postgrex.Connection.start_link(opts)
   {:ok, #PID<0.115.0>}
@@ -108,7 +110,7 @@ end
   #If using with Ecto, you may want something like thing instead
   Postgrex.Types.define(MyApp.PostgresTypes,
                 [Geo.PostGIS.Extension] ++ Ecto.Adapters.Postgres.extensions(),
-                json: Poison)  
+                json: Poison)
 
   #Add extensions to your repo config
   config :thanks, Repo,
