@@ -15,7 +15,7 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 
 Also includes a Postgrex extension for the PostGIS data types, Geometry and Geography
 
-*Note*: If you are looking to do geospatial calculations outside of PostGIS with Geo's structs, checkout [topo](https://github.com/pkinney/topo)
+*Note*: If you are looking to do geospatial calculations in memory with Geo's structs, checkout [topo](https://github.com/pkinney/topo)
 
 ```elixir
 defp deps do
