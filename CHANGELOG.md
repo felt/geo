@@ -1,7 +1,12 @@
+# v1.4.1
+* Fixes
+  * [Updated ecto related documentation on Geo module](https://github.com/bryanjos/geo/pull/66)
+
 # v1.4.0
 * Enhancements
   * [Add `st_dwithin_in_meters\3`](https://github.com/bryanjos/geo/pull/64)
   * [Make sure an srid of 0 does not show srid in WKT](https://github.com/bryanjos/geo/pull/63)
+  * [Add types PointZ, PointM and PointZM](https://github.com/bryanjos/geo/pull/56)
 
 # v1.3.1
 * Enhancements
