@@ -90,16 +90,19 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 * Can now be used with Ecto as well
 
   ```elixir
+  #Create a file `postgrex_types.ex`
+  Postgrex.Types.define(MyApp.PostgresTypes,
+                [Geo.PostGIS.Extension] ++ Ecto.Adapters.Postgres.extensions(),
+                json: Poison)
 
-  #Add encoder, decoder, and formatter to your repo config
+  #Add the types to your repo config
   config :thanks, Repo,
     database: "geo_postgrex_test",
     username: "postgres",
     password: "postgres",
     hostname: "localhost",
     adapter: Ecto.Adapters.Postgres,
-    extensions: [{Geo.PostGIS, []}]
-
+    types: MyApp.PostgresTypes
 
   #Create a model
   defmodule Test do
