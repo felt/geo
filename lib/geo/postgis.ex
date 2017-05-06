@@ -27,6 +27,15 @@ if Code.ensure_loaded?(Ecto.Query) do
       quote do: fragment("ST_Distance(?,?)", unquote(geometryA), unquote(geometryB))
     end
 
+    defmacro st_distancesphere(geometryA, geometryB) do
+      quote do: fragment("ST_DistanceSphere(?,?)", unquote(geometryA), unquote(geometryB))
+    end
+
+    @doc"""
+    Please note that ST_Distance_Sphere has been deprecated as of Postgis 2.2.
+    Postgis 2.1 is no longer supported on PostgreSQL >= 9.5.
+    This macro is still in place to support users of PostgreSQL <= 9.4.x.
+    """
     defmacro st_distance_sphere(geometryA, geometryB) do
       quote do: fragment("ST_Distance_Sphere(?,?)", unquote(geometryA), unquote(geometryB))
     end
