@@ -98,7 +98,7 @@ defmodule Geo.Ecto.Test do
 
     Repo.insert(%Location{name: "hello", geom: geom})
 
-    query = from location in Location, limit: 5, select: st_distance_sphere(location.geom, ^geom)
+    query = from location in Location, limit: 5, select: st_distancesphere(location.geom, ^geom)
     results = Repo.one(query)
 
     assert results == 0
