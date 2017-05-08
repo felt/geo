@@ -37,7 +37,11 @@ if Code.ensure_loaded?(Ecto.Query) do
     This macro is still in place to support users of PostgreSQL <= 9.4.x.
     """
     defmacro st_distance_sphere(geometryA, geometryB) do
-      quote do: fragment("ST_Distance_Sphere(?,?)", unquote(geometryA), unquote(geometryB))
+      quote do: fragment("ST_DistanceSphere(?,?)", unquote(geometryA), unquote(geometryB))
+    end
+        
+    defmacro st_distancesphere(geometryA, geometryB) do
+      quote do: fragment("ST_DistanceSphere(?,?)", unquote(geometryA), unquote(geometryB))
     end
 
     defmacro st_dwithin(geometryA, geometryB, float) do
