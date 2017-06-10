@@ -1,3 +1,7 @@
+# v1.5.0
+* Enhancement
+  * [Add `st_distancesphere/2`](https://github.com/bryanjos/geo/pull/69)
+
 # v1.4.1
 * Fixes
   * [Updated ecto related documentation on Geo module](https://github.com/bryanjos/geo/pull/66)
