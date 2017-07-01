@@ -103,16 +103,16 @@ end
   rows: [{42, %Geo.Point{coordinates: {30.0, -90.0}, srid: 4326 }}]}}
   ```
 
-* Can now be used with Ecto as well
+* Can now be used with Ecto. Referencing [the documentation](https://hexdocs.pm/ecto/Ecto.Adapters.Postgres.html#module-extensions):
 
   ```elixir
-
-  #If using with Ecto, you may want something like thing instead
+  #Place this code within any file in your app. For example, 
+  #inside of a new file, like lib/my_app/postgrex_types.ex:
   Postgrex.Types.define(MyApp.PostgresTypes,
                 [Geo.PostGIS.Extension] ++ Ecto.Adapters.Postgres.extensions(),
                 json: Poison)
 
-  #Add extensions to your repo config
+  #Now add the extensions to your repo config
   config :thanks, Repo,
     database: "geo_postgrex_test",
     username: "postgres",
