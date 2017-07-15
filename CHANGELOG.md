@@ -1,3 +1,7 @@
+# v2.0.0
+* Breaking
+  * Split out PostGIS functionality into its own library, [geo_postgis](https://github.com/bryanjos/geo_postgis)
+
 # v1.5.0
 * Enhancement
   * [Add `st_distancesphere/2`](https://github.com/bryanjos/geo/pull/69)
