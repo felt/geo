@@ -154,7 +154,7 @@ defmodule Geo.WKT do
 
   defp create_point(coordinates) do
     coordinates
-    |> String.strip
+    |> String.trim
     |> remove_outer_parenthesis
     |> String.split
     |> Enum.map(fn(x) -> binary_to_number(x) end)
@@ -163,7 +163,7 @@ defmodule Geo.WKT do
 
   defp create_line_string(coordinates) do
     coordinates
-    |> String.strip
+    |> String.trim
     |> remove_outer_parenthesis
     |> String.split(",")
     |> Enum.map(&create_point(&1))
@@ -171,7 +171,7 @@ defmodule Geo.WKT do
 
   defp create_polygon(coordinates) do
     coordinates
-    |> String.strip
+    |> String.trim
     |> remove_outer_parenthesis
     |> String.split(~r{\), *\(})
     |> Enum.map(&repair_str(&1, "(", ")"))
@@ -180,7 +180,7 @@ defmodule Geo.WKT do
 
   defp create_multi_polygon(coordinates) do
     coordinates
-    |> String.strip
+    |> String.trim
     |> remove_outer_parenthesis
     |> String.split(~r{\)\), *\(\(})
     |> Enum.map(&repair_str(&1, "((", "))"))
