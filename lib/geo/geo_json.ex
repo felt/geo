@@ -109,6 +109,14 @@ defmodule Geo.JSON do
     srid
   end
 
+  # Previous versions of this library incorrectly encoded the name without the
+  # colon. This clause allows JSON encoded with those versions to still be
+  # decoded.
+  defp get_srid(%{"type" => "name", "properties" => %{ "name" => "EPSG" <> srid } }) do
+    {srid, _} = Integer.parse(srid)
+    srid
+  end
+
   defp get_srid(%{"type" => "name", "properties" => %{ "name" => srid } }) do
     srid
   end
