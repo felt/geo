@@ -33,6 +33,18 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+  test "GeoJson with SRID to Point and back" do
+    json = "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[100.0, 101.0]}"
+    exjson = Poison.decode!(json)
+    geom = Poison.decode!(json) |> Geo.JSON.decode
+
+    assert(geom.coordinates == {100.0, 101.0})
+    assert(geom.srid == 4326)
+
+    new_exjson = Geo.JSON.encode(geom)
+    assert(exjson == new_exjson)
+  end
+
   test "GeoJson to LineString and back" do
     json = "{ \"type\": \"LineString\", \"coordinates\": [ [100.0, 0.0], [101.0, 1.0] ]}"
     exjson = Poison.decode!(json)

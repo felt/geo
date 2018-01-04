@@ -104,6 +104,14 @@ defmodule Geo.JSON do
     %MultiPolygon{ coordinates: coordinates, srid: get_srid(crs) }
   end
 
+  defp get_srid(%{"type" => "name", "properties" => %{ "name" => "EPSG:" <> srid } }) do
+    {srid, _} = Integer.parse(srid)
+    srid
+  end
+
+  # Previous versions of this library incorrectly encoded the name without the
+  # colon. This clause allows JSON encoded with those versions to still be
+  # decoded.
   defp get_srid(%{"type" => "name", "properties" => %{ "name" => "EPSG" <> srid } }) do
     {srid, _} = Integer.parse(srid)
     srid
@@ -185,7 +193,7 @@ defmodule Geo.JSON do
   end
 
   defp add_crs(map, srid) do
-    Map.put(map, "crs", %{"type" => "name", "properties" => %{"name" => "EPSG#{srid}"}})
+    Map.put(map, "crs", %{"type" => "name", "properties" => %{"name" => "EPSG:#{srid}"}})
   end
 
 end
