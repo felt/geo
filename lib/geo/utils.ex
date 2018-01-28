@@ -28,16 +28,17 @@ defmodule Geo.Utils do
 
     case bit_size(hex) do
       64 ->
-        << value :: float-32 >> = << String.to_integer(hex, 16) :: integer-32 >>
+        <<value::float-32>> = <<String.to_integer(hex, 16)::integer-32>>
         value
+
       128 ->
-        << value :: float-64 >> = << String.to_integer(hex, 16) :: integer-64 >>
+        <<value::float-64>> = <<String.to_integer(hex, 16)::integer-64>>
         value
+
       _ ->
-        raise( ArgumentError, message: "hex must be either 4 or 8 bytes long")
+        raise(ArgumentError, message: "hex must be either 4 or 8 bytes long")
     end
   end
-
 
   @doc """
   Turns a float into a hex value. The size can either be 32 or 64.
@@ -45,10 +46,11 @@ defmodule Geo.Utils do
   def float_to_hex(float, size) do
     case size do
       32 ->
-        << value :: integer-32 >> = << float :: float-32 >>
+        <<value::integer-32>> = <<float::float-32>>
         value
+
       64 ->
-        << value :: integer-64 >> = << float :: float-64 >>
+        <<value::integer-64>> = <<float::float-64>>
         value
     end
   end
@@ -69,11 +71,11 @@ defmodule Geo.Utils do
   end
 
   def reverse_byte_order(hex) do
-    byte_range = Enum.to_list(0..(div( byte_size(hex) , 2) -1))
+    byte_range = Enum.to_list(0..(div(byte_size(hex), 2) - 1))
 
-    Enum.map(byte_range, fn(x) -> :binary.part(hex, x * 2, 2) end)
-    |> Enum.reverse
-    |> Enum.join
+    Enum.map(byte_range, fn x -> :binary.part(hex, x * 2, 2) end)
+    |> Enum.reverse()
+    |> Enum.join()
   end
 
   @doc """
@@ -98,27 +100,26 @@ defmodule Geo.Utils do
     end
   end
 
-
   @doc """
   Repeats the char count number of times
   """
   def repeat(char, count) do
-    Enum.map(1..count, fn(_x) -> char end) |> Enum.join
+    Enum.map(1..count, fn _x -> char end) |> Enum.join()
   end
 
   def endian_to_binary(:xdr) do
-    <<48,48>>
+    <<48, 48>>
   end
 
   def endian_to_binary(:ndr) do
-    <<48,49>>
+    <<48, 49>>
   end
 
-  def binary_to_endian(<<48,49>>) do
+  def binary_to_endian(<<48, 49>>) do
     :ndr
   end
 
-  def binary_to_endian(<<48,48>>) do
+  def binary_to_endian(<<48, 48>>) do
     :xdr
   end
 
@@ -206,5 +207,4 @@ defmodule Geo.Utils do
   def do_type_to_hex(%Geo.GeometryCollection{}) do
     0x07
   end
-
 end

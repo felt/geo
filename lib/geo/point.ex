@@ -1,10 +1,9 @@
 defmodule Geo.Point do
-
   @moduledoc """
   Defines the Point struct. Implements the Ecto.Type behaviour
   """
 
-  @type t :: %Geo.Point{ coordinates: {number, number}, srid: integer }
+  @type t :: %Geo.Point{coordinates: {number, number}, srid: integer}
   defstruct coordinates: {0, 0}, srid: nil
 
   if Code.ensure_loaded?(Ecto.Type) do
@@ -21,14 +20,12 @@ defmodule Geo.Point do
     def dump(_), do: :error
 
     def cast(%Geo.Point{} = point), do: {:ok, point}
-    def cast(%{"type" => _, "coordinates" => _} = point), do: { :ok, Geo.JSON.decode(point) }
+    def cast(%{"type" => "Point", "coordinates" => _} = point), do: {:ok, Geo.JSON.decode(point)}
 
     if Code.ensure_loaded?(Poison) do
-      def cast(point) when is_binary(point), do: { :ok, Poison.decode!(point) |> Geo.JSON.decode }
+      def cast(point) when is_binary(point), do: {:ok, Poison.decode!(point) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error
-
   end
-
 end

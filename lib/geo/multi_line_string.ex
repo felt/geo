@@ -21,7 +21,7 @@ defmodule Geo.MultiLineString do
     def dump(_), do: :error
 
     def cast(%Geo.MultiLineString{} = multi_line_string), do: {:ok, multi_line_string}
-    def cast(%{"type" => _, "coordinates" => _} = multi_line_string), do: { :ok, Geo.JSON.decode(multi_line_string) }
+    def cast(%{"type" => "MultiLineString", "coordinates" => _} = multi_line_string), do: { :ok, Geo.JSON.decode(multi_line_string) }
 
     if Code.ensure_loaded?(Poison) do
       def cast(multi_line_string) when is_binary(multi_line_string), do: { :ok, Poison.decode!(multi_line_string) |> Geo.JSON.decode }

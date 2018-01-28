@@ -5,3 +5,4 @@ erl_crash.dump
 /cover
 /docs
 /doc
+/.elixir_ls

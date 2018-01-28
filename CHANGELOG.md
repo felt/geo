@@ -1,27 +1,39 @@
+# v2.1.0
+
+* Fix
+  * Make stricter patterns for casts functions so that error pattern is used when types are wrong
+
 # v2.0.0
+
 * Breaking
   * Split out PostGIS functionality into its own library, [geo_postgis](https://github.com/bryanjos/geo_postgis)
 
 # v1.5.0
+
 * Enhancement
   * [Add `st_distancesphere/2`](https://github.com/bryanjos/geo/pull/69)
 
 # v1.4.1
+
 * Fixes
   * [Updated ecto related documentation on Geo module](https://github.com/bryanjos/geo/pull/66)
 
 # v1.4.0
+
 * Enhancements
   * [Add `st_dwithin_in_meters\3`](https://github.com/bryanjos/geo/pull/64)
   * [Make sure an srid of 0 does not show srid in WKT](https://github.com/bryanjos/geo/pull/63)
   * [Add types PointZ, PointM and PointZM](https://github.com/bryanjos/geo/pull/56)
 
 # v1.3.1
+
 * Enhancements
   * Relax Poison dependency requirement
 
 # v1.3.0
+
 * Enhancements
+
   * [Support new Postgrex 0.13 Extension API](https://github.com/bryanjos/geo/pull/53)
 
 * Breaking
@@ -29,90 +41,109 @@
   * Now only supports Ecto 2.1+
 
 # v1.2.1
+
 * Enhancements
   * [add st_transform](https://github.com/bryanjos/geo/pull/51)
 
 # v1.2
+
 * Enhancements
   * [add st_distance_sphere](https://github.com/bryanjos/geo/pull/49)
 
 # v1.1.2
+
 * Bug Fixes
   * WKBs that are GeometryCollections with one element should now properly decode
 
 # v1.1.1
+
 * Enhancements
   * Added `Geo.JSON.EncodeError` and `Geo.JSON.DecodeError` thrown whenever `Geo.JSON.encode` or `Geo.JSON.decode` are given invalid data
 
-
 # v1.1
+
 * Enhancements
   * Add Geo.Geometry custom Ecto type to allow multiple geometries in a single field
 
 # v1.0.6
+
 * Enhancements
   * Fixed warnings that appeared in Elixir 1.3
 
 # v1.0.5
+
 * Enhancements
   * Update to allow use with Ecto 2.0
 
 # v1.0.4
+
 * Enhancements
   * Ecto.Type: matching on geojson properties so that Ecto.DataType can be used by users
 
 # v1.0.3
+
 * Enhancements
   * Updated dependencies to allow for using ecto 2.0 release candidate versions
 
 # v1.0.2
+
 * Enhancements
   * Updated dependencies to allow for using ecto 2.0 beta versions
 
 # v1.0.1
+
 * Enhancements
   * Updated Postgrex and Poison optional dependencies
 
 # v1.0.0
 
 # v0.18.0
+
 * Enhancements
   * Made Postgrex, Ecto, and Poison optional dependencies
 
 # v0.17.0
+
 * Breaking
   * Geo.JSON.encode and Geo.JSON.decode now do not do any JSON parsing at all and
     instead work on a map representation of GeoJSON. All JSON encoding and decoding
     must be done before or after calling those functions.
 
 # v0.16.1
+
 * Enhancements
   * Made Postgrex a required dependency
 
 # v0.16.0
+
 * Enhancements
   * Updated to Ecto 1.0
 
 # v0.15.2
+
 * Enhancements
   * Added an `opts` parameter to `Geo.JSON.encode` to allow for skipping JSON encoding
 
 # v0.15.1
+
 * Enhancements
   * Fixed st_dwithin macro
 
 # v0.15.0
+
 * Enhancements
   * Updated cast function on structs to handle maps and strings
   * Now reading the srid from geo json
 
 # v0.14.0
+
 * Enhancements
   * Basic Support for Geography datatype
 
 # v0.13.0
 
 * Enhancements
+
   * Added PostGIS function macros for use in Ecto Queries. Currently only the OpenGIS ones
 
 * Breaking
@@ -138,6 +169,7 @@
 # v0.11.0
 
 * Enhancements
+
   * Created structs for the supported geospatial types (Point, LineString, Polygon, MultiPoint, MultiLineString, MultiPolygon, GeometryCollection)
   * GeoJson module will encode the srid as a crs property if an srid exists
 

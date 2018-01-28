@@ -1,9 +1,17 @@
 if Code.ensure_loaded?(Ecto.Type) do
   defmodule Geo.Geometry do
-
     @moduledoc """
     Implements the Ecto.Type behaviour for all geometry types
     """
+
+    @types [
+      "Point",
+      "LineString",
+      "Polygon",
+      "MultiPoint",
+      "MultiLineString",
+      "MultiPolygon"
+    ]
 
     @behaviour Ecto.Type
 
@@ -36,11 +44,17 @@ if Code.ensure_loaded?(Ecto.Type) do
     def cast(%Geo.MultiLineString{} = geom), do: {:ok, geom}
     def cast(%Geo.MultiPolygon{} = geom), do: {:ok, geom}
     def cast(%Geo.GeometryCollection{} = geom), do: {:ok, geom}
-    def cast(%{"type" => _, "coordinates" => _} = geom), do: { :ok, Geo.JSON.decode(geom) }
-    def cast(%{"type" => _, "geometries" => _} = geom), do: { :ok, Geo.JSON.decode(geom) }
+
+    def cast(%{"type" => type, "coordinates" => _} = geom) when type in @types do
+      {:ok, Geo.JSON.decode(geom)}
+    end
+
+    def cast(%{"type" => "GeometryCollection", "geometries" => _} = geom) do
+      {:ok, Geo.JSON.decode(geom)}
+    end
 
     if Code.ensure_loaded?(Poison) do
-      def cast(geom) when is_binary(geom), do: { :ok, Poison.decode!(geom) |> Geo.JSON.decode }
+      def cast(geom) when is_binary(geom), do: {:ok, Poison.decode!(geom) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error

@@ -1,10 +1,9 @@
 defmodule Geo.LineString do
-
   @moduledoc """
   Defines the LineString struct. Implements the Ecto.Type behaviour
   """
 
-  @type t :: %Geo.LineString{ coordinates: [{number, number}], srid: integer }
+  @type t :: %Geo.LineString{coordinates: [{number, number}], srid: integer}
   defstruct coordinates: [], srid: nil
 
   if Code.ensure_loaded?(Ecto.Type) do
@@ -21,13 +20,15 @@ defmodule Geo.LineString do
     def dump(_), do: :error
 
     def cast(%Geo.LineString{} = line_string), do: {:ok, line_string}
-    def cast(%{"type" => _, "coordinates" => _} = line_string), do: { :ok, Geo.JSON.decode(line_string) }
+
+    def cast(%{"type" => "LineString", "coordinates" => _} = line_string),
+      do: {:ok, Geo.JSON.decode(line_string)}
 
     if Code.ensure_loaded?(Poison) do
-      def cast(line_string) when is_binary(line_string), do: { :ok, Poison.decode!(line_string) |> Geo.JSON.decode }
+      def cast(line_string) when is_binary(line_string),
+        do: {:ok, Poison.decode!(line_string) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error
   end
-
 end
