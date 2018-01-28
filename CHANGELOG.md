@@ -2,6 +2,8 @@
 
 * Fix
   * Make stricter patterns for casts functions so that error pattern is used when types are wrong
+  * [Change handling of EPSG/SRID to match standard](https://github.com/bryanjos/geo/pull/79)
+  * [Fix String.strip() deprecations in Elixir 1.5+](https://github.com/bryanjos/geo/pull/78)
 
 # v2.0.0
 
