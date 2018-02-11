@@ -11,6 +11,11 @@ defmodule Geo.WKB.Test do
     assert(point.coordinates == {1, 1, 1})
   end
 
+  test "Decode WKB to PointZ with zeros" do
+    point = Geo.WKB.decode("0101000080000000000000000000000000000000000000000000000000")
+    assert(point.coordinates == {0, 0, 0})
+  end
+
   test "Decode WKB to PointZ" do
     point = Geo.WKB.decode("0101000080000000000000F03F000000000000F03F000000000000F03F")
     assert(point.coordinates == {1, 1, 1})

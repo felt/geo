@@ -2,27 +2,25 @@ defmodule Geo.WKB.Reader do
   @moduledoc false
   defstruct wkb: nil, endian: :xdr
 
-  def start(wkb) do
+  def new(wkb) do
+    <<endian::binary-size(2), wkb::binary>> = wkb
+
     endian =
-      if :binary.at(wkb, 1) == 49 do
-        :ndr
-      else
-        :xdr
+      case endian do
+        "01" -> :ndr
+        "00" -> :xdr
       end
 
-    %Geo.WKB.Reader{wkb: :binary.part(wkb, 2, byte_size(wkb) - 2), endian: endian}
+    %Geo.WKB.Reader{wkb: wkb, endian: endian}
   end
 
   def read(reader, count) do
-    value = :binary.part(reader.wkb, 0, count)
+    <<value::binary-size(count), _rest::binary>> = reader.wkb
 
     value = if reader.endian == :ndr, do: Geo.Utils.reverse_byte_order(value), else: value
+    <<_rest::binary-size(count), wkb::binary>> = reader.wkb
 
-    {value, %{reader | wkb: :binary.part(reader.wkb, count, byte_size(reader.wkb) - count)}}
-  end
-
-  def get_wkb(reader) do
-    reader.wkb
+    {value, %{reader | wkb: wkb}}
   end
 
   def eof?(reader) do

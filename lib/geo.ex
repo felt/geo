@@ -76,61 +76,19 @@ defmodule Geo do
 
   @type endian :: :ndr | :xdr
 
-  defimpl String.Chars, for: Geo.Point do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.PointZ do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.PointM do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.PointZM do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.LineString do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.Polygon do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.MultiPoint do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.MultiLineString do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.MultiPolygon do
-    def to_string(geo) do
-      Geo.WKT.encode(geo)
-    end
-  end
-
-  defimpl String.Chars, for: Geo.GeometryCollection do
+  defimpl String.Chars,
+    for: [
+      Geo.Point,
+      Geo.PointZ,
+      Geo.PointM,
+      Geo.PointZM,
+      Geo.LineString,
+      Geo.Polygon,
+      Geo.MultiPoint,
+      Geo.MultiLineString,
+      Geo.MultiPolygon,
+      Geo.GeometryCollection
+    ] do
     def to_string(geo) do
       Geo.WKT.encode(geo)
     end

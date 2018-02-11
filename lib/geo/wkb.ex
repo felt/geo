@@ -34,7 +34,7 @@ defmodule Geo.WKB do
   """
   @spec encode(binary, Geo.endian()) :: binary
   def encode(geom, endian \\ :xdr) do
-    writer = Writer.start(endian)
+    writer = Writer.new(endian)
     do_encode(geom, writer)
   end
 
@@ -55,12 +55,12 @@ defmodule Geo.WKB do
     coordinates =
       Enum.map(geom.geometries, fn x ->
         x = %{x | srid: nil}
-        encode(x, Writer.get_endian(writer))
+        encode(x, writer.endian)
       end)
 
     coordinates = Enum.join(coordinates)
 
-    Writer.get_wkb(writer) <> coordinates
+    writer.wkb <> coordinates
   end
 
   defp do_encode(geom, writer) do
@@ -75,7 +75,7 @@ defmodule Geo.WKB do
     writer = Writer.write(writer, srid)
 
     writer = encode_coordinates(writer, geom)
-    Writer.get_wkb(writer)
+    writer.wkb
   end
 
   defp encode_coordinates(writer, %Point{coordinates: {0, 0}}) do
@@ -90,10 +90,6 @@ defmodule Geo.WKB do
     Writer.write(writer, y)
   end
 
-  defp encode_coordinates(writer, %PointZ{coordinates: {0, 0, 0}}) do
-    Writer.write(writer, Utils.repeat("0", 48))
-  end
-
   defp encode_coordinates(writer, %PointZ{coordinates: {x, y, z}}) do
     x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
     y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
@@ -105,10 +101,6 @@ defmodule Geo.WKB do
     |> Writer.write(z)
   end
 
-  defp encode_coordinates(writer, %PointM{coordinates: {0, 0, 0}}) do
-    Writer.write(writer, Utils.repeat("0", 48))
-  end
-
   defp encode_coordinates(writer, %PointM{coordinates: {x, y, m}}) do
     x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
     y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
@@ -118,10 +110,6 @@ defmodule Geo.WKB do
     |> Writer.write(x)
     |> Writer.write(y)
     |> Writer.write(m)
-  end
-
-  defp encode_coordinates(writer, %PointZM{coordinates: {0, 0, 0, 0}}) do
-    Writer.write(writer, Utils.repeat("0", 64))
   end
 
   defp encode_coordinates(writer, %PointZM{coordinates: {x, y, z, m}}) do
@@ -168,7 +156,7 @@ defmodule Geo.WKB do
 
     geoms =
       Enum.map(coordinates, fn geom ->
-        encode(%Point{coordinates: geom}, Writer.get_endian(writer))
+        encode(%Point{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 
@@ -180,7 +168,7 @@ defmodule Geo.WKB do
 
     geoms =
       Enum.map(coordinates, fn geom ->
-        encode(%LineString{coordinates: geom}, Writer.get_endian(writer))
+        encode(%LineString{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 
@@ -192,7 +180,7 @@ defmodule Geo.WKB do
 
     geoms =
       Enum.map(coordinates, fn geom ->
-        encode(%Polygon{coordinates: geom}, Writer.get_endian(writer))
+        encode(%Polygon{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 
@@ -204,7 +192,7 @@ defmodule Geo.WKB do
   """
   @spec decode(binary, [Geo.geometry()]) :: Geo.geometry()
   def decode(wkb, geometries \\ []) do
-    wkb_reader = Reader.start(wkb)
+    wkb_reader = Reader.new(wkb)
     {type, wkb_reader} = Reader.read(wkb_reader, 8)
 
     type = String.to_integer(type, 16)
@@ -237,7 +225,7 @@ defmodule Geo.WKB do
     if Reader.eof?(wkb_reader) do
       return_geom(geometries)
     else
-      Reader.get_wkb(wkb_reader) |> decode(geometries)
+      wkb_reader.wkb |> decode(geometries)
     end
   end
 
@@ -322,14 +310,14 @@ defmodule Geo.WKB do
 
   defp decode_coordinates(%GeometryCollection{}, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
-    geometries = decode(Reader.get_wkb(wkb_reader))
-    {List.wrap(geometries), Reader.start("00")}
+    geometries = decode(wkb_reader.wkb)
+    {List.wrap(geometries), Reader.new("00")}
   end
 
   defp decode_coordinates(_geom, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
 
-    decoded_geom = Reader.get_wkb(wkb_reader) |> decode
+    decoded_geom = wkb_reader.wkb |> decode
 
     coordinates =
       if is_list(decoded_geom) do
@@ -340,6 +328,6 @@ defmodule Geo.WKB do
         [decoded_geom.coordinates]
       end
 
-    {coordinates, Reader.start("00")}
+    {coordinates, Reader.new("00")}
   end
 end

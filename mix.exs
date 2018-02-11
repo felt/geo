@@ -10,7 +10,14 @@ defmodule Geo.Mixfile do
       description: description(),
       package: package(),
       name: "Geo",
-      source_url: "https://github.com/bryanjos/geo"
+      source_url: "https://github.com/bryanjos/geo",
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ]
     ]
   end
 
@@ -31,7 +38,8 @@ defmodule Geo.Mixfile do
     [
       {:ecto, "~> 2.1", optional: true},
       {:poison, "~> 3.0", optional: true},
-      {:ex_doc, "~> 0.18", only: :dev}
+      {:ex_doc, "~> 0.18", only: :dev},
+      {:excoveralls, "~> 0.8.1", only: :test}
     ]
   end
 

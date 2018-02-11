@@ -34,9 +34,6 @@ defmodule Geo.Utils do
       128 ->
         <<value::float-64>> = <<String.to_integer(hex, 16)::integer-64>>
         value
-
-      _ ->
-        raise(ArgumentError, message: "hex must be either 4 or 8 bytes long")
     end
   end
 
@@ -79,17 +76,6 @@ defmodule Geo.Utils do
   end
 
   @doc """
-  Adds 0's to the right of hex string
-  """
-  def pad_right(hex, size) do
-    if byte_size(hex) == size do
-      hex
-    else
-      hex <> repeat("0", size - byte_size(hex))
-    end
-  end
-
-  @doc """
   Adds 0's to the left of hex string
   """
   def pad_left(hex, size) do
@@ -105,14 +91,6 @@ defmodule Geo.Utils do
   """
   def repeat(char, count) do
     Enum.map(1..count, fn _x -> char end) |> Enum.join()
-  end
-
-  def endian_to_binary(:xdr) do
-    <<48, 48>>
-  end
-
-  def endian_to_binary(:ndr) do
-    <<48, 49>>
   end
 
   def binary_to_endian(<<48, 49>>) do
