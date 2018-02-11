@@ -139,4 +139,28 @@ defmodule Geo.JSON.Test do
       Geo.JSON.decode(%{a: "b"})
     end
   end
+
+  test "Gets srid value from previous version of geo" do
+    json = %{
+      "type" => "Point",
+      "coordinates" => [100.0, 0.0],
+      "crs" => %{"type" => "name", "properties" => %{"name" => "EPSG4326"}}
+    }
+
+    geom = Geo.JSON.decode(json)
+
+    assert geom.srid == 4326
+  end
+
+  test "Gets srid value when just a number" do
+    json = %{
+      "type" => "Point",
+      "coordinates" => [100.0, 0.0],
+      "crs" => %{"type" => "name", "properties" => %{"name" => 4326}}
+    }
+
+    geom = Geo.JSON.decode(json)
+
+    assert geom.srid == 4326
+  end
 end
