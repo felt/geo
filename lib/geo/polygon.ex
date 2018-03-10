@@ -3,6 +3,8 @@ defmodule Geo.Polygon do
   Defines the Polygon struct. Implements the Ecto.Type behaviour
   """
 
+  alias Geo.Config
+
   @type t :: %Geo.Polygon{coordinates: [[{number, number}]], srid: integer}
   defstruct coordinates: [], srid: nil
 
@@ -24,9 +26,8 @@ defmodule Geo.Polygon do
     def cast(%{"type" => "Polygon", "coordinates" => _} = polygon),
       do: {:ok, Geo.JSON.decode(polygon)}
 
-    if Code.ensure_loaded?(Poison) do
-      def cast(polygon) when is_binary(polygon),
-        do: {:ok, Poison.decode!(polygon) |> Geo.JSON.decode()}
+    def cast(polygon) when is_binary(polygon) do
+      {:ok, Config.json_library().decode!(polygon) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error

@@ -4,6 +4,8 @@ if Code.ensure_loaded?(Ecto.Type) do
     Implements the Ecto.Type behaviour for all geometry types
     """
 
+    alias Geo.Config
+
     @types [
       "Point",
       "LineString",
@@ -53,8 +55,8 @@ if Code.ensure_loaded?(Ecto.Type) do
       {:ok, Geo.JSON.decode(geom)}
     end
 
-    if Code.ensure_loaded?(Poison) do
-      def cast(geom) when is_binary(geom), do: {:ok, Poison.decode!(geom) |> Geo.JSON.decode()}
+    def cast(geom) when is_binary(geom) do
+      {:ok, Config.json_library().decode!(geom) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error

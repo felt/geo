@@ -3,6 +3,8 @@ defmodule Geo.PointZM do
   Defines the PointZM struct. Implements the Ecto.Type behaviour
   """
 
+  alias Geo.Config
+
   @type t :: %Geo.PointZM{coordinates: {number, number, number, number}, srid: integer}
   defstruct coordinates: {0, 0, 0, 0}, srid: nil
 
@@ -22,8 +24,8 @@ defmodule Geo.PointZM do
     def cast(%Geo.PointZM{} = point), do: {:ok, point}
     def cast(%{"type" => _, "coordinates" => _} = point), do: {:ok, Geo.JSON.decode(point)}
 
-    if Code.ensure_loaded?(Poison) do
-      def cast(point) when is_binary(point), do: {:ok, Poison.decode!(point) |> Geo.JSON.decode()}
+    def cast(point) when is_binary(point) do
+      {:ok, Config.json_library().decode!(point) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error

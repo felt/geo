@@ -3,6 +3,8 @@ defmodule Geo.GeometryCollection do
   Defines the GeometryCollection struct. Implements the Ecto.Type behaviour
   """
 
+  alias Geo.Config
+
   @type t :: %Geo.GeometryCollection{geometries: [Geo.geometry()], srid: integer}
   defstruct geometries: [], srid: nil
 
@@ -24,9 +26,8 @@ defmodule Geo.GeometryCollection do
     def cast(%{"type" => "GeometryCollection", "geometries" => _} = geometry_collection),
       do: {:ok, Geo.JSON.decode(geometry_collection)}
 
-    if Code.ensure_loaded?(Poison) do
-      def cast(geometry_collection) when is_binary(geometry_collection),
-        do: {:ok, Poison.decode!(geometry_collection) |> Geo.JSON.decode()}
+    def cast(geometry_collection) when is_binary(geometry_collection) do
+      {:ok, Config.json_library().decode!(geometry_collection) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error
