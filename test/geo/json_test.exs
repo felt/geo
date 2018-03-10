@@ -3,21 +3,21 @@ defmodule Geo.JSON.Test do
 
   test "Point to GeoJson Map" do
     geom = %Geo.Point{coordinates: {100.0, 0.0}}
-    json = Geo.JSON.encode(geom)
+    json = Geo.JSON.encode!(geom)
 
     assert json == %{"type" => "Point", "coordinates" => [100.0, 0.0]}
   end
 
   test "Point to GeoJson" do
     geom = %Geo.Point{coordinates: {100.0, 0.0}}
-    json = Geo.JSON.encode(geom) |> Poison.encode!()
+    json = Geo.JSON.encode!(geom) |> Poison.encode!()
 
     assert(json == "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}")
   end
 
   test "LineString to GeoJson" do
     geom = %Geo.LineString{coordinates: [{100.0, 0.0}, {101.0, 1.0}]}
-    json = Geo.JSON.encode(geom) |> Poison.encode!()
+    json = Geo.JSON.encode!(geom) |> Poison.encode!()
 
     assert(json == "{\"type\":\"LineString\",\"coordinates\":[[100.0,0.0],[101.0,1.0]]}")
   end
@@ -29,7 +29,7 @@ defmodule Geo.JSON.Test do
 
     assert(geom.coordinates == {100.0, 0.0})
 
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
@@ -43,7 +43,7 @@ defmodule Geo.JSON.Test do
     assert(geom.coordinates == {100.0, 101.0})
     assert(geom.srid == 4326)
 
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
@@ -53,7 +53,7 @@ defmodule Geo.JSON.Test do
     geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
@@ -68,7 +68,7 @@ defmodule Geo.JSON.Test do
       geom.coordinates == [[{100.0, 0.0}, {101.0, 0.0}, {101.0, 1.0}, {100.0, 1.0}, {100.0, 0.0}]]
     )
 
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
@@ -78,7 +78,7 @@ defmodule Geo.JSON.Test do
     geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
@@ -90,7 +90,7 @@ defmodule Geo.JSON.Test do
     geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [[{100.0, 0.0}, {101.0, 1.0}], [{102.0, 2.0}, {103.0, 3.0}]])
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
@@ -111,7 +111,7 @@ defmodule Geo.JSON.Test do
       ]
     )
 
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
@@ -124,13 +124,13 @@ defmodule Geo.JSON.Test do
 
     assert(Enum.count(geom.geometries) == 2)
 
-    new_exjson = Geo.JSON.encode(geom)
+    new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
 
   test "Unable to encode non-geo type" do
-    assert_raise Geo.JSON.EncodeError, fn ->
-      Geo.JSON.encode(%{a: "b"})
+    assert_raise Geo.JSON.Encoder.EncodeError, fn ->
+      Geo.JSON.encode!(%{a: "b"})
     end
   end
 
@@ -170,5 +170,13 @@ defmodule Geo.JSON.Test do
 
     assert {:ok, _value} = Poison.decode!(valid_json) |> Geo.JSON.decode()
     assert {:error, _error} = Poison.decode!(invalid_json) |> Geo.JSON.decode()
+  end
+
+  test "encode/1" do
+    valid_geom = %Geo.LineString{coordinates: [{100.0, 0.0}, {101.0, 1.0}]}
+    invalid_geom = %{random: 123}
+
+    assert {:ok, _map} = Geo.JSON.encode(valid_geom)
+    assert {:error, _error} = Geo.JSON.encode(invalid_geom)
   end
 end

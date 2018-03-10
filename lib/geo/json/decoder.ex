@@ -14,7 +14,7 @@ defmodule Geo.JSON.Decoder do
 
     defexception [:message, :value]
 
-      def message(%{message: nil, value: value}) do
+    def message(%{message: nil, value: value}) do
       "unable to decode value: #{inspect(value)}"
     end
 
