@@ -105,7 +105,7 @@ defmodule Geo.JSON.Decoder do
   end
 
   defp do_decode(type, _, _) do
-    raise DecodeError, message: "#{type} is not a valid"
+    raise DecodeError, message: "#{type} is not a valid type"
   end
 
   defp get_srid(%{"type" => "name", "properties" => %{"name" => "EPSG:" <> srid}}) do
