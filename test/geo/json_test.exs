@@ -25,7 +25,7 @@ defmodule Geo.JSON.Test do
   test "GeoJson to Point and back" do
     json = "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == {100.0, 0.0})
 
@@ -38,7 +38,7 @@ defmodule Geo.JSON.Test do
       "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[100.0, 101.0]}"
 
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == {100.0, 101.0})
     assert(geom.srid == 4326)
@@ -50,7 +50,7 @@ defmodule Geo.JSON.Test do
   test "GeoJson to LineString and back" do
     json = "{ \"type\": \"LineString\", \"coordinates\": [ [100.0, 0.0], [101.0, 1.0] ]}"
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
     new_exjson = Geo.JSON.encode(geom)
@@ -62,7 +62,7 @@ defmodule Geo.JSON.Test do
       "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0] ]]}"
 
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(
       geom.coordinates == [[{100.0, 0.0}, {101.0, 0.0}, {101.0, 1.0}, {100.0, 1.0}, {100.0, 0.0}]]
@@ -75,7 +75,7 @@ defmodule Geo.JSON.Test do
   test "GeoJson to MultiPoint and back" do
     json = "{ \"type\": \"MultiPoint\", \"coordinates\": [ [100.0, 0.0], [101.0, 1.0] ]}"
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
     new_exjson = Geo.JSON.encode(geom)
@@ -87,7 +87,7 @@ defmodule Geo.JSON.Test do
       "{ \"type\": \"MultiLineString\", \"coordinates\": [[ [100.0, 0.0], [101.0, 1.0] ],[ [102.0, 2.0], [103.0, 3.0] ]]}"
 
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [[{100.0, 0.0}, {101.0, 1.0}], [{102.0, 2.0}, {103.0, 3.0}]])
     new_exjson = Geo.JSON.encode(geom)
@@ -99,7 +99,7 @@ defmodule Geo.JSON.Test do
       "{ \"type\": \"MultiPolygon\", \"coordinates\": [[[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],[[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],[[100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2]]]]}"
 
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(
       geom.coordinates == [
@@ -120,7 +120,7 @@ defmodule Geo.JSON.Test do
       "{ \"type\": \"GeometryCollection\",\"geometries\": [{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0]},{ \"type\": \"LineString\",\"coordinates\": [ [101.0, 0.0], [102.0, 1.0] ]}]}"
 
     exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode()
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
 
     assert(Enum.count(geom.geometries) == 2)
 
@@ -135,8 +135,8 @@ defmodule Geo.JSON.Test do
   end
 
   test "Unable to decode invalid geojson map" do
-    assert_raise Geo.JSON.DecodeError, fn ->
-      Geo.JSON.decode(%{a: "b"})
+    assert_raise Geo.JSON.Decoder.DecodeError, fn ->
+      Geo.JSON.decode!(%{a: "b"})
     end
   end
 
@@ -147,7 +147,7 @@ defmodule Geo.JSON.Test do
       "crs" => %{"type" => "name", "properties" => %{"name" => "EPSG4326"}}
     }
 
-    geom = Geo.JSON.decode(json)
+    geom = Geo.JSON.decode!(json)
 
     assert geom.srid == 4326
   end
@@ -159,8 +159,16 @@ defmodule Geo.JSON.Test do
       "crs" => %{"type" => "name", "properties" => %{"name" => 4326}}
     }
 
-    geom = Geo.JSON.decode(json)
+    geom = Geo.JSON.decode!(json)
 
     assert geom.srid == 4326
+  end
+
+  test "decode/1" do
+    valid_json = "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
+    invalid_json = "{ \"type\": \"random_type\", \"coordinates\": [100.0, 0.0] }"
+
+    assert {:ok, _value} = Poison.decode!(valid_json) |> Geo.JSON.decode()
+    assert {:error, _error} = Poison.decode!(invalid_json) |> Geo.JSON.decode()
   end
 end

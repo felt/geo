@@ -7,12 +7,22 @@ defmodule Geo.JSON do
   alias Geo.MultiPolygon
   alias Geo.GeometryCollection
 
-  defmodule DecodeError do
-    defexception [:message]
-  end
+  alias Geo.JSON.{
+    Decoder
+  }
 
   defmodule EncodeError do
-    defexception [:message]
+    @type t :: %EncodeError{message: String.t, value: any}
+
+    defexception [:message, :value]
+
+    def message(%{message: nil, value: value}) do
+      "unable to encode value: #{inspect(value)}"
+    end
+
+    def message(%{message: message}) do
+      message
+    end
   end
 
   @moduledoc """
@@ -28,7 +38,7 @@ defmodule Geo.JSON do
   #Using Poison as the JSON parser for these examples
 
   json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
-  geom = Poison.decode!(json) |> Geo.JSON.decode(json)
+  geom = Poison.decode!(json) |> Geo.JSON.decode!(json)
   Geo.Point[coordinates: {100.0, 0.0}, srid: nil]
 
   Geo.JSON.encode(geom) |> Poison.encode!
@@ -42,93 +52,14 @@ defmodule Geo.JSON do
   @doc """
   Takes a map representing GeoJSON and returns a Geometry
   """
-  @spec decode(Map.t()) :: Geo.geometry()
-  def decode(geo_json) do
-    cond do
-      Map.has_key?(geo_json, "geometries") ->
-        crs = Map.get(geo_json, "crs")
+  @spec decode!(Map.t()) :: Geo.geometry() | no_return
+  defdelegate decode!(geo_json), to: Decoder
 
-        geometries =
-          Enum.map(Map.get(geo_json, "geometries"), fn x ->
-            do_decode(Map.get(x, "type"), Map.get(x, "coordinates"), crs)
-          end)
-
-        %GeometryCollection{geometries: geometries}
-
-      Map.has_key?(geo_json, "coordinates") ->
-        crs = Map.get(geo_json, "crs")
-        do_decode(Map.get(geo_json, "type"), Map.get(geo_json, "coordinates"), crs)
-
-      true ->
-        raise DecodeError, message: "Unable to decode given value: #{inspect(geo_json)}"
-    end
-  end
-
-  defp do_decode("Point", [x, y], crs) do
-    %Point{coordinates: {x, y}, srid: get_srid(crs)}
-  end
-
-  defp do_decode("LineString", coordinates, crs) do
-    coordinates = Enum.map(coordinates, &List.to_tuple(&1))
-
-    %LineString{coordinates: coordinates, srid: get_srid(crs)}
-  end
-
-  defp do_decode("Polygon", coordinates, crs) do
-    coordinates =
-      Enum.map(coordinates, fn sub_coordinates ->
-        Enum.map(sub_coordinates, &List.to_tuple(&1))
-      end)
-
-    %Polygon{coordinates: coordinates, srid: get_srid(crs)}
-  end
-
-  defp do_decode("MultiPoint", coordinates, crs) do
-    coordinates = Enum.map(coordinates, &List.to_tuple(&1))
-
-    %MultiPoint{coordinates: coordinates, srid: get_srid(crs)}
-  end
-
-  defp do_decode("MultiLineString", coordinates, crs) do
-    coordinates =
-      Enum.map(coordinates, fn sub_coordinates ->
-        Enum.map(sub_coordinates, &List.to_tuple(&1))
-      end)
-
-    %MultiLineString{coordinates: coordinates, srid: get_srid(crs)}
-  end
-
-  defp do_decode("MultiPolygon", coordinates, crs) do
-    coordinates =
-      Enum.map(coordinates, fn sub_coordinates ->
-        Enum.map(sub_coordinates, fn third_sub_coordinates ->
-          Enum.map(third_sub_coordinates, &List.to_tuple(&1))
-        end)
-      end)
-
-    %MultiPolygon{coordinates: coordinates, srid: get_srid(crs)}
-  end
-
-  defp get_srid(%{"type" => "name", "properties" => %{"name" => "EPSG:" <> srid}}) do
-    {srid, _} = Integer.parse(srid)
-    srid
-  end
-
-  # Previous versions of this library incorrectly encoded the name without the
-  # colon. This clause allows JSON encoded with those versions to still be
-  # decoded.
-  defp get_srid(%{"type" => "name", "properties" => %{"name" => "EPSG" <> srid}}) do
-    {srid, _} = Integer.parse(srid)
-    srid
-  end
-
-  defp get_srid(%{"type" => "name", "properties" => %{"name" => srid}}) do
-    srid
-  end
-
-  defp get_srid(nil) do
-    nil
-  end
+  @doc """
+  Takes a map representing GeoJSON and returns a Geometry
+  """
+  @spec decode(Map.t()) :: {:ok, Geo.geometry()} | {:error, Decoder.DecodeError.t()}
+  defdelegate decode(geo_json), to: Decoder
 
   @doc """
   Takes a Geometry and returns a map representing the GeoJSON
