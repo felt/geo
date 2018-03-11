@@ -1,4 +1,6 @@
 defmodule Geo.JSON.Decoder do
+  @moduledoc false
+
   alias Geo.{
     Point,
     LineString,
