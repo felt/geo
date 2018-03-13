@@ -3,6 +3,8 @@ defmodule Geo.MultiPoint do
   Defines the MultiPoint struct. Implements the Ecto.Type behaviour
   """
 
+  alias Geo.Config
+
   @type t :: %Geo.MultiPoint{coordinates: [{number, number}], srid: integer}
   defstruct coordinates: [], srid: nil
 
@@ -24,9 +26,8 @@ defmodule Geo.MultiPoint do
     def cast(%{"type" => "MultiPoint", "coordinates" => _} = multi_point),
       do: {:ok, Geo.JSON.decode(multi_point)}
 
-    if Code.ensure_loaded?(Poison) do
-      def cast(multi_point) when is_binary(multi_point),
-        do: {:ok, Poison.decode!(multi_point) |> Geo.JSON.decode()}
+    def cast(multi_point) when is_binary(multi_point) do
+      {:ok, Config.json_library().decode!(multi_point) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error

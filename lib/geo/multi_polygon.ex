@@ -3,6 +3,8 @@ defmodule Geo.MultiPolygon do
   Defines the MultiPolygon struct. Implements the Ecto.Type behaviour
   """
 
+  alias Geo.Config
+
   @type t :: %Geo.MultiPolygon{coordinates: [[[{number, number}]]], srid: integer}
   defstruct coordinates: [], srid: nil
 
@@ -24,9 +26,8 @@ defmodule Geo.MultiPolygon do
     def cast(%{"type" => "MultiPolygon", "coordinates" => _} = multi_polygon),
       do: {:ok, Geo.JSON.decode(multi_polygon)}
 
-    if Code.ensure_loaded?(Poison) do
-      def cast(multi_polygon) when is_binary(multi_polygon),
-        do: {:ok, Poison.decode!(multi_polygon) |> Geo.JSON.decode()}
+    def cast(multi_polygon) when is_binary(multi_polygon) do
+      {:ok, Config.json_library().decode!(multi_polygon) |> Geo.JSON.decode()}
     end
 
     def cast(_), do: :error

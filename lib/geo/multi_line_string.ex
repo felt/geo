@@ -4,6 +4,8 @@ defmodule Geo.MultiLineString do
   Defines the MultiLineString struct. Implements the Ecto.Type behaviour
   """
 
+  alias Geo.Config
+
   @type t :: %Geo.MultiLineString{ coordinates: [[{number, number}]], srid: integer }
   defstruct coordinates: [], srid: nil
 
@@ -23,8 +25,8 @@ defmodule Geo.MultiLineString do
     def cast(%Geo.MultiLineString{} = multi_line_string), do: {:ok, multi_line_string}
     def cast(%{"type" => "MultiLineString", "coordinates" => _} = multi_line_string), do: { :ok, Geo.JSON.decode(multi_line_string) }
 
-    if Code.ensure_loaded?(Poison) do
-      def cast(multi_line_string) when is_binary(multi_line_string), do: { :ok, Poison.decode!(multi_line_string) |> Geo.JSON.decode }
+    def cast(multi_line_string) when is_binary(multi_line_string) do
+      {:ok, Config.json_library().decode!(multi_line_string) |> Geo.JSON.decode }
     end
 
     def cast(_), do: :error
