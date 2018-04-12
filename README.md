@@ -22,15 +22,6 @@ defp deps do
 end
 ```
 
-### Configuration
-
-```elixir
-# config.exs
-
-config :geo,
-  json_library: Poison # If you want to set your JSON module
-```
-
 [Documentation](http://hexdocs.pm/geo)
 
 ## Examples
