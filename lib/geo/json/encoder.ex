@@ -12,7 +12,7 @@ defmodule Geo.JSON.Encoder do
   }
 
   defmodule EncodeError do
-    @type t :: %__MODULE__{message: String.t, value: any}
+    @type t :: %__MODULE__{message: String.t(), value: any}
 
     defexception [:message, :value]
 

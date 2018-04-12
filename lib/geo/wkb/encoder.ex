@@ -1,7 +1,8 @@
 defmodule Geo.WKB.Encoder do
   @moduledoc false
-  
+
   use Bitwise
+
   alias Geo.{
     Point,
     PointZ,
@@ -15,6 +16,7 @@ defmodule Geo.WKB.Encoder do
     GeometryCollection,
     Utils
   }
+
   alias Geo.WKB.Writer
 
   @doc """

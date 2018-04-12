@@ -3,6 +3,6 @@ defmodule Geo.PointZ do
   Defines the PointZ struct.
   """
 
-  @type t :: %Geo.PointZ{coordinates: {number, number, number}, srid: integer}
-  defstruct coordinates: {0, 0, 0}, srid: nil
+  @type t :: %Geo.PointZ{coordinates: {number, number, number}, srid: integer, properties: map}
+  defstruct coordinates: {0, 0, 0}, srid: nil, properties: %{}
 end

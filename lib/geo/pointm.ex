@@ -3,6 +3,6 @@ defmodule Geo.PointM do
   Defines the PointM struct.
   """
 
-  @type t :: %Geo.PointM{coordinates: {number, number, number}, srid: integer}
-  defstruct coordinates: {0, 0, 0}, srid: nil
+  @type t :: %Geo.PointM{coordinates: {number, number, number}, srid: integer, properties: map}
+  defstruct coordinates: {0, 0, 0}, srid: nil, properties: %{}
 end

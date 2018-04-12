@@ -3,6 +3,10 @@ defmodule Geo.MultiPolygon do
   Defines the MultiPolygon struct.
   """
 
-  @type t :: %Geo.MultiPolygon{coordinates: [[[{number, number}]]], srid: integer}
-  defstruct coordinates: [], srid: nil
+  @type t :: %Geo.MultiPolygon{
+          coordinates: [[[{number, number}]]],
+          srid: integer,
+          properties: map
+        }
+  defstruct coordinates: [], srid: nil, properties: %{}
 end
