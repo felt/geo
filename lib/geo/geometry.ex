@@ -4,7 +4,19 @@ if Code.ensure_loaded?(Ecto.Type) do
     Implements the Ecto.Type behaviour for all geometry types
     """
 
-    alias Geo.Config
+    alias Geo.{
+      Config,
+      Point,
+      PointZ,
+      PointM,
+      PointZM,
+      LineString,
+      Polygon,
+      MultiPoint,
+      MultiLineString,
+      MultiPolygon,
+      GeometryCollection
+    }
 
     @types [
       "Point",
@@ -15,37 +27,32 @@ if Code.ensure_loaded?(Ecto.Type) do
       "MultiPolygon"
     ]
 
+    @geometries [
+      Point,
+      PointZ,
+      PointM,
+      PointZM,
+      LineString,
+      Polygon,
+      MultiPoint,
+      MultiLineString,
+      MultiPolygon,
+      GeometryCollection
+    ]
+
     @behaviour Ecto.Type
 
     def type, do: :geometry
 
     def blank?(_), do: false
 
-    def load(%Geo.Point{} = geom), do: {:ok, geom}
-    def load(%Geo.LineString{} = geom), do: {:ok, geom}
-    def load(%Geo.Polygon{} = geom), do: {:ok, geom}
-    def load(%Geo.MultiPoint{} = geom), do: {:ok, geom}
-    def load(%Geo.MultiLineString{} = geom), do: {:ok, geom}
-    def load(%Geo.MultiPolygon{} = geom), do: {:ok, geom}
-    def load(%Geo.GeometryCollection{} = geom), do: {:ok, geom}
+    def load(%struct{} = geom) when struct in @geometries, do: {:ok, geom}
     def load(_), do: :error
 
-    def dump(%Geo.Point{} = geom), do: {:ok, geom}
-    def dump(%Geo.LineString{} = geom), do: {:ok, geom}
-    def dump(%Geo.Polygon{} = geom), do: {:ok, geom}
-    def dump(%Geo.MultiPoint{} = geom), do: {:ok, geom}
-    def dump(%Geo.MultiLineString{} = geom), do: {:ok, geom}
-    def dump(%Geo.MultiPolygon{} = geom), do: {:ok, geom}
-    def dump(%Geo.GeometryCollection{} = geom), do: {:ok, geom}
+    def dump(%struct{} = geom) when struct in @geometries, do: {:ok, geom}
     def dump(_), do: :error
 
-    def cast(%Geo.Point{} = geom), do: {:ok, geom}
-    def cast(%Geo.LineString{} = geom), do: {:ok, geom}
-    def cast(%Geo.Polygon{} = geom), do: {:ok, geom}
-    def cast(%Geo.MultiPoint{} = geom), do: {:ok, geom}
-    def cast(%Geo.MultiLineString{} = geom), do: {:ok, geom}
-    def cast(%Geo.MultiPolygon{} = geom), do: {:ok, geom}
-    def cast(%Geo.GeometryCollection{} = geom), do: {:ok, geom}
+    def cast(%struct{} = geom) when struct in @geometries, do: {:ok, geom}
 
     def cast(%{"type" => type, "coordinates" => _} = geom) when type in @types do
       {:ok, Geo.JSON.decode(geom)}
