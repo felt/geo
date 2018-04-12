@@ -12,9 +12,9 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 * MultiPolygon
 * GeometryCollection
 
-*Note*: If you are looking for the Postgrex PostGIS extension, check out [geo_postgis](https://github.com/bryanjos/geo_postgis)
+_Note_: If you are looking for the Postgrex PostGIS extension, check out [geo_postgis](https://github.com/bryanjos/geo_postgis)
 
-*Note*: If you are looking to do geospatial calculations in memory with Geo's structs, check out [topo](https://github.com/pkinney/topo)
+_Note_: If you are looking to do geospatial calculations in memory with Geo's structs, check out [topo](https://github.com/pkinney/topo)
 
 ```elixir
 defp deps do
@@ -33,9 +33,7 @@ config :geo,
 
 [Documentation](http://hexdocs.pm/geo)
 
-
 ## Examples
-
 
 * Encode and decode WKT and EWKT
 
@@ -50,8 +48,7 @@ config :geo,
   %Geo.Point{coordinates: {30, -90}, srid: 4326}
   ```
 
-
-* Encode and decode WKB and EWKB
+- Encode and decode WKB and EWKB
 
   ```elixir
   iex(1)> point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
@@ -67,31 +64,20 @@ config :geo,
   "0020000001000010E640427B633A61FB9EC05E73D350092CCF"
   ```
 
-* Encode and decode GeoJSON
+- Encode and decode GeoJSON
 
+Geo only encodes and decodes maps shaped as GeoJSON. JSON encoding and decoding must
+be done before and after.
 
-  Geo only encodes and decodes maps shaped as GeoJSON. JSON encoding and decoding must
-  be done before and after.
+```elixir
+#Examples using Poison as the JSON parser
 
-  ```elixir
-  #Examples using Poison as the JSON parser
+iex(1)> Geo.JSON.encode(point)
+%{ "type" => "Point", "coordinates" => [100.0, 0.0] }
 
-  iex(1)> Geo.JSON.encode(point)
-  %{ "type" => "Point", "coordinates" => [100.0, 0.0] }
+iex(2)> point = Poison.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
+%Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
 
-  iex(2)> point = Poison.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
-  %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
-
-  iex(3)> Geo.JSON.encode(point) |> Poison.encode!
-  "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
-  ```
-
-## Development
-
-After you got the dependencies via `mix deps.get` make sure that:
-
-* `postgis` is installed
-* your `postgres` user has the database `"geo_postgrex_test"`
-* your `postgres` db user can login without a password or you set the `PGPASSWORD` environment variable appropriately
-
-Then you can run the tests as you are used to with `mix test`.
+iex(3)> Geo.JSON.encode(point) |> Poison.encode!
+"{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
+```

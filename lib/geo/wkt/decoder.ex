@@ -15,7 +15,7 @@ defmodule Geo.WKT.Decoder do
   }
 
   @doc """
-  Takes a WKT string and returns a Geo.Geometry struct or list of Geo.Geometry
+  Takes a WKT string and returns a Geo.geometry struct or list of Geo.geometry
   """
   @spec decode(binary) :: Geo.geometry()
   def decode(wkt) do
