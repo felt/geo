@@ -140,18 +140,6 @@ defmodule Geo.JSON.Test do
     end
   end
 
-  test "Gets srid value from previous version of geo" do
-    json = %{
-      "type" => "Point",
-      "coordinates" => [100.0, 0.0],
-      "crs" => %{"type" => "name", "properties" => %{"name" => "EPSG4326"}}
-    }
-
-    geom = Geo.JSON.decode!(json)
-
-    assert geom.srid == 4326
-  end
-
   test "Gets srid value when just a number" do
     json = %{
       "type" => "Point",
@@ -178,5 +166,27 @@ defmodule Geo.JSON.Test do
 
     assert {:ok, _map} = Geo.JSON.encode(valid_geom)
     assert {:error, _error} = Geo.JSON.encode(invalid_geom)
+  end
+
+  test "Point with properties to GeoJson" do
+    geom = %Geo.Point{coordinates: {100.0, 0.0}, properties: %{hi: "there"}}
+    json = Geo.JSON.encode!(geom) |> Poison.encode!()
+
+    assert(
+      json == "{\"type\":\"Point\",\"properties\":{\"hi\":\"there\"},\"coordinates\":[100.0,0.0]}"
+    )
+  end
+
+  test "GeoJson with properties to GeometryCollection and back" do
+    json =
+      "{\"properties\":{\"hi\":\"there\"}, \"type\": \"GeometryCollection\",\"geometries\": [{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0]},{ \"type\": \"LineString\",\"coordinates\": [ [101.0, 0.0], [102.0, 1.0] ]}]}"
+
+    exjson = Poison.decode!(json)
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
+
+    assert(Enum.count(geom.geometries) == 2)
+
+    new_exjson = Geo.JSON.encode!(geom)
+    assert(exjson == new_exjson)
   end
 end

@@ -31,13 +31,15 @@ defmodule Geo.JSON.Encoder do
   @spec encode!(Geo.geometry()) :: Map.t()
   def encode!(geom) do
     case geom do
-      %GeometryCollection{geometries: geometries, srid: srid} ->
-        %{"type" => "GeometryCollection", "geometries" => Enum.map(geometries, &do_encode(&1))}
+      %GeometryCollection{geometries: geometries, srid: srid, properties: properties} ->
+        %{"type" => "GeometryCollection", "geometries" => Enum.map(geometries, &encode!(&1))}
         |> add_crs(srid)
+        |> add_properties(properties)
 
       _ ->
         do_encode(geom)
         |> add_crs(geom.srid)
+        |> add_properties(geom.properties)
     end
   end
 
@@ -107,5 +109,13 @@ defmodule Geo.JSON.Encoder do
 
   defp add_crs(map, srid) do
     Map.put(map, "crs", %{"type" => "name", "properties" => %{"name" => "EPSG:#{srid}"}})
+  end
+
+  def add_properties(map, props) do
+    if Enum.empty?(props) do
+      map
+    else
+      Map.put(map, "properties", props)
+    end
   end
 end
