@@ -1,3 +1,27 @@
+## v3.0.0
+
+* Add
+
+  * `Geo.WKT.encode!`
+  * `Geo.WKT.decode!`
+  * `Geo.WKB.encode!`
+  * `Geo.WKB.decode!`
+  * `Geo.JSON.encode!`
+  * `Geo.JSON.decode!`
+
+* Enhancement
+
+  * Geometry struct now have a `properties` field. This is used to convert GeoJSON properties
+
+* Breaking
+
+  * `Geo.WKT.encode` now returns either `{:ok, binary}` or `{:error, exception}`
+  * `Geo.WKT.decode` now returns either `{:ok, geometry}` or `{:error, exception}`
+  * `Geo.WKB.encode` now returns either `{:ok, binary}` or `{:error, exception}`
+  * `Geo.WKB.decode` now returns either `{:ok, geometry}` or `{:error, exception}`
+  * `Geo.JSON.encode` now returns either `{:ok, map}` or `{:error, exception}`
+  * `Geo.JSON.decode` now returns either `{:ok, geom}` or `{:error, exception}`
+
 # v2.1.0
 
 * Fix
