@@ -23,8 +23,20 @@ defmodule Geo.WKB.Encoder do
   Takes a Geometry and returns a WKB string. The endian decides
   what the byte order will be
   """
-  @spec encode(binary, Geo.endian()) :: binary
+  @spec encode(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
   def encode(geom, endian \\ :xdr) do
+    {:ok, encode!(geom, endian)}
+  rescue
+    exception ->
+      {:error, exception}
+  end
+
+  @doc """
+  Takes a Geometry and returns a WKB string. The endian decides
+  what the byte order will be
+  """
+  @spec encode!(binary, Geo.endian()) :: binary | no_return
+  def encode!(geom, endian \\ :xdr) do
     writer = Writer.new(endian)
     do_encode(geom, writer)
   end
@@ -46,7 +58,7 @@ defmodule Geo.WKB.Encoder do
     coordinates =
       Enum.map(geom.geometries, fn x ->
         x = %{x | srid: nil}
-        encode(x, writer.endian)
+        encode!(x, writer.endian)
       end)
 
     coordinates = Enum.join(coordinates)
@@ -147,7 +159,7 @@ defmodule Geo.WKB.Encoder do
 
     geoms =
       Enum.map(coordinates, fn geom ->
-        encode(%Point{coordinates: geom}, writer.endian)
+        encode!(%Point{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 
@@ -159,7 +171,7 @@ defmodule Geo.WKB.Encoder do
 
     geoms =
       Enum.map(coordinates, fn geom ->
-        encode(%LineString{coordinates: geom}, writer.endian)
+        encode!(%LineString{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 
@@ -171,7 +183,7 @@ defmodule Geo.WKB.Encoder do
 
     geoms =
       Enum.map(coordinates, fn geom ->
-        encode(%Polygon{coordinates: geom}, writer.endian)
+        encode!(%Polygon{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 

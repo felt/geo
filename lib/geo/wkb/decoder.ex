@@ -19,8 +19,19 @@ defmodule Geo.WKB.Decoder do
   @doc """
   Takes a WKB string and returns a Geometry
   """
-  @spec decode(binary, [Geo.geometry()]) :: Geo.geometry()
+  @spec decode(binary, [Geo.geometry()]) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
   def decode(wkb, geometries \\ []) do
+    {:ok, decode!(wkb, geometries)}
+  rescue
+    exception ->
+      {:error, exception}
+  end
+
+  @doc """
+  Takes a WKB string and returns a Geometry
+  """
+  @spec decode!(binary, [Geo.geometry()]) :: Geo.geometry() | no_return
+  def decode!(wkb, geometries \\ []) do
     wkb_reader = Reader.new(wkb)
     {type, wkb_reader} = Reader.read(wkb_reader, 8)
 
@@ -54,7 +65,7 @@ defmodule Geo.WKB.Decoder do
     if Reader.eof?(wkb_reader) do
       return_geom(geometries)
     else
-      wkb_reader.wkb |> decode(geometries)
+      wkb_reader.wkb |> decode!(geometries)
     end
   end
 
@@ -139,14 +150,14 @@ defmodule Geo.WKB.Decoder do
 
   defp decode_coordinates(%GeometryCollection{}, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
-    geometries = decode(wkb_reader.wkb)
+    geometries = decode!(wkb_reader.wkb)
     {List.wrap(geometries), Reader.new("00")}
   end
 
   defp decode_coordinates(_geom, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
 
-    decoded_geom = wkb_reader.wkb |> decode
+    decoded_geom = wkb_reader.wkb |> decode!()
 
     coordinates =
       if is_list(decoded_geom) do

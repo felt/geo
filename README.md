@@ -29,29 +29,29 @@ end
 * Encode and decode WKT and EWKT
 
   ```elixir
-  iex(1)> point = Geo.WKT.decode("POINT(30 -90)")
+  iex(1)> {:ok, point} = Geo.WKT.decode("POINT(30 -90)")
   %Geo.Point{ coordinates: {30, -90}, srid: nil}
 
-  iex(2)> Geo.WKT.encode(point)
+  iex(2)> Geo.WKT.encode!(point)
   "POINT(30 -90)"
 
-  iex(3)> point = Geo.WKT.decode("SRID=4326;POINT(30 -90)")
+  iex(3)> point = Geo.WKT.decode!("SRID=4326;POINT(30 -90)")
   %Geo.Point{coordinates: {30, -90}, srid: 4326}
   ```
 
 - Encode and decode WKB and EWKB
 
   ```elixir
-  iex(1)> point = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
+  iex(1)> {:ok, point} = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
   %Geo.Point{ coordinates: {1.0, 1.0}, srid: nil }
 
-  iex(2)> Geo.WKB.encode(point)
+  iex(2)> Geo.WKB.encode!(point)
   "00000000013FF00000000000003FF0000000000000"
 
-  iex(3)> point = Geo.WKB.decode("0101000020E61000009EFB613A637B4240CF2C0950D3735EC0")
+  iex(3)> point = Geo.WKB.decode!("0101000020E61000009EFB613A637B4240CF2C0950D3735EC0")
   %Geo.Point{ coordinates: {36.9639657, -121.8097725}, srid: 4326 }
 
-  iex(4)> Geo.WKB.encode(point)
+  iex(4)> Geo.WKB.encode!(point)
   "0020000001000010E640427B633A61FB9EC05E73D350092CCF"
   ```
 
@@ -64,11 +64,11 @@ be done before and after.
 #Examples using Poison as the JSON parser
 
 iex(1)> Geo.JSON.encode(point)
-%{ "type" => "Point", "coordinates" => [100.0, 0.0] }
+{:ok, %{ "type" => "Point", "coordinates" => [100.0, 0.0] }}
 
 iex(2)> point = Poison.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
 %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
 
-iex(3)> Geo.JSON.encode(point) |> Poison.encode!
+iex(3)> Geo.JSON.encode!(point) |> Poison.encode!
 "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
 ```

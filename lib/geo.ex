@@ -90,7 +90,7 @@ defmodule Geo do
       Geo.GeometryCollection
     ] do
     def to_string(geo) do
-      Geo.WKT.encode(geo)
+      Geo.WKT.encode!(geo)
     end
   end
 end

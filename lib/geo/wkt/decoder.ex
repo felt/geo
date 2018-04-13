@@ -17,8 +17,19 @@ defmodule Geo.WKT.Decoder do
   @doc """
   Takes a WKT string and returns a Geo.geometry struct or list of Geo.geometry
   """
-  @spec decode(binary) :: Geo.geometry()
-  def decode(wkt) do
+  @spec decode(binary) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
+  def decode(wkb) do
+    {:ok, decode!(wkb)}
+  rescue
+    exception ->
+      {:error, exception}
+  end
+
+  @doc """
+  Takes a WKT string and returns a Geo.geometry struct or list of Geo.geometry
+  """
+  @spec decode!(binary) :: Geo.geometry() | no_return
+  def decode!(wkt) do
     wkt_split = String.split(wkt, ";")
 
     {srid, actual_wkt} =
