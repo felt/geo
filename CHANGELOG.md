@@ -21,6 +21,7 @@
   * `Geo.WKB.decode` now returns either `{:ok, geometry}` or `{:error, exception}`
   * `Geo.JSON.encode` now returns either `{:ok, map}` or `{:error, exception}`
   * `Geo.JSON.decode` now returns either `{:ok, geom}` or `{:error, exception}`
+  * All Ecto.Type behaviour implementations were removed. This may not effect too many people, but it was moved to the [geo_postgis](https://github.com/bryanjos/geo_postgis) package
 
 # v2.1.0
 
