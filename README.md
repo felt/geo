@@ -1,6 +1,7 @@
 # Geo
 
 [![Build Status](https://travis-ci.org/bryanjos/geo.svg?branch=master)](https://travis-ci.org/bryanjos/geo)
+[![Hex.pm](https://img.shields.io/hexpm/v/geo.svg)](https://hex.pm/packages/geo)
 
 A collection of GIS functions. Handles conversions to and from WKT, WKB, and GeoJSON for the following geometries:
 
@@ -18,7 +19,7 @@ _Note_: If you are looking to do geospatial calculations in memory with Geo's st
 
 ```elixir
 defp deps do
-  [{:geo, "~> 2.0"}]
+  [{:geo, "~> 3.0"}]
 end
 ```
 
