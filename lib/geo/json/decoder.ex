@@ -3,6 +3,7 @@ defmodule Geo.JSON.Decoder do
 
   alias Geo.{
     Point,
+    PointZ,
     LineString,
     Polygon,
     MultiPoint,
@@ -77,6 +78,10 @@ defmodule Geo.JSON.Decoder do
 
   defp do_decode("Point", [x, y], properties, crs) do
     %Point{coordinates: {x, y}, srid: get_srid(crs), properties: properties}
+  end
+
+  defp do_decode("PointZ", [x, y, z], properties, crs) do
+    %PointZ{coordinates: {x, y, z}, srid: get_srid(crs), properties: properties}
   end
 
   defp do_decode("LineString", coordinates, properties, crs) do

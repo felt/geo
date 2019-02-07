@@ -3,6 +3,7 @@ defmodule Geo.JSON.Encoder do
 
   alias Geo.{
     Point,
+    PointZ,
     LineString,
     Polygon,
     MultiPoint,
@@ -56,6 +57,10 @@ defmodule Geo.JSON.Encoder do
 
   defp do_encode(%Point{coordinates: {x, y}}) do
     %{"type" => "Point", "coordinates" => [x, y]}
+  end
+
+  defp do_encode(%PointZ{coordinates: {x, y, z}}) do
+    %{"type" => "PointZ", "coordinates" => [x, y, z]}
   end
 
   defp do_encode(%LineString{coordinates: coordinates}) do
