@@ -157,7 +157,11 @@ defmodule Geo.WKB.Decoder do
   defp decode_coordinates(_geom, wkb_reader) do
     {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
 
-    decoded_geom = wkb_reader.wkb |> decode!()
+    decoded_geom =
+      case wkb_reader.wkb do
+        "" -> []
+        wkb -> decode!(wkb)
+      end
 
     coordinates =
       if is_list(decoded_geom) do
