@@ -15,6 +15,20 @@ defmodule Geo.JSON.Test do
     assert(json == "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}")
   end
 
+  test "PointZ to GeoJson Map" do
+    geom = %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}}
+    json = Geo.JSON.encode!(geom)
+
+    assert json == %{"type" => "PointZ", "coordinates" => [100.0, 0.0, 70.0]}
+  end
+
+  test "PointZ to GeoJson" do
+    geom = %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}}
+    json = Geo.JSON.encode!(geom) |> Poison.encode!()
+
+    assert(json == "{\"type\":\"PointZ\",\"coordinates\":[100.0,0.0,70.0]}")
+  end
+
   test "LineString to GeoJson" do
     geom = %Geo.LineString{coordinates: [{100.0, 0.0}, {101.0, 1.0}]}
     json = Geo.JSON.encode!(geom) |> Poison.encode!()

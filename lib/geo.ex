@@ -3,6 +3,7 @@ defmodule Geo do
   A collection of GIS functions. Handles conversions to and from WKT, WKB, and GeoJSON for the following geometries:
 
   * Point
+  * PointZ
   * LineString
   * Polygon
   * MultiPoint
