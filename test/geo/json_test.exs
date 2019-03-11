@@ -203,4 +203,70 @@ defmodule Geo.JSON.Test do
     new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
+
+  test "GeoJSON to GeometryCollection" do
+    json = """
+      {
+          "attribution": "BAN",
+          "licence": "ODbL 1.0",
+          "query": "8 bd du port",
+          "type": "FeatureCollection",
+          "version": "draft",
+          "features": [
+            {
+              "properties": {
+                "context": "80, Somme, Picardie",
+                "housenumber": "8",
+                "label": "8 Boulevard du Port 80000 Amiens",
+                "postcode": "80000",
+                "citycode": "80021",
+                "id": "ADRNIVX_0000000260875032",
+                "score": 0.3351181818181818,
+                "name": "8 Boulevard du Port",
+                "city": "Amiens",
+                "type": "housenumber"
+              },
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  2.29009,
+                  49.897446
+                ]
+              },
+              "type": "Feature"
+            },
+            {
+              "properties": {
+                "context": "34, Hérault, Languedoc-Roussillon",
+                "housenumber": "8",
+                "label": "8 Boulevard du Port 34140 Mèze",
+                "postcode": "34140",
+                "citycode": "34157",
+                "id": "ADRNIVX_0000000284423783",
+                "score": 0.3287575757575757,
+                "name": "8 Boulevard du Port",
+                "city": "Mèze",
+                "type": "housenumber"
+              },
+              "geometry": {
+                "type": "Point",
+                "coordinates": [
+                  3.605875,
+                  43.425232
+                ]
+              },
+              "type": "Feature"
+            }
+          ]
+        }
+    """
+
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
+
+    assert(Enum.count(geom.geometries) == 2)
+
+    [geom1, _geom2] = geom.geometries
+    assert geom1.coordinates == {2.29009, 49.897446}
+    assert geom1.properties["label"] == "8 Boulevard du Port 80000 Amiens"
+  end
 end

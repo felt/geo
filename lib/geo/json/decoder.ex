@@ -60,6 +60,30 @@ defmodule Geo.JSON.Decoder do
           crs
         )
 
+      Map.get(geo_json, "type") == "Feature" ->
+        do_decode(
+          "Feature",
+          Map.get(geo_json, "geometry"),
+          Map.get(geo_json, "properties", %{}),
+          Map.get(geo_json, "id", "")
+        )
+
+      Map.get(geo_json, "type") == "FeatureCollection" ->
+        geometries =
+          Enum.map(Map.get(geo_json, "features"), fn x ->
+            do_decode(
+              Map.get(x, "type"),
+              Map.get(x, "geometry"),
+              Map.get(x, "properties", %{}),
+              Map.get(x, "id", "")
+            )
+          end)
+
+        %GeometryCollection{
+          geometries: geometries,
+          properties: %{}
+        }
+
       true ->
         raise DecodeError, value: geo_json
     end
@@ -123,6 +147,10 @@ defmodule Geo.JSON.Decoder do
       end)
 
     %MultiPolygon{coordinates: coordinates, srid: get_srid(crs), properties: properties}
+  end
+
+  defp do_decode("Feature", geometry, properties, _id) do
+    do_decode(Map.get(geometry, "type"), Map.get(geometry, "coordinates"), properties, nil)
   end
 
   defp do_decode(type, _, _, _) do
