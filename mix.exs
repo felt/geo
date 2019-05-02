@@ -38,7 +38,7 @@ defmodule Geo.Mixfile do
     [
       {:poison, "~> 4.0", only: :test},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:excoveralls, "~> 0.10.2", only: :test}
+      {:excoveralls, "~> 0.11.0", only: :test}
     ]
   end
 
