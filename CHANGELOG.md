@@ -1,3 +1,8 @@
+## v3.1.1
+
+- Fixed
+  - [Optimise reverse_byte_order/1](https://github.com/bryanjos/geo/pull/107)
+
 ## v3.1.0
 
 - Added
