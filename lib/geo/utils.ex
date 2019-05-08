@@ -68,11 +68,15 @@ defmodule Geo.Utils do
   end
 
   def reverse_byte_order(hex) do
-    byte_range = Enum.to_list(0..(div(byte_size(hex), 2) - 1))
+    do_reverse_byte_order(hex, "")
+  end
 
-    Enum.map(byte_range, fn x -> :binary.part(hex, x * 2, 2) end)
-    |> Enum.reverse()
-    |> Enum.join()
+  defp do_reverse_byte_order("", acc) do
+    acc
+  end
+
+  defp do_reverse_byte_order(<<a, b, rest :: binary>>, acc) do
+    do_reverse_byte_order(rest, <<a, b, acc :: binary>>)
   end
 
   @doc """
