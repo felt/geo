@@ -19,14 +19,21 @@ defmodule Geo.JSON.Test do
     geom = %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}}
     json = Geo.JSON.encode!(geom)
 
-    assert json == %{"type" => "PointZ", "coordinates" => [100.0, 0.0, 70.0]}
+    assert json == %{"type" => "Point", "coordinates" => [100.0, 0.0, 70.0]}
   end
 
   test "PointZ to GeoJson" do
     geom = %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}}
     json = Geo.JSON.encode!(geom) |> Poison.encode!()
 
-    assert(json == "{\"type\":\"PointZ\",\"coordinates\":[100.0,0.0,70.0]}")
+    assert(json == "{\"type\":\"Point\",\"coordinates\":[100.0,0.0,70.0]}")
+  end
+
+  test "PointZ from GeoJson" do
+    json = "{\"type\":\"Point\",\"coordinates\":[100.0,0.0,70.0]}"
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
+
+    assert(geom == %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}})
   end
 
   test "LineString to GeoJson" do
@@ -69,6 +76,18 @@ defmodule Geo.JSON.Test do
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
     new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
+  end
+
+  test "Throw altitude away from things other than points" do
+    json =
+      "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0, 1.0], [101.0, 0.0, 1.0], [101.0, 1.0, 1.0], [100.0, 1.0, 1.0], [100.0, 0.0, 1.0] ]]}"
+
+    geom = Poison.decode!(json) |> Geo.JSON.decode!()
+
+    assert(
+      geom.coordinates == [[{100.0, 0.0}, {101.0, 0.0}, {101.0, 1.0}, {100.0, 1.0}, {100.0, 0.0}]]
+    )
+
   end
 
   test "GeoJson to Polygon and back" do

@@ -100,16 +100,20 @@ defmodule Geo.JSON.Decoder do
       {:error, exception}
   end
 
+  defp do_decode("Point", [x, y, z], properties, crs) do
+    %PointZ{coordinates: {x, y, z}, srid: get_srid(crs), properties: properties}
+  end
+
   defp do_decode("Point", [x, y], properties, crs) do
     %Point{coordinates: {x, y}, srid: get_srid(crs), properties: properties}
   end
 
-  defp do_decode("PointZ", [x, y, z], properties, crs) do
-    %PointZ{coordinates: {x, y, z}, srid: get_srid(crs), properties: properties}
+  defp do_decode(type, [x, y, _z], properties, crs) do
+    do_decode(type, [x, y], properties, crs)
   end
 
   defp do_decode("LineString", coordinates, properties, crs) do
-    coordinates = Enum.map(coordinates, &List.to_tuple(&1))
+    coordinates = Enum.map(coordinates, &list_to_tuple(&1))
 
     %LineString{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
@@ -117,14 +121,14 @@ defmodule Geo.JSON.Decoder do
   defp do_decode("Polygon", coordinates, properties, crs) do
     coordinates =
       Enum.map(coordinates, fn sub_coordinates ->
-        Enum.map(sub_coordinates, &List.to_tuple(&1))
+        Enum.map(sub_coordinates, &list_to_tuple(&1))
       end)
 
     %Polygon{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
 
   defp do_decode("MultiPoint", coordinates, properties, crs) do
-    coordinates = Enum.map(coordinates, &List.to_tuple(&1))
+    coordinates = Enum.map(coordinates, &list_to_tuple(&1))
 
     %MultiPoint{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
@@ -132,7 +136,7 @@ defmodule Geo.JSON.Decoder do
   defp do_decode("MultiLineString", coordinates, properties, crs) do
     coordinates =
       Enum.map(coordinates, fn sub_coordinates ->
-        Enum.map(sub_coordinates, &List.to_tuple(&1))
+        Enum.map(sub_coordinates, &list_to_tuple(&1))
       end)
 
     %MultiLineString{coordinates: coordinates, srid: get_srid(crs), properties: properties}
@@ -142,7 +146,7 @@ defmodule Geo.JSON.Decoder do
     coordinates =
       Enum.map(coordinates, fn sub_coordinates ->
         Enum.map(sub_coordinates, fn third_sub_coordinates ->
-          Enum.map(third_sub_coordinates, &List.to_tuple(&1))
+          Enum.map(third_sub_coordinates, &list_to_tuple(&1))
         end)
       end)
 
@@ -156,6 +160,9 @@ defmodule Geo.JSON.Decoder do
   defp do_decode(type, _, _, _) do
     raise DecodeError, message: "#{type} is not a valid type"
   end
+
+  defp list_to_tuple([x, y, _z]), do: {x, y}
+  defp list_to_tuple([x, y]), do: {x, y}
 
   defp get_srid(%{"type" => "name", "properties" => %{"name" => "EPSG:" <> srid}}) do
     {srid, _} = Integer.parse(srid)

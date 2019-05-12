@@ -60,7 +60,7 @@ defmodule Geo.JSON.Encoder do
   end
 
   defp do_encode(%PointZ{coordinates: {x, y, z}}) do
-    %{"type" => "PointZ", "coordinates" => [x, y, z]}
+    %{"type" => "Point", "coordinates" => [x, y, z]}
   end
 
   defp do_encode(%LineString{coordinates: coordinates}) do
