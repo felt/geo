@@ -77,21 +77,23 @@ defmodule Geo do
 
   @type endian :: :ndr | :xdr
 
-  defimpl String.Chars,
-    for: [
-      Geo.Point,
-      Geo.PointZ,
-      Geo.PointM,
-      Geo.PointZM,
-      Geo.LineString,
-      Geo.Polygon,
-      Geo.MultiPoint,
-      Geo.MultiLineString,
-      Geo.MultiPolygon,
-      Geo.GeometryCollection
-    ] do
-    def to_string(geo) do
-      Geo.WKT.encode!(geo)
+  if Application.get_env(:geo, :impl_to_string, true) do
+    defimpl String.Chars,
+      for: [
+        Geo.Point,
+        Geo.PointZ,
+        Geo.PointM,
+        Geo.PointZM,
+        Geo.LineString,
+        Geo.Polygon,
+        Geo.MultiPoint,
+        Geo.MultiLineString,
+        Geo.MultiPolygon,
+        Geo.GeometryCollection
+      ] do
+      def to_string(geo) do
+        Geo.WKT.encode!(geo)
+      end
     end
   end
 end
