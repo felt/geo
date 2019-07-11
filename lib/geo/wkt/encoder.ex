@@ -11,6 +11,7 @@ defmodule Geo.WKT.Encoder do
     Polygon,
     PolygonZ,
     MultiPoint,
+    MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
     MultiPolygon,
@@ -59,7 +60,7 @@ defmodule Geo.WKT.Encoder do
     "LINESTRING#{coordinate_string}"
   end
 
-  defp do_encode(%LineString{coordinates: coordinates}) do
+  defp do_encode(%LineStringZ{coordinates: coordinates}) do
     coordinate_string = create_line_string_str(coordinates)
 
     "LINESTRINGZ#{coordinate_string}"
@@ -81,6 +82,12 @@ defmodule Geo.WKT.Encoder do
     coordinate_string = create_line_string_str(coordinates)
 
     "MULTIPOINT#{coordinate_string}"
+  end
+
+  defp do_encode(%MultiPointZ{coordinates: coordinates}) do
+    coordinate_string = create_line_string_str(coordinates)
+
+    "MULTIPOINTZ#{coordinate_string}"
   end
 
   defp do_encode(%MultiLineString{coordinates: coordinates}) do

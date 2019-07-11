@@ -141,6 +141,10 @@ defmodule Geo.Utils do
     %Geo.MultiPoint{}
   end
 
+  def hex_to_type(0x80_00_00_04) do
+    %Geo.MultiPointZ{}
+  end
+
   def hex_to_type(0x05) do
     %Geo.MultiLineString{}
   end
@@ -196,6 +200,10 @@ defmodule Geo.Utils do
 
   def do_type_to_hex(%Geo.MultiPoint{}) do
     0x04
+  end
+
+  def do_type_to_hex(%Geo.MultiPointZ{}) do
+    0x80_00_00_04
   end
 
   def do_type_to_hex(%Geo.MultiLineString{}) do

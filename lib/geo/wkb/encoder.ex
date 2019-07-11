@@ -13,6 +13,7 @@ defmodule Geo.WKB.Encoder do
     Polygon,
     PolygonZ,
     MultiPoint,
+    MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
     MultiPolygon,
@@ -190,6 +191,18 @@ defmodule Geo.WKB.Encoder do
     geoms =
       Enum.map(coordinates, fn geom ->
         encode!(%Point{coordinates: geom}, writer.endian)
+      end)
+      |> Enum.join()
+
+    Writer.write_no_endian(writer, geoms)
+  end
+
+  defp encode_coordinates(writer, %MultiPointZ{coordinates: coordinates}) do
+    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
+
+    geoms =
+      Enum.map(coordinates, fn geom ->
+        encode!(%PointZ{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 
