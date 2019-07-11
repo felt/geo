@@ -7,11 +7,18 @@ A collection of GIS functions. Handles conversions to and from WKT, WKB, and Geo
 
 * Point
 * PointZ
+* PointM
+* PointZM
 * LineString
+* LineStringZ
 * Polygon
+* PolygonZ
 * MultiPoint
-* MulitLineString
+* MultiPointZ
+* MuliLineString
+* MuliLineStringZ
 * MultiPolygon
+* MultiPolygonZ
 * GeometryCollection
 
 _Note_: If you are looking for the Postgrex PostGIS extension, check out [geo_postgis](https://github.com/bryanjos/geo_postgis)
