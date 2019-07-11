@@ -9,7 +9,9 @@ defmodule Geo.WKB.Decoder do
     PointM,
     PointZM,
     LineString,
+    LineStringZ,
     Polygon,
+    PolygonZ,
     GeometryCollection,
     Utils
   }
@@ -138,6 +140,15 @@ defmodule Geo.WKB.Decoder do
     end)
   end
 
+  defp decode_coordinates(%LineStringZ{}, wkb_reader) do
+    {number_of_points, wkb_reader} = Reader.read(wkb_reader, 8)
+    number_of_points = number_of_points |> String.to_integer(16)
+
+    Enum.map_reduce(Enum.to_list(0..(number_of_points - 1)), wkb_reader, fn _x, acc ->
+      decode_coordinates(%PointZ{}, acc)
+    end)
+  end
+
   defp decode_coordinates(%Polygon{}, wkb_reader) do
     {number_of_lines, wkb_reader} = Reader.read(wkb_reader, 8)
 
@@ -145,6 +156,16 @@ defmodule Geo.WKB.Decoder do
 
     Enum.map_reduce(Enum.to_list(0..(number_of_lines - 1)), wkb_reader, fn _x, acc ->
       decode_coordinates(%LineString{}, acc)
+    end)
+  end
+
+  defp decode_coordinates(%PolygonZ{}, wkb_reader) do
+    {number_of_lines, wkb_reader} = Reader.read(wkb_reader, 8)
+
+    number_of_lines = number_of_lines |> String.to_integer(16)
+
+    Enum.map_reduce(Enum.to_list(0..(number_of_lines - 1)), wkb_reader, fn _x, acc ->
+      decode_coordinates(%LineStringZ{}, acc)
     end)
   end
 

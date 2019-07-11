@@ -9,6 +9,7 @@ defmodule Geo.JSON.Encoder do
     MultiPoint,
     MultiLineString,
     MultiPolygon,
+    MultiPolygonZ,
     GeometryCollection
   }
 
@@ -94,6 +95,17 @@ defmodule Geo.JSON.Encoder do
   end
 
   defp do_encode(%MultiPolygon{coordinates: coordinates}) do
+    coordinates =
+      Enum.map(coordinates, fn sub_coordinates ->
+        Enum.map(sub_coordinates, fn third_sub_coordinates ->
+          Enum.map(third_sub_coordinates, &Tuple.to_list(&1))
+        end)
+      end)
+
+    %{"type" => "MultiPolygon", "coordinates" => coordinates}
+  end
+
+  defp do_encode(%MultiPolygonZ{coordinates: coordinates}) do
     coordinates =
       Enum.map(coordinates, fn sub_coordinates ->
         Enum.map(sub_coordinates, fn third_sub_coordinates ->

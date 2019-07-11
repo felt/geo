@@ -5,10 +5,14 @@ defmodule Geo do
   * Point
   * PointZ
   * LineString
+  * LineStringZ
   * Polygon
+  * PolygonZ
   * MultiPoint
   * MulitLineString
+  * MulitLineStringZ
   * MultiPolygon
+  * MultiPolygonZ
   * GeometryCollection
 
   ## Examples
@@ -69,10 +73,14 @@ defmodule Geo do
           | Geo.PointM.t()
           | Geo.PointZM.t()
           | Geo.LineString.t()
+          | Geo.LineStringZ.t()
           | Geo.Polygon.t()
+          | Geo.PolygonZ.t()
           | Geo.MultiPoint.t()
           | Geo.MultiLineString.t()
+          | Geo.MultiLineStringZ.t()
           | Geo.MultiPolygon.t()
+          | Geo.MultiPolygonZ.t()
           | Geo.GeometryCollection.t()
 
   @type endian :: :ndr | :xdr
@@ -84,10 +92,14 @@ defmodule Geo do
       Geo.PointM,
       Geo.PointZM,
       Geo.LineString,
+      Geo.LineStringZ,
       Geo.Polygon,
+      Geo.PolygonZ,
       Geo.MultiPoint,
       Geo.MultiLineString,
+      Geo.MultiLineStringZ,
       Geo.MultiPolygon,
+      Geo.MultiPolygonZ,
       Geo.GeometryCollection
     ] do
     def to_string(geo) do
