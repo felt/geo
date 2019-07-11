@@ -1,6 +1,6 @@
 defmodule Geo.MultiLineStringZ do
   @moduledoc """
-  Defines the MultiLineString struct.
+  Defines the MultiLineStringZ struct.
   """
 
   @type t :: %__MODULE__{
