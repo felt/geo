@@ -7,10 +7,15 @@ defmodule Geo.WKT.Encoder do
     PointM,
     PointZM,
     LineString,
+    LineStringZ,
     Polygon,
+    PolygonZ,
     MultiPoint,
+    MultiPointZ,
     MultiLineString,
+    MultiLineStringZ,
     MultiPolygon,
+    MultiPolygonZ,
     GeometryCollection
   }
 
@@ -55,7 +60,19 @@ defmodule Geo.WKT.Encoder do
     "LINESTRING#{coordinate_string}"
   end
 
+  defp do_encode(%LineStringZ{coordinates: coordinates}) do
+    coordinate_string = create_line_string_str(coordinates)
+
+    "LINESTRINGZ#{coordinate_string}"
+  end
+
   defp do_encode(%Polygon{coordinates: coordinates}) do
+    coordinate_string = create_polygon_str(coordinates)
+
+    "POLYGON#{coordinate_string}"
+  end
+
+  defp do_encode(%PolygonZ{coordinates: coordinates}) do
     coordinate_string = create_polygon_str(coordinates)
 
     "POLYGON#{coordinate_string}"
@@ -67,16 +84,34 @@ defmodule Geo.WKT.Encoder do
     "MULTIPOINT#{coordinate_string}"
   end
 
+  defp do_encode(%MultiPointZ{coordinates: coordinates}) do
+    coordinate_string = create_line_string_str(coordinates)
+
+    "MULTIPOINTZ#{coordinate_string}"
+  end
+
   defp do_encode(%MultiLineString{coordinates: coordinates}) do
     coordinate_string = create_polygon_str(coordinates)
 
     "MULTILINESTRING#{coordinate_string}"
   end
 
+  defp do_encode(%MultiLineStringZ{coordinates: coordinates}) do
+    coordinate_string = create_polygon_str(coordinates)
+
+    "MULTILINESTRINGZ#{coordinate_string}"
+  end
+
   defp do_encode(%MultiPolygon{coordinates: coordinates}) do
     coordinate_string = create_multi_polygon_str(coordinates)
 
     "MULTIPOLYGON#{coordinate_string}"
+  end
+
+  defp do_encode(%MultiPolygonZ{coordinates: coordinates}) do
+    coordinate_string = create_multi_polygon_str(coordinates)
+
+    "MULTIPOLYGONZ#{coordinate_string}"
   end
 
   defp do_encode(%GeometryCollection{geometries: geometries}) do
@@ -88,7 +123,7 @@ defmodule Geo.WKT.Encoder do
   defp create_line_string_str(coordinates) do
     coordinate_str =
       coordinates
-      |> Enum.map(&create_pair_str(&1))
+      |> Enum.map(&create_coord_str(&1))
       |> Enum.join(",")
 
     "(#{coordinate_str})"
@@ -112,7 +147,8 @@ defmodule Geo.WKT.Encoder do
     "(#{coordinate_str})"
   end
 
-  defp create_pair_str({x, y}), do: "#{x} #{y}"
+  defp create_coord_str({x, y}), do: "#{x} #{y}"
+  defp create_coord_str({x, y, z}), do: "#{x} #{y} #{z}"
 
   defp get_srid_binary(nil), do: ""
   defp get_srid_binary(0), do: ""

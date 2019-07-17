@@ -9,10 +9,15 @@ defmodule Geo.WKB.Encoder do
     PointM,
     PointZM,
     LineString,
+    LineStringZ,
     Polygon,
+    PolygonZ,
     MultiPoint,
+    MultiPointZ,
     MultiLineString,
+    MultiLineStringZ,
     MultiPolygon,
+    MultiPolygonZ,
     GeometryCollection,
     Utils
   }
@@ -141,6 +146,19 @@ defmodule Geo.WKB.Encoder do
     writer
   end
 
+  defp encode_coordinates(writer, %LineStringZ{coordinates: coordinates}) do
+    number_of_points = Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8)
+    writer = Writer.write(writer, number_of_points)
+
+    {_nils, writer} =
+      Enum.map_reduce(coordinates, writer, fn point, acc ->
+        acc = encode_coordinates(acc, %PointZ{coordinates: point})
+        {nil, acc}
+      end)
+
+    writer
+  end
+
   defp encode_coordinates(writer, %Polygon{coordinates: coordinates}) do
     number_of_lines = Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8)
     writer = Writer.write(writer, number_of_lines)
@@ -148,6 +166,19 @@ defmodule Geo.WKB.Encoder do
     {_nils, writer} =
       Enum.map_reduce(coordinates, writer, fn line, acc ->
         acc = encode_coordinates(acc, %LineString{coordinates: line})
+        {nil, acc}
+      end)
+
+    writer
+  end
+
+  defp encode_coordinates(writer, %PolygonZ{coordinates: coordinates}) do
+    number_of_lines = Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8)
+    writer = Writer.write(writer, number_of_lines)
+
+    {_nils, writer} =
+      Enum.map_reduce(coordinates, writer, fn line, acc ->
+        acc = encode_coordinates(acc, %LineStringZ{coordinates: line})
         {nil, acc}
       end)
 
@@ -166,6 +197,18 @@ defmodule Geo.WKB.Encoder do
     Writer.write_no_endian(writer, geoms)
   end
 
+  defp encode_coordinates(writer, %MultiPointZ{coordinates: coordinates}) do
+    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
+
+    geoms =
+      Enum.map(coordinates, fn geom ->
+        encode!(%PointZ{coordinates: geom}, writer.endian)
+      end)
+      |> Enum.join()
+
+    Writer.write_no_endian(writer, geoms)
+  end
+
   defp encode_coordinates(writer, %MultiLineString{coordinates: coordinates}) do
     writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
 
@@ -178,12 +221,36 @@ defmodule Geo.WKB.Encoder do
     Writer.write_no_endian(writer, geoms)
   end
 
+  defp encode_coordinates(writer, %MultiLineStringZ{coordinates: coordinates}) do
+    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
+
+    geoms =
+      Enum.map(coordinates, fn geom ->
+        encode!(%LineStringZ{coordinates: geom}, writer.endian)
+      end)
+      |> Enum.join()
+
+    Writer.write_no_endian(writer, geoms)
+  end
+
   defp encode_coordinates(writer, %MultiPolygon{coordinates: coordinates}) do
     writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
 
     geoms =
       Enum.map(coordinates, fn geom ->
         encode!(%Polygon{coordinates: geom}, writer.endian)
+      end)
+      |> Enum.join()
+
+    Writer.write_no_endian(writer, geoms)
+  end
+
+  defp encode_coordinates(writer, %MultiPolygonZ{coordinates: coordinates}) do
+    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
+
+    geoms =
+      Enum.map(coordinates, fn geom ->
+        encode!(%PolygonZ{coordinates: geom}, writer.endian)
       end)
       |> Enum.join()
 

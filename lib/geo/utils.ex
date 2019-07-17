@@ -125,12 +125,24 @@ defmodule Geo.Utils do
     %Geo.LineString{}
   end
 
+  def hex_to_type(0x80_00_00_02) do
+    %Geo.LineStringZ{}
+  end
+
   def hex_to_type(0x03) do
     %Geo.Polygon{}
   end
 
+  def hex_to_type(0x80_00_00_03) do
+    %Geo.PolygonZ{}
+  end
+
   def hex_to_type(0x04) do
     %Geo.MultiPoint{}
+  end
+
+  def hex_to_type(0x80_00_00_04) do
+    %Geo.MultiPointZ{}
   end
 
   def hex_to_type(0x05) do
@@ -139,6 +151,10 @@ defmodule Geo.Utils do
 
   def hex_to_type(0x06) do
     %Geo.MultiPolygon{}
+  end
+
+  def hex_to_type(0x80_00_00_06) do
+    %Geo.MultiPolygonZ{}
   end
 
   def hex_to_type(0x07) do
@@ -170,12 +186,24 @@ defmodule Geo.Utils do
     0x02
   end
 
+  def do_type_to_hex(%Geo.LineStringZ{}) do
+    0x80_00_00_02
+  end
+
   def do_type_to_hex(%Geo.Polygon{}) do
     0x03
   end
 
+  def do_type_to_hex(%Geo.PolygonZ{}) do
+    0x80_00_00_03
+  end
+
   def do_type_to_hex(%Geo.MultiPoint{}) do
     0x04
+  end
+
+  def do_type_to_hex(%Geo.MultiPointZ{}) do
+    0x80_00_00_04
   end
 
   def do_type_to_hex(%Geo.MultiLineString{}) do
@@ -184,6 +212,10 @@ defmodule Geo.Utils do
 
   def do_type_to_hex(%Geo.MultiPolygon{}) do
     0x06
+  end
+
+  def do_type_to_hex(%Geo.MultiPolygonZ{}) do
+    0x80_00_00_06
   end
 
   def do_type_to_hex(%Geo.GeometryCollection{}) do
