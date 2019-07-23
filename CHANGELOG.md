@@ -1,3 +1,8 @@
+## v3.2.0
+
+- Added
+  - [3D versions of the various datatypes](https://github.com/bryanjos/geo/pull/111)
+
 ## v3.1.1
 
 - Fixed
