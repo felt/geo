@@ -83,7 +83,7 @@ defmodule Geo.Utils do
   Adds 0's to the left of hex string
   """
   def pad_left(hex, size) do
-    if byte_size(hex) == size do
+    if byte_size(hex) >= size do
       hex
     else
       repeat("0", size - byte_size(hex)) <> hex
