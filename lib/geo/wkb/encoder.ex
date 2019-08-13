@@ -86,22 +86,18 @@ defmodule Geo.WKB.Encoder do
     writer.wkb
   end
 
-  defp encode_coordinates(writer, %Point{coordinates: {0, 0}}) do
-    Writer.write(writer, Utils.repeat("0", 32))
-  end
-
   defp encode_coordinates(writer, %Point{coordinates: {x, y}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
 
     writer = Writer.write(writer, x)
     Writer.write(writer, y)
   end
 
   defp encode_coordinates(writer, %PointZ{coordinates: {x, y, z}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
 
     writer
     |> Writer.write(x)
@@ -110,9 +106,9 @@ defmodule Geo.WKB.Encoder do
   end
 
   defp encode_coordinates(writer, %PointM{coordinates: {x, y, m}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
 
     writer
     |> Writer.write(x)
@@ -121,10 +117,10 @@ defmodule Geo.WKB.Encoder do
   end
 
   defp encode_coordinates(writer, %PointZM{coordinates: {x, y, z, m}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16)
-    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16)
+    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
 
     writer
     |> Writer.write(x)

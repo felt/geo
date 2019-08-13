@@ -83,7 +83,7 @@ defmodule Geo.Utils do
   Adds 0's to the left of hex string
   """
   def pad_left(hex, size) do
-    if byte_size(hex) == size do
+    if byte_size(hex) >= size do
       hex
     else
       repeat("0", size - byte_size(hex)) <> hex
@@ -149,6 +149,10 @@ defmodule Geo.Utils do
     %Geo.MultiLineString{}
   end
 
+  def hex_to_type(0x80_00_00_05) do
+    %Geo.MultiLineStringZ{}
+  end
+
   def hex_to_type(0x06) do
     %Geo.MultiPolygon{}
   end
@@ -208,6 +212,10 @@ defmodule Geo.Utils do
 
   def do_type_to_hex(%Geo.MultiLineString{}) do
     0x05
+  end
+
+  def do_type_to_hex(%Geo.MultiLineStringZ{}) do
+    0x80_00_00_05
   end
 
   def do_type_to_hex(%Geo.MultiPolygon{}) do
