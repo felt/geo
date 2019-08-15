@@ -34,7 +34,7 @@ defmodule Geo.JSON.Encoder do
   @doc """
   Takes a Geometry and returns a map representing the GeoJSON
   """
-  @spec encode!(Geo.geometry()) :: Map.t()
+  @spec encode!(Geo.geometry()) :: map()
   def encode!(geom) do
     case geom do
       %GeometryCollection{geometries: geometries, srid: srid, properties: properties} ->
@@ -52,7 +52,7 @@ defmodule Geo.JSON.Encoder do
   @doc """
   Takes a Geometry and returns a map representing the GeoJSON
   """
-  @spec encode(Geo.geometry()) :: {:ok, Map.t()} | {:error, EncodeError.t()}
+  @spec encode(Geo.geometry()) :: {:ok, map()} | {:error, EncodeError.t()}
   def encode(geom) do
     {:ok, encode!(geom)}
   rescue
