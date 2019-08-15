@@ -3,6 +3,6 @@ defmodule Geo.MultiPointZ do
   Defines the MultiPointZ struct.
   """
 
-  @type t :: %__MODULE__{coordinates: [{number, number, number}], srid: integer, properties: map}
+  @type t :: %__MODULE__{coordinates: [{number, number, number}], srid: integer | nil, properties: map}
   defstruct coordinates: [], srid: nil, properties: %{}
 end
