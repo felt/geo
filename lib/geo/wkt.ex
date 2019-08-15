@@ -24,7 +24,7 @@ defmodule Geo.WKT do
   @doc """
   Takes a Geometry and returns a WKT string
   """
-  @spec encode(Geo.geometry()) :: binary
+  @spec encode!(Geo.geometry()) :: binary
   defdelegate encode!(geom), to: Encoder
 
   @doc """
