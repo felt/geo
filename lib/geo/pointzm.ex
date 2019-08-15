@@ -5,7 +5,7 @@ defmodule Geo.PointZM do
 
   @type t :: %Geo.PointZM{
           coordinates: {number, number, number, number},
-          srid: integer,
+          srid: integer | nil,
           properties: map
         }
   defstruct coordinates: {0, 0, 0, 0}, srid: nil, properties: %{}

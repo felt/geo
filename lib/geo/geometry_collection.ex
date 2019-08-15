@@ -3,6 +3,6 @@ defmodule Geo.GeometryCollection do
   Defines the GeometryCollection struct.
   """
 
-  @type t :: %Geo.GeometryCollection{geometries: [Geo.geometry()], srid: integer, properties: map}
+  @type t :: %Geo.GeometryCollection{geometries: [Geo.geometry()], srid: integer | nil, properties: map}
   defstruct geometries: [], srid: nil, properties: %{}
 end

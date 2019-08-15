@@ -28,24 +28,24 @@ defmodule Geo.JSON do
   @doc """
   Takes a map representing GeoJSON and returns a Geometry
   """
-  @spec decode!(Map.t()) :: Geo.geometry() | no_return
+  @spec decode!(map()) :: Geo.geometry() | no_return
   defdelegate decode!(geo_json), to: Decoder
 
   @doc """
   Takes a map representing GeoJSON and returns a Geometry
   """
-  @spec decode(Map.t()) :: {:ok, Geo.geometry()} | {:error, Decoder.DecodeError.t()}
+  @spec decode(map()) :: {:ok, Geo.geometry()} | {:error, Decoder.DecodeError.t()}
   defdelegate decode(geo_json), to: Decoder
 
   @doc """
   Takes a Geometry and returns a map representing the GeoJSON
   """
-  @spec encode!(Geo.geometry()) :: Map.t() | no_return
+  @spec encode!(Geo.geometry()) :: map() | no_return
   defdelegate encode!(geom), to: Encoder
 
   @doc """
   Takes a Geometry and returns a map representing the GeoJSON
   """
-  @spec encode(Geo.geometry()) :: {:ok, Map.t()} | {:error, Encoder.EncodeError.t()}
+  @spec encode(Geo.geometry()) :: {:ok, map()} | {:error, Encoder.EncodeError.t()}
   defdelegate encode(geom), to: Encoder
 end

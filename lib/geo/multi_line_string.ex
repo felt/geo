@@ -5,7 +5,7 @@ defmodule Geo.MultiLineString do
 
   @type t :: %Geo.MultiLineString{
           coordinates: [[{number, number}]],
-          srid: integer,
+          srid: integer | nil,
           properties: map
         }
   defstruct coordinates: [], srid: nil, properties: %{}

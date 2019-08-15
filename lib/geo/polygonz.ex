@@ -3,6 +3,6 @@ defmodule Geo.PolygonZ do
   Defines the Polygon struct.
   """
 
-  @type t :: %__MODULE__{coordinates: [[{number, number, number}]], srid: integer, properties: map}
+  @type t :: %__MODULE__{coordinates: [[{number, number, number}]], srid: integer | nil, properties: map}
   defstruct coordinates: [], srid: nil, properties: %{}
 end
