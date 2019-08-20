@@ -1,3 +1,9 @@
+## v3.3.0
+
+- Added
+  - [Updated Type Specs](https://github.com/bryanjos/geo/pull/116)
+  - [Allow to disable String.Chars implementation for Geo objects](https://github.com/bryanjos/geo/pull/110)
+
 ## v3.2.0
 
 - Added
