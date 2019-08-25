@@ -24,7 +24,7 @@ defmodule Geo.Mixfile do
   # Configuration for the OTP application
   def application do
     [
-      applications: [:logger]
+      extra_applications: [:logger]
     ]
   end
 
@@ -38,7 +38,8 @@ defmodule Geo.Mixfile do
     [
       {:poison, "~> 4.0", only: :test},
       {:ex_doc, "~> 0.18", only: :dev},
-      {:excoveralls, "~> 0.11.0", only: :test}
+      {:excoveralls, "~> 0.11.0", only: :test},
+      {:stream_data, "~> 0.4.3", only: :test}
     ]
   end
 

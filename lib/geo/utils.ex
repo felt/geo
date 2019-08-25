@@ -27,7 +27,7 @@ defmodule Geo.Utils do
     hex = if is_integer(hex), do: Integer.to_string(hex, 16), else: hex
 
     case bit_size(hex) do
-      64 ->
+      x when x <= 64 ->
         <<value::float-32>> = <<String.to_integer(hex, 16)::integer-32>>
         value
 
@@ -75,8 +75,8 @@ defmodule Geo.Utils do
     acc
   end
 
-  defp do_reverse_byte_order(<<a, b, rest :: binary>>, acc) do
-    do_reverse_byte_order(rest, <<a, b, acc :: binary>>)
+  defp do_reverse_byte_order(<<a, b, rest::binary>>, acc) do
+    do_reverse_byte_order(rest, <<a, b, acc::binary>>)
   end
 
   @doc """
