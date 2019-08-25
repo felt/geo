@@ -1,5 +1,6 @@
 defmodule Geo.WKT.Test do
   use ExUnit.Case, async: false
+  use ExUnitProperties
 
   test "Encode Point to WKT" do
     geom = %Geo.Point{coordinates: {30, -90}}
@@ -274,5 +275,55 @@ defmodule Geo.WKT.Test do
   test "Decode WKT to Point using decode" do
     {:ok, point} = Geo.WKT.decode("POINT(30 -90)")
     assert(point.coordinates == {30, -90})
+  end
+
+  property "encodes and decodes back to the correct Point struct" do
+    check all x <- float(),
+              y <- float() do
+      geom = %Geo.Point{coordinates: {x, y}}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
+  end
+
+  property "encodes and decodes back to the correct PointM struct" do
+    check all x <- float(),
+              y <- float(),
+              m <- float() do
+      geom = %Geo.PointM{coordinates: {x, y, m}}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
+  end
+
+  property "encodes and decodes back to the correct PointZ struct" do
+    check all x <- float(),
+              y <- float(),
+              z <- float() do
+      geom = %Geo.PointZ{coordinates: {x, y, z}}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
+  end
+
+  property "encodes and decodes back to the correct PointZM struct" do
+    check all x <- float(),
+              y <- float(),
+              z <- float(),
+              m <- float() do
+      geom = %Geo.PointZM{coordinates: {x, y, z, m}}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
+  end
+
+  property "encodes and decodes back to the correct LineString struct" do
+    check all list <- list_of({float(), float()}, min_length: 1) do
+      geom = %Geo.LineString{coordinates: list}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
+  end
+
+  property "encodes and decodes back to the correct LineStringZ struct" do
+    check all list <- list_of({float(), float(), float()}, min_length: 1) do
+      geom = %Geo.LineStringZ{coordinates: list}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
   end
 end

@@ -46,7 +46,7 @@ defmodule Geo.Utils.Test do
 
   test "float with many places encodes and decodes to itself" do
     x = 32768.001953125
-    a = Geo.Utils.float_to_hex(x, 32) |> IO.inspect()
+    a = Geo.Utils.float_to_hex(x, 32)
     b = Geo.Utils.hex_to_float(a)
 
     assert x == b

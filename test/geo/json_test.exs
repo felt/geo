@@ -1,5 +1,6 @@
 defmodule Geo.JSON.Test do
   use ExUnit.Case, async: true
+  use ExUnitProperties
 
   test "Point to GeoJson Map" do
     geom = %Geo.Point{coordinates: {100.0, 0.0}}
@@ -87,7 +88,6 @@ defmodule Geo.JSON.Test do
     assert(
       geom.coordinates == [[{100.0, 0.0}, {101.0, 0.0}, {101.0, 1.0}, {100.0, 1.0}, {100.0, 0.0}]]
     )
-
   end
 
   test "GeoJson to Polygon and back" do
@@ -287,5 +287,20 @@ defmodule Geo.JSON.Test do
     [geom1, _geom2] = geom.geometries
     assert geom1.coordinates == {2.29009, 49.897446}
     assert geom1.properties["label"] == "8 Boulevard du Port 80000 Amiens"
+  end
+
+  property "encodes and decodes back to the correct Point struct" do
+    check all x <- float(),
+              y <- float() do
+      geom = %Geo.Point{coordinates: {x, y}}
+      assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+    end
+  end
+
+  property "encodes and decodes back to the correct LineString struct" do
+    check all list <- list_of({float(), float()}, min_length: 1) do
+      geom = %Geo.LineString{coordinates: list}
+      assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+    end
   end
 end
