@@ -1,3 +1,8 @@
+## v3.3.1
+
+- Fixed
+  - Bugs found while property testing
+
 ## v3.3.0
 
 - Added
