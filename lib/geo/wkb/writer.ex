@@ -2,14 +2,21 @@ defmodule Geo.WKB.Writer do
   @moduledoc false
   defstruct wkb: nil, endian: :xdr
 
-  def new(endian) do
-    endian_hex = if endian == :ndr, do: "01", else: "00"
-    %Geo.WKB.Writer{wkb: endian_hex, endian: endian}
+  def new(:ndr) do
+    %Geo.WKB.Writer{wkb: "01", endian: :ndr}
   end
 
-  def write(writer, value) do
-    value = if writer.endian == :ndr, do: Geo.Utils.reverse_byte_order(value), else: value
+  def new(:xdr) do
+    %Geo.WKB.Writer{wkb: "00", endian: :xdr}
+  end
 
+  def write(%{endian: :ndr} = writer, value) do
+    value = Geo.Utils.reverse_byte_order(value)
+
+    %{writer | wkb: writer.wkb <> value}
+  end
+
+  def write(%{endian: :xdr} = writer, value) do
     %{writer | wkb: writer.wkb <> value}
   end
 

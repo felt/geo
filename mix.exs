@@ -4,7 +4,7 @@ defmodule Geo.Mixfile do
   def project do
     [
       app: :geo,
-      version: "3.3.1",
+      version: "3.3.2",
       elixir: "~> 1.6",
       deps: deps(),
       description: description(),
@@ -39,7 +39,8 @@ defmodule Geo.Mixfile do
       {:poison, "~> 4.0", only: :test},
       {:ex_doc, "~> 0.18", only: :dev},
       {:excoveralls, "~> 0.11.0", only: :test},
-      {:stream_data, "~> 0.4.3", only: :test}
+      {:stream_data, "~> 0.4.3", only: :test},
+      {:benchee, "~> 1.0", only: :dev}
     ]
   end
 

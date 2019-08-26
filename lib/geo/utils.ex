@@ -23,9 +23,11 @@ defmodule Geo.Utils do
     1.0
   `
   """
-  def hex_to_float(hex) when is_integer(hex) or is_binary(hex) do
-    hex = if is_integer(hex), do: Integer.to_string(hex, 16), else: hex
+  def hex_to_float(hex) when is_integer(hex) do
+    hex_to_float(Integer.to_string(hex, 16))
+  end
 
+  def hex_to_float(hex) when is_binary(hex) do
     case bit_size(hex) do
       x when x <= 64 ->
         <<value::float-32>> = <<String.to_integer(hex, 16)::integer-32>>
@@ -40,16 +42,14 @@ defmodule Geo.Utils do
   @doc """
   Turns a float into a hex value. The size can either be 32 or 64.
   """
-  def float_to_hex(float, size) do
-    case size do
-      32 ->
-        <<value::integer-32>> = <<float::float-32>>
-        value
+  def float_to_hex(float, 64) do
+    <<value::integer-64>> = <<float::float-64>>
+    value
+  end
 
-      64 ->
-        <<value::integer-64>> = <<float::float-64>>
-        value
-    end
+  def float_to_hex(float, 32) do
+    <<value::integer-32>> = <<float::float-32>>
+    value
   end
 
   @doc """
@@ -82,19 +82,12 @@ defmodule Geo.Utils do
   @doc """
   Adds 0's to the left of hex string
   """
-  def pad_left(hex, size) do
-    if byte_size(hex) >= size do
-      hex
-    else
-      repeat("0", size - byte_size(hex)) <> hex
-    end
+  def pad_left(hex, size) when byte_size(hex) >= size do
+    hex
   end
 
-  @doc """
-  Repeats the char count number of times
-  """
-  def repeat(char, count) do
-    Enum.map(1..count, fn _x -> char end) |> Enum.join()
+  def pad_left(hex, size) do
+    String.duplicate("0", size - byte_size(hex)) <> hex
   end
 
   def binary_to_endian(<<48, 49>>) do
@@ -165,8 +158,13 @@ defmodule Geo.Utils do
     %Geo.GeometryCollection{}
   end
 
-  def type_to_hex(geom, include_srid) do
-    value = if include_srid, do: 0x20000000, else: 0x00000000
+  def type_to_hex(geom, true) do
+    value = 0x20000000
+    value + do_type_to_hex(geom)
+  end
+
+  def type_to_hex(geom, false) do
+    value = 0x00000000
     value + do_type_to_hex(geom)
   end
 

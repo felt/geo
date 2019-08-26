@@ -1,3 +1,8 @@
+## v3.3.2
+
+- Fixed
+  - Some optimizations based on benchmarking
+
 ## v3.3.1
 
 - Fixed
