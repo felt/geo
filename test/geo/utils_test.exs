@@ -43,24 +43,4 @@ defmodule Geo.Utils.Test do
     assert(Geo.Utils.float_to_hex(-2.0, 64) == 0xC000000000000000)
     assert(Geo.Utils.float_to_hex(30000.0, 64) == 0x40DD4C0000000000)
   end
-
-  test "float with many places encodes and decodes to itself" do
-    x = 32768.001953125
-    a = Geo.Utils.float_to_hex(x, 32)
-    b = Geo.Utils.hex_to_float(a)
-
-    assert x == b
-  end
-
-  property "encodes and decodes floats to and from hex 64" do
-    check all x <- float() do
-      assert x == Geo.Utils.float_to_hex(x, 64) |> Geo.Utils.hex_to_float()
-    end
-  end
-
-  property "encodes and decodes floats to and from hex 32" do
-    check all x <- float() do
-      assert x == Geo.Utils.float_to_hex(x, 32) |> Geo.Utils.hex_to_float()
-    end
-  end
 end

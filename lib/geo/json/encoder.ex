@@ -43,7 +43,8 @@ defmodule Geo.JSON.Encoder do
         |> add_properties(properties)
 
       _ ->
-        do_encode(geom)
+        geom
+        |> do_encode()
         |> add_crs(geom.srid)
         |> add_properties(geom.properties)
     end
