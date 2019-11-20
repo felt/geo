@@ -85,6 +85,13 @@ defmodule Geo do
           | Geo.MultiPolygonZ.t()
           | Geo.GeometryCollection.t()
 
+  @typedoc """
+  Endianess (byte-order) of the WKB/EWKB representation.
+  
+    * `:ndr` - little-endian
+    * `:xdr` - big-endian
+
+  """
   @type endian :: :ndr | :xdr
 
   if Application.get_env(:geo, :impl_to_string, true) do
