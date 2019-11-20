@@ -9,6 +9,7 @@ defmodule Geo do
   * Polygon
   * PolygonZ
   * MultiPoint
+  * MultiPointZ
   * MulitLineString
   * MulitLineStringZ
   * MultiPolygon
@@ -77,6 +78,7 @@ defmodule Geo do
           | Geo.Polygon.t()
           | Geo.PolygonZ.t()
           | Geo.MultiPoint.t()
+          | Geo.MultiPointZ.t()
           | Geo.MultiLineString.t()
           | Geo.MultiLineStringZ.t()
           | Geo.MultiPolygon.t()
@@ -97,6 +99,7 @@ defmodule Geo do
         Geo.Polygon,
         Geo.PolygonZ,
         Geo.MultiPoint,
+        Geo.MultiPointZ,
         Geo.MultiLineString,
         Geo.MultiLineStringZ,
         Geo.MultiPolygon,
