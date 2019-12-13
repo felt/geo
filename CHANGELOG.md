@@ -1,3 +1,9 @@
+## v3.3.3
+
+- Fixed
+  - [Add missing MultiPointZ in list of geometry types](https://github.com/bryanjos/geo/pull/122)
+  - [Improve docs around Geo.endian type](https://github.com/bryanjos/geo/pull/123)
+
 ## v3.3.2
 
 - Fixed
