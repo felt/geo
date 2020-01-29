@@ -35,7 +35,9 @@ defmodule Geo.JSON.Encoder do
   Takes a Geometry and returns a map representing the GeoJSON
   """
   @spec encode!(Geo.geometry()) :: map()
-  def encode!(geom) do
+  def encode!(geom, opts \\ [])
+
+  def encode!(geom, []) do
     case geom do
       %GeometryCollection{geometries: geometries, srid: srid, properties: properties} ->
         %{"type" => "GeometryCollection", "geometries" => Enum.map(geometries, &encode!(&1))}
@@ -50,12 +52,71 @@ defmodule Geo.JSON.Encoder do
     end
   end
 
+  # translate a %GeometryCollection{} to a GeoJSON FeatureCollection (3.3).
+  #
+  # GeometryCollections and their encapsulated Geo.geometry() structs MAY have
+  # properties. GeoJSON Features MUST have properties even if empty (3.2), and
+  # properties objects on other types are considered "foreign members" (6.1).
+  #
+  # This function attempts to merge accordingly into individual Feature
+  # properties. Geo.geometry() properties override Collection properties.
+
+  # This function disregards SRID information as GeoJSON is expected to be in
+  # WGS 84, deviating only in pre-agreed cases (4).
+  #
+  # see:
+  #    https://tools.ietf.org/html/rfc7946#section-3.2
+  #    https://tools.ietf.org/html/rfc7946#section-3.3
+  #    https://tools.ietf.org/html/rfc7946#section-4
+  #    https://tools.ietf.org/html/rfc7946#section-6.1
+  #
+  def encode!(%GeometryCollection{geometries: gs, properties: ps}, feature: true) do
+    ps = Enum.reduce(ps, %{}, &properties_reduce/2)
+
+    %{
+      "type" => "FeatureCollection",
+      "features" => Enum.map(gs, &encode!(&1, feature: true, properties: ps))
+    }
+  end
+
+  # translate a Geo.geometry() to a GeoJSON Feature (3.2), with optional default
+  # properties.
+  #
+  # This function disregards SRID information as GeoJSON is expected to be in
+  # WGS 84, deviating only in pre-agreed cases (4).
+  #
+  # see:
+  #    https://tools.ietf.org/html/rfc7946#section-3.2
+  #    https://tools.ietf.org/html/rfc7946#section-4
+  #
+  def encode!(geom, opts) do
+    if Keyword.get(opts, :feature, false) do
+      ps =
+        Enum.reduce(
+          geom.properties,
+          Keyword.get(opts, :properties, %{}),
+          &properties_reduce/2
+        )
+
+      %{
+        "type" => "Feature",
+        "properties" => ps,
+        "geometry" => do_encode(geom)
+      }
+    else
+      encode!(geom)
+    end
+  end
+
+  defp properties_reduce({k, v}, m) when is_atom(k), do: Map.put(m, Atom.to_string(k), v)
+  defp properties_reduce({k, v}, m), do: Map.put(m, k, v)
+
   @doc """
   Takes a Geometry and returns a map representing the GeoJSON
   """
   @spec encode(Geo.geometry()) :: {:ok, map()} | {:error, EncodeError.t()}
-  def encode(geom) do
-    {:ok, encode!(geom)}
+  def encode(geom, opts \\ []) do
+    {:ok, encode!(geom, opts)}
   rescue
     exception in [EncodeError] ->
       {:error, exception}
