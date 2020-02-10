@@ -303,4 +303,66 @@ defmodule Geo.JSON.Test do
       assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
     end
   end
+
+  test "Point with properties to GeoJSON Feature map" do
+    geom = %Geo.Point{coordinates: {100.0, 0.0}, properties: %{hi: "there"}}
+
+    expected = %{
+      "type" => "Feature",
+      "properties" => %{
+        "hi" => "there"
+      },
+      "geometry" => %{
+        "type" => "Point",
+        "coordinates" => [
+          100.0,
+          0.0
+        ]
+      }
+    }
+
+    assert(Geo.JSON.encode!(geom, feature: true) == expected)
+  end
+
+  test "Collection with properties to GeoJSON FeatureCollection map" do
+    p1 = %Geo.Point{coordinates: {100.0, 0.0}, properties: %{hi: "there"}}
+    p2 = %Geo.Point{coordinates: {0.0, 45.0}, properties: %{foo: 456.78}}
+    gc = %Geo.GeometryCollection{geometries: [p1, p2], properties: %{hi: "other", foo: 123.45}}
+
+    expected = %{
+      "type" => "FeatureCollection",
+      "features" => [
+        %{
+          "type" => "Feature",
+          "properties" => %{
+            "hi" => "there",
+            "foo" => 123.45
+          },
+          "geometry" => %{
+            "type" => "Point",
+            "coordinates" => [
+              100.0,
+              0.0
+            ]
+          }
+        },
+        %{
+          "type" => "Feature",
+          "properties" => %{
+            "hi" => "other",
+            "foo" => 456.78
+          },
+          "geometry" => %{
+            "type" => "Point",
+            "coordinates" => [
+              0.0,
+              45.0
+            ]
+          }
+        }
+      ]
+    }
+
+    assert(Geo.JSON.encode!(gc, feature: true) == expected)
+  end
 end

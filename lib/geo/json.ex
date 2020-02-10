@@ -42,10 +42,12 @@ defmodule Geo.JSON do
   """
   @spec encode!(Geo.geometry()) :: map() | no_return
   defdelegate encode!(geom), to: Encoder
+  defdelegate encode!(geom, opts), to: Encoder
 
   @doc """
   Takes a Geometry and returns a map representing the GeoJSON
   """
   @spec encode(Geo.geometry()) :: {:ok, map()} | {:error, Encoder.EncodeError.t()}
   defdelegate encode(geom), to: Encoder
+  defdelegate encode(geom, opts), to: Encoder
 end
