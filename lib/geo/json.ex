@@ -14,7 +14,7 @@ defmodule Geo.JSON do
   #Using Poison as the JSON parser for these examples
 
   json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
-  geom = Poison.decode!(json) |> Geo.JSON.decode!(json)
+  geom = Poison.decode!(json) |> Geo.JSON.decode!
   Geo.Point[coordinates: {100.0, 0.0}, srid: nil]
 
   Geo.JSON.encode!(geom) |> Poison.encode!
