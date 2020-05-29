@@ -11,17 +11,19 @@ defmodule Geo.JSON do
   in larger JSON structures.
 
   ```
-  #Using Poison as the JSON parser for these examples
+  # Using Jason as the JSON parser for these examples
 
-  json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
-  geom = Poison.decode!(json) |> Geo.JSON.decode!(json)
-  Geo.Point[coordinates: {100.0, 0.0}, srid: nil]
+  iex>json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
+  ...>json |> Jason.decode!() |> Geo.JSON.decode!()
+  %Geo.Point{coordinates: {100.0, 0.0}, srid: nil}
 
-  Geo.JSON.encode!(geom) |> Poison.encode!
-  "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
+  iex>geom = %Geo.Point{coordinates: {100.0, 0.0}, srid: nil}
+  ...>Jason.encode!(geom)
+  "{\\"coordinates\\":[100.0,0.0],\\"type\\":\\"Point\\"}"
 
-  Geo.JSON.encode!(geom)
-  %{ "type" => "Point", "coordinates" => [100.0, 0.0] }
+  iex>geom = %Geo.Point{coordinates: {100.0, 0.0}, srid: nil}
+  ...>Geo.JSON.encode!(geom)
+  %{"type" => "Point", "coordinates" => [100.0, 0.0]}
   ```
   """
 

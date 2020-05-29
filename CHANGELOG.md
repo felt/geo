@@ -1,3 +1,8 @@
+## v3.3.4
+
+- Enhancement
+  - [Replace Poison with Jason for JSON encoding in tests]
+  
 ## v3.3.3
 
 - Fixed
