@@ -1,3 +1,8 @@
+## v3.3.4
+
+- Fixed
+  - [Update typespec to make Point easier to use](https://github.com/bryanjos/geo/pull/140)
+
 ## v3.3.3
 
 - Fixed
