@@ -1,3 +1,8 @@
+## v3.3.5
+
+- Fixed
+  - Typespec on Point
+
 ## v3.3.4
 
 - Fixed
