@@ -55,15 +55,15 @@ defmodule Geo do
     be done before and after.
 
     ```elixir
-    #Examples using Poison as the JSON parser
+    #Examples using Jason as the JSON parser
 
     iex(1)> Geo.JSON.encode(point)
     %{ "type" => "Point", "coordinates" => [100.0, 0.0] }
 
-    iex(2)> point = Poison.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
+    iex(2)> point = Jason.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
     %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
 
-    iex(3)> Geo.JSON.encode(point) |> Poison.encode!
+    iex(3)> Geo.JSON.encode(point) |> Jason.encode!
     "{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
     ```
   """
@@ -87,7 +87,7 @@ defmodule Geo do
 
   @typedoc """
   Endianess (byte-order) of the WKB/EWKB representation.
-  
+
     * `:ndr` - little-endian
     * `:xdr` - big-endian
 
@@ -116,6 +116,29 @@ defmodule Geo do
       def to_string(geo) do
         Geo.WKT.encode!(geo)
       end
+    end
+  end
+
+  defimpl Jason.Encoder,
+    for: [
+      Geo.Point,
+      Geo.PointZ,
+      Geo.PointM,
+      Geo.PointZM,
+      Geo.LineString,
+      Geo.LineStringZ,
+      Geo.Polygon,
+      Geo.PolygonZ,
+      Geo.MultiPoint,
+      Geo.MultiPointZ,
+      Geo.MultiLineString,
+      Geo.MultiLineStringZ,
+      Geo.MultiPolygon,
+      Geo.MultiPolygonZ,
+      Geo.GeometryCollection
+    ] do
+    def encode(value, opts) do
+      Jason.Encode.map(Geo.JSON.encode!(value), opts)
     end
   end
 end
