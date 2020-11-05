@@ -1,7 +1,8 @@
 ## v3.3.6
 
 - Enhancement
-  - [Replace Poison with Jason for JSON encoding in tests]
+  - [Replace Poison with Jason for JSON encoding in tests](https://github.com/bryanjos/geo/pull/141)
+  - [Add JSON decoding support for LineStringZ](https://github.com/bryanjos/geo/pull/147)
 
 ## v3.3.5
 
