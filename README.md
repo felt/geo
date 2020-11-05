@@ -70,14 +70,14 @@ Geo only encodes and decodes maps shaped as GeoJSON. JSON encoding and decoding 
 be done before and after.
 
 ```elixir
-#Examples using Poison as the JSON parser
+#Examples using Jason as the JSON parser
 
 iex(1)> Geo.JSON.encode(point)
 {:ok, %{ "type" => "Point", "coordinates" => [100.0, 0.0] }}
 
-iex(2)> point = Poison.decode!("{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
+iex(2)> point = Jason.decode!("{\"type\": \"Point\", \"coordinates\": [100.0, 0.0] }") |> Geo.JSON.decode
 %Geo.Point{ coordinates: {100.0, 0.0}, srid: nil }
 
-iex(3)> Geo.JSON.encode!(point) |> Poison.encode!
-"{\"type\":\"Point\",\"coordinates\":[100.0,0.0]}"
+iex(3)> Geo.JSON.encode!(point) |> Jason.encode!
+"{\"coordinates\":[100.0,0.0],\"type\":\"Point\"}"
 ```
