@@ -83,8 +83,8 @@ defmodule Geo.JSON.Test do
 
   test "GeoJson to LineStringZ and back" do
     json = "{ \"type\": \"LineStringZ\", \"coordinates\": [ [100.0, 0.0, 50.0], [101.0, 1.0, 20.0] ]}"
-    exjson = Poison.decode!(json)
-    geom = Poison.decode!(json) |> Geo.JSON.decode!()
+    exjson = Jason.decode!(json)
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0, 50.0}, {101.0, 1.0, 20.0}])
     new_exjson = Geo.JSON.encode!(geom)
