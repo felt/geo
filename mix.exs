@@ -36,7 +36,7 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [
-      {:jason, "~> 1.2", only: :test},
+      {:jason, "~> 1.2", optional: true},
       {:ex_doc, "~> 0.18", only: :dev},
       {:excoveralls, "~> 0.12.1", only: :test},
       {:stream_data, "~> 0.4.3", only: :test},

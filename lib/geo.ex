@@ -119,26 +119,28 @@ defmodule Geo do
     end
   end
 
-  defimpl Jason.Encoder,
-    for: [
-      Geo.Point,
-      Geo.PointZ,
-      Geo.PointM,
-      Geo.PointZM,
-      Geo.LineString,
-      Geo.LineStringZ,
-      Geo.Polygon,
-      Geo.PolygonZ,
-      Geo.MultiPoint,
-      Geo.MultiPointZ,
-      Geo.MultiLineString,
-      Geo.MultiLineStringZ,
-      Geo.MultiPolygon,
-      Geo.MultiPolygonZ,
-      Geo.GeometryCollection
-    ] do
-    def encode(value, opts) do
-      Jason.Encode.map(Geo.JSON.encode!(value), opts)
+  if Code.ensure_loaded?(Jason.Encoder) do
+    defimpl Jason.Encoder,
+      for: [
+        Geo.Point,
+        Geo.PointZ,
+        Geo.PointM,
+        Geo.PointZM,
+        Geo.LineString,
+        Geo.LineStringZ,
+        Geo.Polygon,
+        Geo.PolygonZ,
+        Geo.MultiPoint,
+        Geo.MultiPointZ,
+        Geo.MultiLineString,
+        Geo.MultiLineStringZ,
+        Geo.MultiPolygon,
+        Geo.MultiPolygonZ,
+        Geo.GeometryCollection
+      ] do
+      def encode(value, opts) do
+        Jason.Encode.map(Geo.JSON.encode!(value), opts)
+      end
     end
   end
 end
