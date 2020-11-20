@@ -1,3 +1,8 @@
+## v3.3.7
+
+- Fix
+  - [Make Jason optional](https://github.com/bryanjos/geo/pull/149)
+
 ## v3.3.6
 
 - Enhancement
