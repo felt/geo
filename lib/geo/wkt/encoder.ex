@@ -20,7 +20,7 @@ defmodule Geo.WKT.Encoder do
   }
 
   @doc """
-  Takes a Geometry and returns a WKT string
+  Takes a Geometry and returns a WKT string.
   """
   @spec encode(Geo.geometry()) :: {:ok, binary} | {:error, Exception.t()}
   def encode(geom) do
@@ -31,7 +31,7 @@ defmodule Geo.WKT.Encoder do
   end
 
   @doc """
-  Takes a Geometry and returns a WKT string
+  Takes a Geometry and returns a WKT string.
   """
   @spec encode!(Geo.geometry()) :: binary
   def encode!(geom) do

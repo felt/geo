@@ -19,7 +19,7 @@ defmodule Geo.WKB.Decoder do
   alias Geo.WKB.Reader
 
   @doc """
-  Takes a WKB string and returns a Geometry
+  Takes a WKB string and returns a Geometry.
   """
   @spec decode(binary, [Geo.geometry()]) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
   def decode(wkb, geometries \\ []) do
@@ -30,7 +30,7 @@ defmodule Geo.WKB.Decoder do
   end
 
   @doc """
-  Takes a WKB string and returns a Geometry
+  Takes a WKB string and returns a Geometry.
   """
   @spec decode!(binary, [Geo.geometry()]) :: Geo.geometry() | no_return
   def decode!(wkb, geometries \\ []) do

@@ -9,19 +9,20 @@ defmodule Geo.Utils do
   Takes an optional endian atom. Either :xdr for big endian or :ndr for little
   endian. Defaults to :xdr
 
-  `
-    Geo.Utils.hex_to_float("40000000")
-    2.0
+  # Examples
 
-    Geo.Utils.hex_to_float(0x40000000)
-    2.0
+      iex> Geo.Utils.hex_to_float("40000000")
+      2.0
 
-    Geo.Utils.hex_to_float("3ff0000000000000")
-    1.0
+      iex> Geo.Utils.hex_to_float(0x40000000)
+      2.0
 
-    Geo.Utils.hex_to_float(0x3ff0000000000000)
-    1.0
-  `
+      iex> Geo.Utils.hex_to_float("3ff0000000000000")
+      1.0
+
+      iex> Geo.Utils.hex_to_float(0x3ff0000000000000)
+      1.0
+
   """
   def hex_to_float(hex) when is_integer(hex) do
     hex_to_float(Integer.to_string(hex, 16))
@@ -55,13 +56,14 @@ defmodule Geo.Utils do
   @doc """
   Reverses the byte order of the given hex string.
 
-  ```
-  Geo.Utils.reverse_byte_order("00000004")
-  "40000000"
+  ## Examples
 
-  Geo.Utils.reverse_byte_order("E6100000")
-  "000010E6"
-  ```
+      iex> Geo.Utils.reverse_byte_order("00000004")
+      "40000000"
+
+      iex> Geo.Utils.reverse_byte_order("E6100000")
+      "000010E6"
+
   """
   def reverse_byte_order("") do
     ""
@@ -80,7 +82,7 @@ defmodule Geo.Utils do
   end
 
   @doc """
-  Adds 0's to the left of hex string
+  Adds 0's to the left of hex string.
   """
   def pad_left(hex, size) when byte_size(hex) >= size do
     hex

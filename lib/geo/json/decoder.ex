@@ -29,7 +29,7 @@ defmodule Geo.JSON.Decoder do
   end
 
   @doc """
-  Takes a map representing GeoJSON and returns a Geometry
+  Takes a map representing GeoJSON and returns a Geometry.
   """
   @spec decode!(map()) :: Geo.geometry() | no_return
   def decode!(geo_json) do
@@ -92,7 +92,7 @@ defmodule Geo.JSON.Decoder do
   end
 
   @doc """
-  Takes a map representing GeoJSON and returns a Geometry
+  Takes a map representing GeoJSON and returns a Geometry.
   """
   @spec decode(map()) :: {:ok, Geo.geometry()} | {:error, DecodeError.t()}
   def decode(geo_json) do

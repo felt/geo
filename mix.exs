@@ -1,16 +1,19 @@
 defmodule Geo.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/bryanjos/geo"
+  @version "3.3.7"
+
   def project do
     [
       app: :geo,
-      version: "3.3.7",
+      version: @version,
       elixir: "~> 1.6",
       deps: deps(),
       description: description(),
       package: package(),
+      docs: docs(),
       name: "Geo",
-      source_url: "https://github.com/bryanjos/geo",
       test_coverage: [tool: ExCoveralls],
       preferred_cli_env: [
         coveralls: :test,
@@ -21,7 +24,6 @@ defmodule Geo.Mixfile do
     ]
   end
 
-  # Configuration for the OTP application
   def application do
     [
       extra_applications: [:logger]
@@ -37,10 +39,10 @@ defmodule Geo.Mixfile do
   defp deps do
     [
       {:jason, "~> 1.2", optional: true},
-      {:ex_doc, "~> 0.18", only: :dev},
-      {:excoveralls, "~> 0.12.1", only: :test},
-      {:stream_data, "~> 0.4.3", only: :test},
-      {:benchee, "~> 1.0", only: :dev}
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
+      {:excoveralls, "~> 0.12.1", only: :test, runtime: false},
+      {:stream_data, "~> 0.4.3", only: :test, runtime: false},
+      {:benchee, "~> 1.0", only: :dev, runtime: false}
     ]
   end
 
@@ -50,7 +52,16 @@ defmodule Geo.Mixfile do
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
       maintainers: ["Bryan Joseph"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/bryanjos/geo"}
+      links: %{"GitHub" => @version}
+    ]
+  end
+
+  defp docs do
+    [
+      extras: ["CHANGELOG.md", "README.md"],
+      main: "readme",
+      source_url: @source_url,
+      formatters: ["html"]
     ]
   end
 end

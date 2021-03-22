@@ -26,7 +26,7 @@ defmodule Geo.WKB.Encoder do
 
   @doc """
   Takes a Geometry and returns a WKB string. The endian decides
-  what the byte order will be
+  what the byte order will be.
   """
   @spec encode(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
   def encode(geom, endian \\ :xdr) do
@@ -38,7 +38,7 @@ defmodule Geo.WKB.Encoder do
 
   @doc """
   Takes a Geometry and returns a WKB string. The endian decides
-  what the byte order will be
+  what the byte order will be.
   """
   @spec encode!(Geo.geometry(), Geo.endian()) :: binary | no_return
   def encode!(geom, endian \\ :xdr) do

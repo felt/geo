@@ -32,7 +32,7 @@ defmodule Geo.JSON.Encoder do
   end
 
   @doc """
-  Takes a Geometry and returns a map representing the GeoJSON
+  Takes a Geometry and returns a map representing the GeoJSON.
   """
   @spec encode!(Geo.geometry()) :: map()
   def encode!(geom, opts \\ [])
@@ -112,7 +112,7 @@ defmodule Geo.JSON.Encoder do
   defp properties_reduce({k, v}, m), do: Map.put(m, k, v)
 
   @doc """
-  Takes a Geometry and returns a map representing the GeoJSON
+  Takes a Geometry and returns a map representing the GeoJSON.
   """
   @spec encode(Geo.geometry()) :: {:ok, map()} | {:error, EncodeError.t()}
   def encode(geom, opts \\ []) do
