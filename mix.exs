@@ -52,7 +52,7 @@ defmodule Geo.Mixfile do
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
       maintainers: ["Bryan Joseph"],
       licenses: ["MIT"],
-      links: %{"GitHub" => @version}
+      links: %{"GitHub" => "https://github.com/bryanjos/geo"}
     ]
   end
 
