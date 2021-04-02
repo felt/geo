@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.3.8 - 2021-04-02
+
+- Fix
+  - [Misc doc changes](https://github.com/bryanjos/geo/pull/153)
+
 ## v3.3.7 - 2020-11-20
 
 - Fix
