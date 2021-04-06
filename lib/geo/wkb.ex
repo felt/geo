@@ -42,4 +42,7 @@ defmodule Geo.WKB do
   """
   @spec decode!(binary, [Geo.geometry()]) :: Geo.geometry() | no_return
   defdelegate decode!(wkb, geometries \\ []), to: Decoder
+
+  @spec decode_iodata!(binary) :: Geo.geometry() | no_return
+  defdelegate decode_iodata!(wkb), to: Geo.WKB.IODecoder
 end

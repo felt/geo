@@ -81,6 +81,10 @@ defmodule Geo.Utils do
     do_reverse_byte_order(rest, <<a, b, acc::binary>>)
   end
 
+  defp do_reverse_byte_order(<<a, rest::binary>>, acc) do
+    do_reverse_byte_order(rest, <<a, acc::binary>>)
+  end
+
   @doc """
   Adds 0's to the left of hex string.
   """
