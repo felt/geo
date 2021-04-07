@@ -39,112 +39,129 @@ defmodule Geo.WKB.IODecoder do
   @spec decode_iodata!(iodata()) :: Geo.geometry() | no_return
   def decode_iodata!(wkb)
 
-  def decode_iodata!(<<0, type::32-big, rest::bits>>) do
-    rest =
-      rest
-      |> :binary.decode_unsigned(:big)
-      |> :binary.encode_unsigned(:little)
+  for {endian, modifier} <- [{1, {:little, [], Elixir}}, {0, {:big, [], Elixir}}] do
+    def decode_iodata!(
+          <<unquote(endian)::unquote(modifier)-integer-unsigned, type::32-unquote(modifier),
+            srid::32-unquote(modifier), rest::bits>>
+        )
+        when has_srid(type) do
+      do_decode(remove_srid(type), rest, srid, unquote(endian))
+    end
 
-    IO.inspect(type == 0x80_00_00_02)
+    def decode_iodata!(
+          <<unquote(endian)::unquote(modifier)-integer-unsigned, type::32-unquote(modifier),
+            rest::bits>>
+        ) do
+      do_decode(type, rest, nil, unquote(endian))
+    end
 
-    wkb = <<1, type::32-little, rest::bits>>
-    IO.inspect(wkb)
+    defp do_decode(
+           0x00_00_00_01,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64>>,
+           srid,
+           unquote(endian)
+         ) do
+      %Point{coordinates: {x, y}, srid: srid}
+    end
 
-    decode_iodata!(wkb)
-  end
+    defp do_decode(
+           0x40_00_00_01,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+             m::unquote(modifier)-float-64>>,
+           srid,
+           unquote(endian)
+         ) do
+      %PointM{coordinates: {x, y, m}, srid: srid}
+    end
 
-  def decode_iodata!(<<1, type::32-little, srid::32-little, rest::bits>>)
-      when has_srid(type) do
-    do_decode_ndr(remove_srid(type), rest, srid)
-  end
+    defp do_decode(
+           0x80_00_00_01,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+             z::unquote(modifier)-float-64>>,
+           srid,
+           unquote(endian)
+         ) do
+      %PointZ{coordinates: {x, y, z}, srid: srid}
+    end
 
-  def decode_iodata!(<<1, type::32-little, rest::bits>>) do
-    do_decode_ndr(type, rest, nil)
-  end
+    defp do_decode(
+           0xC0_00_00_01,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+             z::unquote(modifier)-float-64, m::unquote(modifier)-float-64>>,
+           srid,
+           unquote(endian)
+         ) do
+      %PointZM{coordinates: {x, y, z, m}, srid: srid}
+    end
 
-  defp do_decode_ndr(0x00_00_00_01, <<x::little-float-64, y::little-float-64>>, srid) do
-    %Point{coordinates: {x, y}, srid: srid}
-  end
+    defp do_decode(
+           0x00_00_00_02,
+           <<number_of_points::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      coordinates = decode_linestring_points(number_of_points, rest, [], unquote(endian))
 
-  defp do_decode_ndr(
-         0x40_00_00_01,
-         <<x::little-float-64, y::little-float-64, m::little-float-64>>,
-         srid
-       ) do
-    %PointM{coordinates: {x, y, m}, srid: srid}
-  end
+      %LineString{coordinates: coordinates, srid: srid}
+    end
 
-  defp do_decode_ndr(
-         0x80_00_00_01,
-         <<x::little-float-64, y::little-float-64, z::little-float-64>>,
-         srid
-       ) do
-    %PointZ{coordinates: {x, y, z}, srid: srid}
-  end
+    defp do_decode(
+           0x80_00_00_02,
+           <<number_of_points::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      coordinates = decode_linestringz_points(number_of_points, rest, [], unquote(endian))
 
-  defp do_decode_ndr(
-         0xC0_00_00_01,
-         <<x::little-float-64, y::little-float-64, z::little-float-64, m::little-float-64>>,
-         srid
-       ) do
-    %PointZM{coordinates: {x, y, z, m}, srid: srid}
-  end
+      %LineStringZ{coordinates: coordinates, srid: srid}
+    end
 
-  defp do_decode_ndr(
-         0x00_00_00_02,
-         <<number_of_points::little-32, rest::bits>>,
-         srid
-       ) do
-    coordinates = decode_linestring_points_ndr(number_of_points, rest, [])
+    defp decode_linestring_points(0, _bits, data, _) do
+      Enum.reverse(data)
+    end
 
-    %LineString{coordinates: coordinates, srid: srid}
-  end
+    defp decode_linestring_points(
+           number_of_points,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64, rest::bits>>,
+           data,
+           unquote(endian)
+         ) do
+      %Point{coordinates: coordinates} =
+        do_decode(
+          0x00_00_00_01,
+          <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64>>,
+          nil,
+          unquote(endian)
+        )
 
-  defp do_decode_ndr(
-         0x80_00_00_02,
-         <<number_of_points::little-32, rest::bits>>,
-         srid
-       ) do
-    coordinates = decode_linestringz_points_ndr(number_of_points, rest, [])
+      data = [coordinates | data]
 
-    %LineStringZ{coordinates: coordinates, srid: srid}
-  end
+      decode_linestring_points(number_of_points - 1, rest, data, unquote(endian))
+    end
 
-  defp decode_linestring_points_ndr(0, _bits, data) do
-    Enum.reverse(data)
-  end
+    defp decode_linestringz_points(0, _bits, data, _) do
+      Enum.reverse(data)
+    end
 
-  defp decode_linestring_points_ndr(
-         number_of_points,
-         <<x::little-float-64, y::little-float-64, rest::bits>>,
-         data
-       ) do
-    %Point{coordinates: coordinates} =
-      do_decode_ndr(0x00_00_00_01, <<x::little-float-64, y::little-float-64>>, nil)
+    defp decode_linestringz_points(
+           number_of_points,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+             z::unquote(modifier)-float-64, rest::bits>>,
+           data,
+           unquote(endian)
+         ) do
+      %PointZ{coordinates: coordinates} =
+        do_decode(
+          0x80_00_00_01,
+          <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+            z::unquote(modifier)-float-64>>,
+          nil,
+          unquote(endian)
+        )
 
-    data = [coordinates | data]
+      data = [coordinates | data]
 
-    decode_linestring_points_ndr(number_of_points - 1, rest, data)
-  end
-
-  defp decode_linestringz_points_ndr(0, _bits, data) do
-    Enum.reverse(data)
-  end
-
-  defp decode_linestringz_points_ndr(
-         number_of_points,
-         <<x::little-float-64, y::little-float-64, z::little-float-64, rest::bits>>,
-         data
-       ) do
-    %PointZ{coordinates: coordinates} =
-      do_decode_ndr(
-        0x80_00_00_01,
-        <<x::little-float-64, y::little-float-64, z::little-float-64>>,
-        nil
-      )
-
-    data = [coordinates | data]
-
-    decode_linestringz_points_ndr(number_of_points - 1, rest, data)
+      decode_linestringz_points(number_of_points - 1, rest, data, unquote(endian))
+    end
   end
 end

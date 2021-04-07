@@ -765,8 +765,6 @@ defmodule Geo.WKB.Test do
         )
       )
 
-    IO.inspect(point)
-
     assert(point.coordinates == [{30, 10, 3}, {10, 30, 90}, {40, 40, 40}])
   end
 end
