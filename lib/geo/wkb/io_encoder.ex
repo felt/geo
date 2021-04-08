@@ -41,6 +41,8 @@ defmodule Geo.WKB.IOEncoder do
 
   defp add_srid(type), do: type + @wkbsridflag
 
+  def encode!(geom, endian \\ :ndr)
+
   for {endian, endian_atom, modifier} <- [{1, :ndr, quote(do: little)}, {0, :xdr, quote(do: big)}] do
     def encode!(geom, unquote(endian_atom)) do
       {type, rest} = do_encode(geom, unquote(endian_atom))
@@ -75,6 +77,58 @@ defmodule Geo.WKB.IOEncoder do
          <<y::unquote(modifier)-float-64>>,
          <<m::unquote(modifier)-float-64>>
        ]}
+    end
+
+    def do_encode(%PointZM{coordinates: {x, y, z, m}}, unquote(endian_atom)) do
+      {@point_zm,
+       [
+         <<x::unquote(modifier)-float-64>>,
+         <<y::unquote(modifier)-float-64>>,
+         <<z::unquote(modifier)-float-64>>,
+         <<m::unquote(modifier)-float-64>>
+       ]}
+    end
+
+    def do_encode(%LineString{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn {x, y}, acc ->
+          {[<<x::unquote(modifier)-float-64>>, <<y::unquote(modifier)-float-64>>], acc + 1}
+        end)
+
+      {@line_string, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
+    def do_encode(%LineStringZ{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn {x, y, z}, acc ->
+          {[
+             <<x::unquote(modifier)-float-64>>,
+             <<y::unquote(modifier)-float-64>>,
+             <<z::unquote(modifier)-float-64>>
+           ], acc + 1}
+        end)
+
+      {@line_string_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
+    def do_encode(%Polygon{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn ring, acc ->
+          {_, data} = do_encode(%LineString{coordinates: ring}, unquote(endian_atom))
+          {data, acc + 1}
+        end)
+
+      {@polygon, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
+    def do_encode(%PolygonZ{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn ring, acc ->
+          {_, data} = do_encode(%LineStringZ{coordinates: ring}, unquote(endian_atom))
+          {data, acc + 1}
+        end)
+
+      {@polygon_z, [<<count::unquote(modifier)-32>> | coordinates]}
     end
   end
 end
