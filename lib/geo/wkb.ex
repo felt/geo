@@ -22,14 +22,42 @@ defmodule Geo.WKB do
   what the byte order will be.
   """
   @spec encode!(Geo.geometry(), Geo.endian()) :: binary | no_return
-  defdelegate encode!(geom, endian \\ :xdr), to: Encoder
+  def encode!(geom, endian \\ :xdr) do
+    geom |> Encoder.encode!(endian) |> Base.encode16()
+  end
 
   @doc """
   Takes a Geometry and returns a WKB string. The endian decides
   what the byte order will be.
   """
   @spec encode(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
-  defdelegate encode(geom, endian \\ :xdr), to: Encoder
+  def encode(geom, endian \\ :xdr) do
+    {:ok, geom |> Encoder.encode!(endian) |> Base.encode16()}
+  rescue
+    exception ->
+      {:error, exception}
+  end
+
+  @doc """
+  Takes a Geometry and returns a WKB string as iodata. The endian decides
+  what the byte order will be.
+  """
+  @spec encode_iodata!(Geo.geometry(), Geo.endian()) :: binary | no_return
+  def encode_iodata!(geom, endian \\ :xdr) do
+    geom |> Encoder.encode!(endian)
+  end
+
+  @doc """
+  Takes a Geometry and returns a WKB string as iodata. The endian decides
+  what the byte order will be.
+  """
+  @spec encode_iodata(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
+  def encode_iodata(geom, endian \\ :xdr) do
+    {:ok, geom |> Encoder.encode!(endian)}
+  rescue
+    exception ->
+      {:error, exception}
+  end
 
   @doc """
   Takes a WKB as iodata and returns a Geometry.
