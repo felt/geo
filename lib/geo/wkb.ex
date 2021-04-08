@@ -32,20 +32,41 @@ defmodule Geo.WKB do
   defdelegate encode(geom, endian \\ :xdr), to: Encoder
 
   @doc """
-  Takes a WKB string and returns a Geometry.
+  Takes a WKB as iodata and returns a Geometry.
   """
-  @spec decode(binary, [Geo.geometry()]) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
-  defdelegate decode(wkb, geometries \\ []), to: Decoder
+  @spec decode_iodata(iodata()) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
+  def decode_iodata(wkb) do
+    {:ok, Decoder.decode_iodata!(wkb) |> elem(0)}
+  rescue
+    exception ->
+      {:error, exception}
+  end
+
+  @doc """
+  Takes a WKB as iodata and returns a Geometry.
+  """
+  @spec decode_iodata!(iodata()) :: Geo.geometry() | no_return
+  def decode_iodata!(wkb) do
+    Decoder.decode_iodata!(wkb) |> elem(0)
+  end
 
   @doc """
   Takes a WKB string and returns a Geometry.
   """
-  @spec decode!(binary, [Geo.geometry()]) :: Geo.geometry() | no_return
-  defdelegate decode!(wkb, geometries \\ []), to: Decoder
+  @spec decode(binary) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
+  def decode(wkb) do
+    wkb
+    |> Base.decode16!()
+    |> decode_iodata()
+  end
 
-  @spec decode_iodata(iodata()) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
-  defdelegate decode_iodata(wkb), to: Geo.WKB.IODecoder
-
-  @spec decode_iodata!(iodata()) :: Geo.geometry() | no_return
-  defdelegate decode_iodata!(wkb), to: Geo.WKB.IODecoder
+  @doc """
+  Takes a WKB string and returns a Geometry.
+  """
+  @spec decode!(binary) :: Geo.geometry() | no_return
+  def decode!(wkb) do
+    wkb
+    |> Base.decode16!()
+    |> decode_iodata!()
+  end
 end
