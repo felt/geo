@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.4.0 - 2021-04-09
+
+- Add
+  - `Geo.WKB.encode_iodata!`
+  - `Geo.WKB.decode_iodata!`
+  - `Geo.WKB.encode_iodata`
+  - `Geo.WKB.decode_iodata`
+
+- Enhancements
+  - The implementation of encoding and decoding WKBs has been updated to use iodata instead of binaries, improving overall performance
+
 ## v3.3.8 - 2021-04-02
 
 - Fix
