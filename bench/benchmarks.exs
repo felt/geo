@@ -1,5 +1,5 @@
 binaries_list_fn = fn geom -> geom |> Geo.WKB.encode!() |> Geo.WKB.decode!() end
-iodata_list_fn = fn geom -> geom |> Geo.WKB.encode_iodata!() |> Geo.WKB.decode_iodata!() end
+iodata_list_fn = fn geom -> geom |> Geo.WKB.encode_to_iodata() |> Geo.WKB.decode!() end
 
 Benchee.run(
   %{

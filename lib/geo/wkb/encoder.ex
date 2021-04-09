@@ -54,7 +54,7 @@ defmodule Geo.WKB.Encoder do
           <<type::unquote(modifier)-32>>
         end
 
-      IO.iodata_to_binary([unquote(endian), binary, rest])
+      [unquote(endian), binary, rest]
     end
 
     def do_encode(%Point{coordinates: {x, y}}, unquote(endian_atom)) do

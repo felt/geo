@@ -44,7 +44,7 @@ defmodule Geo.WKB.Decoder do
   defp remove_srid(type), do: type - @wkbsridflag
 
   for {endian, modifier} <- [{1, quote(do: little)}, {0, quote(do: big)}] do
-    def decode_iodata!(
+    def decode(
           <<unquote(endian)::unquote(modifier)-integer-unsigned, type::32-unquote(modifier),
             srid::32-unquote(modifier), rest::bits>>
         )
@@ -52,7 +52,7 @@ defmodule Geo.WKB.Decoder do
       do_decode(remove_srid(type), rest, srid, unquote(endian))
     end
 
-    def decode_iodata!(
+    def decode(
           <<unquote(endian)::unquote(modifier)-integer-unsigned, type::32-unquote(modifier),
             rest::bits>>
         ) do
@@ -200,7 +200,7 @@ defmodule Geo.WKB.Decoder do
          ) do
       {coordinates, rest} =
         Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
-          {%Point{coordinates: coordinates}, rest} = decode_iodata!(rest)
+          {%Point{coordinates: coordinates}, rest} = decode(rest)
 
           {coordinates, rest}
         end)
@@ -216,7 +216,7 @@ defmodule Geo.WKB.Decoder do
          ) do
       {coordinates, rest} =
         Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
-          {%PointZ{coordinates: coordinates}, rest} = decode_iodata!(rest)
+          {%PointZ{coordinates: coordinates}, rest} = decode(rest)
 
           {coordinates, rest}
         end)
@@ -232,7 +232,7 @@ defmodule Geo.WKB.Decoder do
          ) do
       {coordinates, rest} =
         Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
-          {%LineString{coordinates: coordinates}, rest} = decode_iodata!(rest)
+          {%LineString{coordinates: coordinates}, rest} = decode(rest)
 
           {coordinates, rest}
         end)
@@ -248,7 +248,7 @@ defmodule Geo.WKB.Decoder do
          ) do
       {coordinates, rest} =
         Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
-          {%LineStringZ{coordinates: coordinates}, rest} = decode_iodata!(rest)
+          {%LineStringZ{coordinates: coordinates}, rest} = decode(rest)
 
           {coordinates, rest}
         end)
@@ -264,7 +264,7 @@ defmodule Geo.WKB.Decoder do
          ) do
       {coordinates, rest} =
         Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
-          {%Polygon{coordinates: coordinates}, rest} = decode_iodata!(rest)
+          {%Polygon{coordinates: coordinates}, rest} = decode(rest)
 
           {coordinates, rest}
         end)
@@ -280,7 +280,7 @@ defmodule Geo.WKB.Decoder do
          ) do
       {coordinates, rest} =
         Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
-          {%PolygonZ{coordinates: coordinates}, rest} = decode_iodata!(rest)
+          {%PolygonZ{coordinates: coordinates}, rest} = decode(rest)
 
           {coordinates, rest}
         end)
@@ -296,7 +296,7 @@ defmodule Geo.WKB.Decoder do
          ) do
       {geometries, rest} =
         Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
-          decode_iodata!(rest)
+          decode(rest)
         end)
 
       geometries = Enum.map(geometries, fn geom -> %{geom | srid: srid} end)
