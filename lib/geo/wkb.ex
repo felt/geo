@@ -21,14 +21,15 @@ defmodule Geo.WKB do
   Takes a Geometry and returns a WKB string. The endian decides
   what the byte order will be.
   """
-  @spec encode!(Geo.geometry(), Geo.endian()) :: binary | no_return
+  @spec encode!(Geo.geometry(), Geo.endian()) :: binary
   def encode!(geom, endian \\ :xdr) do
     geom |> Encoder.encode!(endian) |> IO.iodata_to_binary() |> Base.encode16()
   end
 
   @doc """
-  Takes a Geometry and returns a WKB string. The endian decides
-  what the byte order will be.
+  Takes a Geometry and returns a WKB string.
+
+  The endian decides what the byte order will be.
   """
   @spec encode(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
   def encode(geom, endian \\ :xdr) do
@@ -39,10 +40,11 @@ defmodule Geo.WKB do
   end
 
   @doc """
-  Takes a Geometry and returns a WKB as iodata. The endian decides
-  what the byte order will be.
+  Takes a Geometry and returns a WKB as iodata.
+
+  The endian decides what the byte order will be.
   """
-  @spec encode_to_iodata(Geo.geometry(), Geo.endian()) :: iodata() | no_return
+  @spec encode_to_iodata(Geo.geometry(), Geo.endian()) :: iodata()
   def encode_to_iodata(geom, endian \\ :xdr) do
     Encoder.encode!(geom, endian)
   end
@@ -79,7 +81,7 @@ defmodule Geo.WKB do
   @doc """
   Takes a WKB string and returns a Geometry.
   """
-  @spec decode!(binary | iodata()) :: Geo.geometry() | no_return
+  @spec decode!(iodata()) :: Geo.geometry()
   def decode!(wkb)
 
   def decode!("00" <> _ = wkb) do

@@ -31,7 +31,7 @@ defmodule Geo.JSON.Decoder do
   @doc """
   Takes a map representing GeoJSON and returns a Geometry.
   """
-  @spec decode!(map()) :: Geo.geometry() | no_return
+  @spec decode!(map()) :: Geo.geometry()
   def decode!(geo_json) do
     cond do
       Map.has_key?(geo_json, "geometries") ->
