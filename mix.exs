@@ -2,7 +2,7 @@ defmodule Geo.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/bryanjos/geo"
-  @version "3.4.0"
+  @version "3.4.1"
 
   def project do
     [
@@ -13,14 +13,7 @@ defmodule Geo.Mixfile do
       description: description(),
       package: package(),
       docs: docs(),
-      name: "Geo",
-      test_coverage: [tool: ExCoveralls],
-      preferred_cli_env: [
-        coveralls: :test,
-        "coveralls.detail": :test,
-        "coveralls.post": :test,
-        "coveralls.html": :test
-      ]
+      name: "Geo"
     ]
   end
 
@@ -40,8 +33,7 @@ defmodule Geo.Mixfile do
     [
       {:jason, "~> 1.2", optional: true},
       {:ex_doc, "~> 0.24", only: :dev, runtime: false},
-      {:excoveralls, "~> 0.12.1", only: :test, runtime: false},
-      {:stream_data, "~> 0.4.3", only: :test, runtime: false},
+      {:stream_data, "~> 0.5", only: :test, runtime: false},
       {:benchee, "~> 1.0", only: :dev, runtime: false}
     ]
   end

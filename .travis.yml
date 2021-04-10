@@ -1,9 +1,9 @@
 sudo: false
 language: elixir
 elixir:
-  - 1.9
+  - 1.11
 otp_release:
-  - 22.0
+  - 22.3
 cache:
   directories:
     - _build
