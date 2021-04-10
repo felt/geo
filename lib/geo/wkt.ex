@@ -38,6 +38,6 @@ defmodule Geo.WKT do
   @doc """
   Takes a WKT string and returns a Geo.geometry struct or list of Geo.geometry.
   """
-  @spec decode!(binary) :: Geo.geometry() | no_return
+  @spec decode!(binary) :: Geo.geometry()
   defdelegate decode!(wkt), to: Decoder
 end
