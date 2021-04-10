@@ -689,50 +689,58 @@ defmodule Geo.WKB.Test do
   end
 
   property "encodes and decodes back to the correct Point struct" do
-    check all x <- float(),
-              y <- float() do
+    check all(
+            x <- float(),
+            y <- float()
+          ) do
       geom = %Geo.Point{coordinates: {x, y}}
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end
   end
 
   property "encodes and decodes back to the correct PointM struct" do
-    check all x <- float(),
-              y <- float(),
-              m <- float() do
+    check all(
+            x <- float(),
+            y <- float(),
+            m <- float()
+          ) do
       geom = %Geo.PointM{coordinates: {x, y, m}}
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end
   end
 
   property "encodes and decodes back to the correct PointZ struct" do
-    check all x <- float(),
-              y <- float(),
-              z <- float() do
+    check all(
+            x <- float(),
+            y <- float(),
+            z <- float()
+          ) do
       geom = %Geo.PointZ{coordinates: {x, y, z}}
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end
   end
 
   property "encodes and decodes back to the correct PointZM struct" do
-    check all x <- float(),
-              y <- float(),
-              z <- float(),
-              m <- float() do
+    check all(
+            x <- float(),
+            y <- float(),
+            z <- float(),
+            m <- float()
+          ) do
       geom = %Geo.PointZM{coordinates: {x, y, z, m}}
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end
   end
 
   property "encodes and decodes back to the correct LineString struct" do
-    check all list <- list_of({float(), float()}, min_length: 1) do
+    check all(list <- list_of({float(), float()}, min_length: 1)) do
       geom = %Geo.LineString{coordinates: list}
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end
   end
 
   property "encodes and decodes back to the correct LineStringZ struct" do
-    check all list <- list_of({float(), float(), float()}, min_length: 1) do
+    check all(list <- list_of({float(), float(), float()}, min_length: 1)) do
       geom = %Geo.LineStringZ{coordinates: list}
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end

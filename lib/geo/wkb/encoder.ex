@@ -1,6 +1,24 @@
 defmodule Geo.WKB.Encoder do
   @moduledoc false
 
+  @point 0x00_00_00_01
+  @point_m 0x40_00_00_01
+  @point_z 0x80_00_00_01
+  @point_zm 0xC0_00_00_01
+  @line_string 0x00_00_00_02
+  @line_string_z 0x80_00_00_02
+  @polygon 0x00_00_00_03
+  @polygon_z 0x80_00_00_03
+  @multi_point 0x00_00_00_04
+  @multi_point_z 0x80_00_00_04
+  @multi_line_string 0x00_00_00_05
+  @multi_line_string_z 0x80_00_00_05
+  @multi_polygon 0x00_00_00_06
+  @multi_polygon_z 0x80_00_00_06
+  @geometry_collection 0x00_00_00_07
+
+  @wkbsridflag 0x20000000
+
   use Bitwise
 
   alias Geo.{
@@ -18,238 +36,169 @@ defmodule Geo.WKB.Encoder do
     MultiLineStringZ,
     MultiPolygon,
     MultiPolygonZ,
-    GeometryCollection,
-    Utils
+    GeometryCollection
   }
 
-  alias Geo.WKB.Writer
+  defp add_srid(type), do: type + @wkbsridflag
 
-  @doc """
-  Takes a Geometry and returns a WKB string. The endian decides
-  what the byte order will be.
-  """
-  @spec encode(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
-  def encode(geom, endian \\ :xdr) do
-    {:ok, encode!(geom, endian)}
-  rescue
-    exception ->
-      {:error, exception}
-  end
+  def encode!(geom, endian \\ :ndr)
 
-  @doc """
-  Takes a Geometry and returns a WKB string. The endian decides
-  what the byte order will be.
-  """
-  @spec encode!(Geo.geometry(), Geo.endian()) :: binary | no_return
-  def encode!(geom, endian \\ :xdr) do
-    writer = Writer.new(endian)
-    do_encode(geom, writer)
-  end
+  for {endian, endian_atom, modifier} <- [{1, :ndr, quote(do: little)}, {0, :xdr, quote(do: big)}] do
+    def encode!(geom, unquote(endian_atom)) do
+      {type, rest} = do_encode(geom, unquote(endian_atom))
 
-  defp do_encode(%GeometryCollection{} = geom, writer) do
-    type =
-      Utils.type_to_hex(geom, geom.srid != nil)
-      |> Integer.to_string(16)
-      |> Utils.pad_left(8)
+      binary =
+        if geom.srid do
+          <<add_srid(type)::unquote(modifier)-32, geom.srid::unquote(modifier)-32>>
+        else
+          <<type::unquote(modifier)-32>>
+        end
 
-    srid = if geom.srid, do: Integer.to_string(geom.srid, 16) |> Utils.pad_left(8), else: ""
+      [unquote(endian), binary, rest]
+    end
 
-    count = Integer.to_string(Enum.count(geom.geometries), 16) |> Utils.pad_left(8)
+    def do_encode(%Point{coordinates: {x, y}}, unquote(endian_atom)) do
+      {@point, [<<x::unquote(modifier)-float-64>>, <<y::unquote(modifier)-float-64>>]}
+    end
 
-    writer = Writer.write(writer, type)
-    writer = Writer.write(writer, srid)
-    writer = Writer.write(writer, count)
+    def do_encode(%PointZ{coordinates: {x, y, z}}, unquote(endian_atom)) do
+      {@point_z,
+       [
+         <<x::unquote(modifier)-float-64>>,
+         <<y::unquote(modifier)-float-64>>,
+         <<z::unquote(modifier)-float-64>>
+       ]}
+    end
 
-    coordinates =
-      Enum.map(geom.geometries, fn x ->
-        x = %{x | srid: nil}
-        encode!(x, writer.endian)
-      end)
+    def do_encode(%PointM{coordinates: {x, y, m}}, unquote(endian_atom)) do
+      {@point_m,
+       [
+         <<x::unquote(modifier)-float-64>>,
+         <<y::unquote(modifier)-float-64>>,
+         <<m::unquote(modifier)-float-64>>
+       ]}
+    end
 
-    coordinates = Enum.join(coordinates)
+    def do_encode(%PointZM{coordinates: {x, y, z, m}}, unquote(endian_atom)) do
+      {@point_zm,
+       [
+         <<x::unquote(modifier)-float-64>>,
+         <<y::unquote(modifier)-float-64>>,
+         <<z::unquote(modifier)-float-64>>,
+         <<m::unquote(modifier)-float-64>>
+       ]}
+    end
 
-    writer.wkb <> coordinates
-  end
+    def do_encode(%LineString{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn {x, y}, acc ->
+          {[<<x::unquote(modifier)-float-64>>, <<y::unquote(modifier)-float-64>>], acc + 1}
+        end)
 
-  defp do_encode(geom, writer) do
-    type =
-      Utils.type_to_hex(geom, geom.srid != nil)
-      |> Integer.to_string(16)
-      |> Utils.pad_left(8)
+      {@line_string, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    srid = if geom.srid, do: Integer.to_string(geom.srid, 16) |> Utils.pad_left(8), else: ""
+    def do_encode(%LineStringZ{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn {x, y, z}, acc ->
+          {[
+             <<x::unquote(modifier)-float-64>>,
+             <<y::unquote(modifier)-float-64>>,
+             <<z::unquote(modifier)-float-64>>
+           ], acc + 1}
+        end)
 
-    writer = Writer.write(writer, type)
-    writer = Writer.write(writer, srid)
+      {@line_string_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    writer = encode_coordinates(writer, geom)
-    writer.wkb
-  end
+    def do_encode(%Polygon{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn ring, acc ->
+          {_, data} = do_encode(%LineString{coordinates: ring}, unquote(endian_atom))
+          {data, acc + 1}
+        end)
 
-  defp encode_coordinates(writer, %Point{coordinates: {x, y}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+      {@polygon, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    writer = Writer.write(writer, x)
-    Writer.write(writer, y)
-  end
+    def do_encode(%PolygonZ{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn ring, acc ->
+          {_, data} = do_encode(%LineStringZ{coordinates: ring}, unquote(endian_atom))
+          {data, acc + 1}
+        end)
 
-  defp encode_coordinates(writer, %PointZ{coordinates: {x, y, z}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+      {@polygon_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    writer
-    |> Writer.write(x)
-    |> Writer.write(y)
-    |> Writer.write(z)
-  end
+    def do_encode(%MultiPoint{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          point = encode!(%Point{coordinates: coordinate}, unquote(endian_atom))
+          {point, acc + 1}
+        end)
 
-  defp encode_coordinates(writer, %PointM{coordinates: {x, y, m}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+      {@multi_point, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    writer
-    |> Writer.write(x)
-    |> Writer.write(y)
-    |> Writer.write(m)
-  end
+    def do_encode(%MultiPointZ{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          point = encode!(%PointZ{coordinates: coordinate}, unquote(endian_atom))
+          {point, acc + 1}
+        end)
 
-  defp encode_coordinates(writer, %PointZM{coordinates: {x, y, z, m}}) do
-    x = x |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    y = y |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    z = z |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
-    m = m |> Utils.float_to_hex(64) |> Integer.to_string(16) |> Utils.pad_left(16)
+      {@multi_point_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    writer
-    |> Writer.write(x)
-    |> Writer.write(y)
-    |> Writer.write(z)
-    |> Writer.write(m)
-  end
+    def do_encode(%MultiLineString{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          geom = encode!(%LineString{coordinates: coordinate}, unquote(endian_atom))
+          {geom, acc + 1}
+        end)
 
-  defp encode_coordinates(writer, %LineString{coordinates: coordinates}) do
-    number_of_points = Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8)
-    writer = Writer.write(writer, number_of_points)
+      {@multi_line_string, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    {_nils, writer} =
-      Enum.map_reduce(coordinates, writer, fn pair, acc ->
-        acc = encode_coordinates(acc, %Point{coordinates: pair})
-        {nil, acc}
-      end)
+    def do_encode(%MultiLineStringZ{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          geom = encode!(%LineStringZ{coordinates: coordinate}, unquote(endian_atom))
+          {geom, acc + 1}
+        end)
 
-    writer
-  end
+      {@multi_line_string_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-  defp encode_coordinates(writer, %LineStringZ{coordinates: coordinates}) do
-    number_of_points = Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8)
-    writer = Writer.write(writer, number_of_points)
+    def do_encode(%MultiPolygon{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          geom = encode!(%Polygon{coordinates: coordinate}, unquote(endian_atom))
+          {geom, acc + 1}
+        end)
 
-    {_nils, writer} =
-      Enum.map_reduce(coordinates, writer, fn point, acc ->
-        acc = encode_coordinates(acc, %PointZ{coordinates: point})
-        {nil, acc}
-      end)
+      {@multi_polygon, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    writer
-  end
+    def do_encode(%MultiPolygonZ{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          geom = encode!(%PolygonZ{coordinates: coordinate}, unquote(endian_atom))
+          {geom, acc + 1}
+        end)
 
-  defp encode_coordinates(writer, %Polygon{coordinates: coordinates}) do
-    number_of_lines = Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8)
-    writer = Writer.write(writer, number_of_lines)
+      {@multi_polygon_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
 
-    {_nils, writer} =
-      Enum.map_reduce(coordinates, writer, fn line, acc ->
-        acc = encode_coordinates(acc, %LineString{coordinates: line})
-        {nil, acc}
-      end)
+    def do_encode(%GeometryCollection{geometries: geometries}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(geometries, 0, fn geom, acc ->
+          geom = encode!(%{geom | srid: nil}, unquote(endian_atom))
+          {geom, acc + 1}
+        end)
 
-    writer
-  end
-
-  defp encode_coordinates(writer, %PolygonZ{coordinates: coordinates}) do
-    number_of_lines = Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8)
-    writer = Writer.write(writer, number_of_lines)
-
-    {_nils, writer} =
-      Enum.map_reduce(coordinates, writer, fn line, acc ->
-        acc = encode_coordinates(acc, %LineStringZ{coordinates: line})
-        {nil, acc}
-      end)
-
-    writer
-  end
-
-  defp encode_coordinates(writer, %MultiPoint{coordinates: coordinates}) do
-    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
-
-    geoms =
-      Enum.map(coordinates, fn geom ->
-        encode!(%Point{coordinates: geom}, writer.endian)
-      end)
-      |> Enum.join()
-
-    Writer.write_no_endian(writer, geoms)
-  end
-
-  defp encode_coordinates(writer, %MultiPointZ{coordinates: coordinates}) do
-    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
-
-    geoms =
-      Enum.map(coordinates, fn geom ->
-        encode!(%PointZ{coordinates: geom}, writer.endian)
-      end)
-      |> Enum.join()
-
-    Writer.write_no_endian(writer, geoms)
-  end
-
-  defp encode_coordinates(writer, %MultiLineString{coordinates: coordinates}) do
-    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
-
-    geoms =
-      Enum.map(coordinates, fn geom ->
-        encode!(%LineString{coordinates: geom}, writer.endian)
-      end)
-      |> Enum.join()
-
-    Writer.write_no_endian(writer, geoms)
-  end
-
-  defp encode_coordinates(writer, %MultiLineStringZ{coordinates: coordinates}) do
-    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
-
-    geoms =
-      Enum.map(coordinates, fn geom ->
-        encode!(%LineStringZ{coordinates: geom}, writer.endian)
-      end)
-      |> Enum.join()
-
-    Writer.write_no_endian(writer, geoms)
-  end
-
-  defp encode_coordinates(writer, %MultiPolygon{coordinates: coordinates}) do
-    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
-
-    geoms =
-      Enum.map(coordinates, fn geom ->
-        encode!(%Polygon{coordinates: geom}, writer.endian)
-      end)
-      |> Enum.join()
-
-    Writer.write_no_endian(writer, geoms)
-  end
-
-  defp encode_coordinates(writer, %MultiPolygonZ{coordinates: coordinates}) do
-    writer = Writer.write(writer, Integer.to_string(length(coordinates), 16) |> Utils.pad_left(8))
-
-    geoms =
-      Enum.map(coordinates, fn geom ->
-        encode!(%PolygonZ{coordinates: geom}, writer.endian)
-      end)
-      |> Enum.join()
-
-    Writer.write_no_endian(writer, geoms)
+      {@geometry_collection, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
   end
 end

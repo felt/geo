@@ -22,24 +22,83 @@ defmodule Geo.WKB do
   what the byte order will be.
   """
   @spec encode!(Geo.geometry(), Geo.endian()) :: binary | no_return
-  defdelegate encode!(geom, endian \\ :xdr), to: Encoder
+  def encode!(geom, endian \\ :xdr) do
+    geom |> Encoder.encode!(endian) |> IO.iodata_to_binary() |> Base.encode16()
+  end
 
   @doc """
   Takes a Geometry and returns a WKB string. The endian decides
   what the byte order will be.
   """
   @spec encode(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
-  defdelegate encode(geom, endian \\ :xdr), to: Encoder
+  def encode(geom, endian \\ :xdr) do
+    {:ok, geom |> Encoder.encode!(endian) |> IO.iodata_to_binary() |> Base.encode16()}
+  rescue
+    exception ->
+      {:error, exception}
+  end
+
+  @doc """
+  Takes a Geometry and returns a WKB as iodata. The endian decides
+  what the byte order will be.
+  """
+  @spec encode_to_iodata(Geo.geometry(), Geo.endian()) :: iodata() | no_return
+  def encode_to_iodata(geom, endian \\ :xdr) do
+    Encoder.encode!(geom, endian)
+  end
 
   @doc """
   Takes a WKB string and returns a Geometry.
   """
-  @spec decode(binary, [Geo.geometry()]) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
-  defdelegate decode(wkb, geometries \\ []), to: Decoder
+  @spec decode(binary) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
+  def decode("00" <> _ = wkb) do
+    wkb
+    |> Base.decode16!()
+    |> decode()
+  end
+
+  def decode("01" <> _ = wkb) do
+    wkb
+    |> Base.decode16!()
+    |> decode()
+  end
+
+  def decode(wkb) when is_list(wkb) do
+    wkb
+    |> IO.iodata_to_binary()
+    |> decode()
+  end
+
+  def decode(wkb) do
+    {:ok, decode!(wkb)}
+  rescue
+    exception ->
+      {:error, exception}
+  end
 
   @doc """
   Takes a WKB string and returns a Geometry.
   """
-  @spec decode!(binary, [Geo.geometry()]) :: Geo.geometry() | no_return
-  defdelegate decode!(wkb, geometries \\ []), to: Decoder
+  @spec decode!(binary | iodata()) :: Geo.geometry() | no_return
+  def decode!(wkb)
+
+  def decode!("00" <> _ = wkb) do
+    wkb
+    |> Base.decode16!()
+    |> decode!()
+  end
+
+  def decode!("01" <> _ = wkb) do
+    wkb
+    |> Base.decode16!()
+    |> decode!()
+  end
+
+  def decode!(wkb) when is_list(wkb) do
+    wkb |> IO.iodata_to_binary() |> decode!()
+  end
+
+  def decode!(wkb) do
+    Decoder.decode(wkb) |> elem(0)
+  end
 end

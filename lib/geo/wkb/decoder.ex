@@ -1,6 +1,24 @@
 defmodule Geo.WKB.Decoder do
   @moduledoc false
 
+  @point 0x00_00_00_01
+  @point_m 0x40_00_00_01
+  @point_z 0x80_00_00_01
+  @point_zm 0xC0_00_00_01
+  @line_string 0x00_00_00_02
+  @line_string_z 0x80_00_00_02
+  @polygon 0x00_00_00_03
+  @polygon_z 0x80_00_00_03
+  @multi_point 0x00_00_00_04
+  @multi_point_z 0x80_00_00_04
+  @multi_line_string 0x00_00_00_05
+  @multi_line_string_z 0x80_00_00_05
+  @multi_polygon 0x00_00_00_06
+  @multi_polygon_z 0x80_00_00_06
+  @geometry_collection 0x00_00_00_07
+
+  @wkbsridflag 0x20000000
+
   use Bitwise
 
   alias Geo.{
@@ -13,186 +31,277 @@ defmodule Geo.WKB.Decoder do
     Polygon,
     PolygonZ,
     GeometryCollection,
-    Utils
+    MultiPoint,
+    MultiPointZ,
+    MultiLineString,
+    MultiLineStringZ,
+    MultiPolygon,
+    MultiPolygonZ
   }
 
-  alias Geo.WKB.Reader
+  defguardp has_srid(type) when (type &&& @wkbsridflag) == @wkbsridflag
 
-  @doc """
-  Takes a WKB string and returns a Geometry.
-  """
-  @spec decode(binary, [Geo.geometry()]) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
-  def decode(wkb, geometries \\ []) do
-    {:ok, decode!(wkb, geometries)}
-  rescue
-    exception ->
-      {:error, exception}
-  end
+  defp remove_srid(type), do: type - @wkbsridflag
 
-  @doc """
-  Takes a WKB string and returns a Geometry.
-  """
-  @spec decode!(binary, [Geo.geometry()]) :: Geo.geometry() | no_return
-  def decode!(wkb, geometries \\ []) do
-    wkb_reader = Reader.new(wkb)
-    {type, wkb_reader} = Reader.read(wkb_reader, 8)
-
-    type = String.to_integer(type, 16)
-
-    {srid, wkb_reader} =
-      if (type &&& 0x20000000) != 0 do
-        {srid, wkb_reader} = Reader.read(wkb_reader, 8)
-        {String.to_integer(srid, 16), wkb_reader}
-      else
-        {nil, wkb_reader}
-      end
-
-    type = Utils.hex_to_type(type &&& 0xDF_FF_FF_FF)
-
-    {coordinates, wkb_reader} = decode_coordinates(type, wkb_reader)
-
-    geometries =
-      case type do
-        %Geo.GeometryCollection{} ->
-          coordinates =
-            coordinates
-            |> Enum.map(fn x -> %{x | srid: srid} end)
-
-          %{type | geometries: coordinates, srid: srid}
-
-        _ ->
-          geometries ++ [%{type | coordinates: coordinates, srid: srid}]
-      end
-
-    if Reader.eof?(wkb_reader) do
-      return_geom(geometries)
-    else
-      wkb_reader.wkb |> decode!(geometries)
+  for {endian, modifier} <- [{1, quote(do: little)}, {0, quote(do: big)}] do
+    def decode(
+          <<unquote(endian)::unquote(modifier)-integer-unsigned, type::32-unquote(modifier),
+            srid::32-unquote(modifier), rest::bits>>
+        )
+        when has_srid(type) do
+      do_decode(remove_srid(type), rest, srid, unquote(endian))
     end
-  end
 
-  defp return_geom(%GeometryCollection{} = geom) do
-    geom
-  end
-
-  defp return_geom(geom) when is_list(geom) do
-    if length(geom) == 1 do
-      hd(geom)
-    else
-      geom
+    def decode(
+          <<unquote(endian)::unquote(modifier)-integer-unsigned, type::32-unquote(modifier),
+            rest::bits>>
+        ) do
+      do_decode(type, rest, nil, unquote(endian))
     end
-  end
 
-  defp decode_coordinates(%Point{}, wkb_reader) do
-    {x, wkb_reader} = Reader.read(wkb_reader, 16)
-    x = Utils.hex_to_float(x)
+    defp do_decode(
+           @point,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {%Point{coordinates: {x, y}, srid: srid}, rest}
+    end
 
-    {y, wkb_reader} = Reader.read(wkb_reader, 16)
-    y = Utils.hex_to_float(y)
-    {{x, y}, wkb_reader}
-  end
+    defp do_decode(
+           @point_m,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+             m::unquote(modifier)-float-64, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {%PointM{coordinates: {x, y, m}, srid: srid}, rest}
+    end
 
-  defp decode_coordinates(%PointZ{}, wkb_reader) do
-    {x, wkb_reader} = Reader.read(wkb_reader, 16)
-    x = Utils.hex_to_float(x)
+    defp do_decode(
+           @point_z,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+             z::unquote(modifier)-float-64, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {%PointZ{coordinates: {x, y, z}, srid: srid}, rest}
+    end
 
-    {y, wkb_reader} = Reader.read(wkb_reader, 16)
-    y = Utils.hex_to_float(y)
+    defp do_decode(
+           @point_zm,
+           <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+             z::unquote(modifier)-float-64, m::unquote(modifier)-float-64, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {%PointZM{coordinates: {x, y, z, m}, srid: srid}, rest}
+    end
 
-    {z, wkb_reader} = Reader.read(wkb_reader, 16)
-    z = Utils.hex_to_float(z)
-    {{x, y, z}, wkb_reader}
-  end
+    defp do_decode(
+           @line_string,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(1..count, rest, fn _,
+                                           <<x::unquote(modifier)-float-64,
+                                             y::unquote(modifier)-float-64, rest::bits>> ->
+          {%Point{coordinates: coordinates}, _rest} =
+            do_decode(
+              @point,
+              <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64>>,
+              nil,
+              unquote(endian)
+            )
 
-  defp decode_coordinates(%PointM{}, wkb_reader) do
-    {x, wkb_reader} = Reader.read(wkb_reader, 16)
-    x = Utils.hex_to_float(x)
-
-    {y, wkb_reader} = Reader.read(wkb_reader, 16)
-    y = Utils.hex_to_float(y)
-
-    {m, wkb_reader} = Reader.read(wkb_reader, 16)
-    m = Utils.hex_to_float(m)
-    {{x, y, m}, wkb_reader}
-  end
-
-  defp decode_coordinates(%PointZM{}, wkb_reader) do
-    {x, wkb_reader} = Reader.read(wkb_reader, 16)
-    x = Utils.hex_to_float(x)
-
-    {y, wkb_reader} = Reader.read(wkb_reader, 16)
-    y = Utils.hex_to_float(y)
-
-    {z, wkb_reader} = Reader.read(wkb_reader, 16)
-    z = Utils.hex_to_float(z)
-
-    {m, wkb_reader} = Reader.read(wkb_reader, 16)
-    m = Utils.hex_to_float(m)
-    {{x, y, z, m}, wkb_reader}
-  end
-
-  defp decode_coordinates(%LineString{}, wkb_reader) do
-    {number_of_points, wkb_reader} = Reader.read(wkb_reader, 8)
-    number_of_points = number_of_points |> String.to_integer(16)
-
-    Enum.map_reduce(Enum.to_list(0..(number_of_points - 1)), wkb_reader, fn _x, acc ->
-      decode_coordinates(%Point{}, acc)
-    end)
-  end
-
-  defp decode_coordinates(%LineStringZ{}, wkb_reader) do
-    {number_of_points, wkb_reader} = Reader.read(wkb_reader, 8)
-    number_of_points = number_of_points |> String.to_integer(16)
-
-    Enum.map_reduce(Enum.to_list(0..(number_of_points - 1)), wkb_reader, fn _x, acc ->
-      decode_coordinates(%PointZ{}, acc)
-    end)
-  end
-
-  defp decode_coordinates(%Polygon{}, wkb_reader) do
-    {number_of_lines, wkb_reader} = Reader.read(wkb_reader, 8)
-
-    number_of_lines = number_of_lines |> String.to_integer(16)
-
-    Enum.map_reduce(Enum.to_list(0..(number_of_lines - 1)), wkb_reader, fn _x, acc ->
-      decode_coordinates(%LineString{}, acc)
-    end)
-  end
-
-  defp decode_coordinates(%PolygonZ{}, wkb_reader) do
-    {number_of_lines, wkb_reader} = Reader.read(wkb_reader, 8)
-
-    number_of_lines = number_of_lines |> String.to_integer(16)
-
-    Enum.map_reduce(Enum.to_list(0..(number_of_lines - 1)), wkb_reader, fn _x, acc ->
-      decode_coordinates(%LineStringZ{}, acc)
-    end)
-  end
-
-  defp decode_coordinates(%GeometryCollection{}, wkb_reader) do
-    {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
-    geometries = decode!(wkb_reader.wkb)
-    {List.wrap(geometries), Reader.new("00")}
-  end
-
-  defp decode_coordinates(_geom, wkb_reader) do
-    {_number_of_items, wkb_reader} = Reader.read(wkb_reader, 8)
-
-    decoded_geom =
-      case wkb_reader.wkb do
-        "" -> []
-        wkb -> decode!(wkb)
-      end
-
-    coordinates =
-      if is_list(decoded_geom) do
-        Enum.map(decoded_geom, fn x ->
-          x.coordinates
+          {coordinates, rest}
         end)
-      else
-        [decoded_geom.coordinates]
-      end
 
-    {coordinates, Reader.new("00")}
+      {%LineString{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @line_string_z,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(1..count, rest, fn _,
+                                           <<x::unquote(modifier)-float-64,
+                                             y::unquote(modifier)-float-64,
+                                             z::unquote(modifier)-float-64, rest::bits>> ->
+          {%PointZ{coordinates: coordinates}, _rest} =
+            do_decode(
+              @point_z,
+              <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+                z::unquote(modifier)-float-64>>,
+              nil,
+              unquote(endian)
+            )
+
+          {coordinates, rest}
+        end)
+
+      {%LineStringZ{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @polygon,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%LineString{coordinates: coordinates}, rest} =
+            do_decode(
+              @line_string,
+              rest,
+              nil,
+              unquote(endian)
+            )
+
+          {coordinates, rest}
+        end)
+
+      {%Polygon{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @polygon_z,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%LineStringZ{coordinates: coordinates}, rest} =
+            do_decode(
+              @line_string_z,
+              rest,
+              nil,
+              unquote(endian)
+            )
+
+          {coordinates, rest}
+        end)
+
+      {%PolygonZ{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_point,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%Point{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiPoint{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_point_z,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%PointZ{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiPointZ{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_line_string,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%LineString{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiLineString{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_line_string_z,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%LineStringZ{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiLineStringZ{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_polygon,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%Polygon{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiPolygon{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_polygon_z,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%PolygonZ{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiPolygonZ{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @geometry_collection,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {geometries, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          decode(rest)
+        end)
+
+      geometries = Enum.map(geometries, fn geom -> %{geom | srid: srid} end)
+
+      {%GeometryCollection{geometries: geometries, srid: srid}, rest}
+    end
   end
 end
