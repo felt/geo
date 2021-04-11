@@ -1,6 +1,11 @@
 # Changelog
 
-## v3.4.1 - 2021-04-09
+## v3.4.2 - 2021-04-11
+
+- Fix
+  - [Do not accept iodata for decoding](https://github.com/bryanjos/geo/pull/158)
+
+## v3.4.1 - 2021-04-10
 
 - Fix
   - [Update Specs](https://github.com/bryanjos/geo/pull/157)
