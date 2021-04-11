@@ -33,7 +33,7 @@ defmodule Geo.WKB do
   """
   @spec encode(binary, Geo.endian()) :: {:ok, binary} | {:error, Exception.t()}
   def encode(geom, endian \\ :xdr) do
-    {:ok, geom |> Encoder.encode!(endian) |> IO.iodata_to_binary() |> Base.encode16()}
+    {:ok, encode!(geom, endian)}
   rescue
     exception ->
       {:error, exception}
@@ -53,24 +53,6 @@ defmodule Geo.WKB do
   Takes a WKB string and returns a Geometry.
   """
   @spec decode(binary) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
-  def decode("00" <> _ = wkb) do
-    wkb
-    |> Base.decode16!()
-    |> decode()
-  end
-
-  def decode("01" <> _ = wkb) do
-    wkb
-    |> Base.decode16!()
-    |> decode()
-  end
-
-  def decode(wkb) when is_list(wkb) do
-    wkb
-    |> IO.iodata_to_binary()
-    |> decode()
-  end
-
   def decode(wkb) do
     {:ok, decode!(wkb)}
   rescue
@@ -94,10 +76,6 @@ defmodule Geo.WKB do
     wkb
     |> Base.decode16!()
     |> decode!()
-  end
-
-  def decode!(wkb) when is_list(wkb) do
-    wkb |> IO.iodata_to_binary() |> decode!()
   end
 
   def decode!(wkb) do
