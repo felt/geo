@@ -101,13 +101,13 @@ defmodule Geo.WKB.Decoder do
     defp do_decode(
            @line_string,
            <<0::unquote(modifier)-32, "">>,
-           _srid,
+           srid,
            unquote(endian)
          ) do
       {%Geo.LineString{
          coordinates: [],
          properties: %{},
-         srid: nil
+         srid: srid
        }, ""}
     end
 
