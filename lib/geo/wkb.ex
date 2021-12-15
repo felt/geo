@@ -2,6 +2,8 @@ defmodule Geo.WKB do
   @moduledoc """
   Converts to and from WKB and EWKB.
 
+  It supports WKB both as base-16 encoded strings or as binaries.
+
   ## Examples
 
       iex> {:ok, point} = Geo.WKB.decode("0101000000000000000000F03F000000000000F03F")
@@ -18,8 +20,9 @@ defmodule Geo.WKB do
   alias Geo.WKB.{Encoder, Decoder}
 
   @doc """
-  Takes a Geometry and returns a WKB string. The endian decides
-  what the byte order will be.
+  Takes a Geometry and returns a base-16 encoded WKB string.
+  
+  The endian decides what the byte order will be.
   """
   @spec encode!(Geo.geometry(), Geo.endian()) :: binary
   def encode!(geom, endian \\ :xdr) do
@@ -27,7 +30,7 @@ defmodule Geo.WKB do
   end
 
   @doc """
-  Takes a Geometry and returns a WKB string.
+  Takes a Geometry and returns a base-16 encoded WKB string.
 
   The endian decides what the byte order will be.
   """
@@ -40,7 +43,7 @@ defmodule Geo.WKB do
   end
 
   @doc """
-  Takes a Geometry and returns a WKB as iodata.
+  Takes a Geometry and returns WKB as iodata (a sequence of bytes).
 
   The endian decides what the byte order will be.
   """
@@ -50,7 +53,7 @@ defmodule Geo.WKB do
   end
 
   @doc """
-  Takes a WKB string and returns a Geometry.
+  Takes a WKB, either as a base-16 encoded string or a binary, and returns a Geometry.
   """
   @spec decode(binary) :: {:ok, Geo.geometry()} | {:error, Exception.t()}
   def decode(wkb) do
@@ -61,9 +64,9 @@ defmodule Geo.WKB do
   end
 
   @doc """
-  Takes a WKB string and returns a Geometry.
+  Takes a WKB, either as a base-16 encoded string or a binary, and returns a Geometry.
   """
-  @spec decode!(iodata()) :: Geo.geometry()
+  @spec decode!(binary) :: Geo.geometry()
   def decode!(wkb)
 
   def decode!("00" <> _ = wkb) do
