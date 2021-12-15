@@ -100,6 +100,19 @@ defmodule Geo.WKB.Decoder do
 
     defp do_decode(
            @line_string,
+           <<0::unquote(modifier)-32, "">>,
+           srid,
+           unquote(endian)
+         ) do
+      {%Geo.LineString{
+         coordinates: [],
+         properties: %{},
+         srid: srid
+       }, ""}
+    end
+
+    defp do_decode(
+           @line_string,
            <<count::unquote(modifier)-32, rest::bits>>,
            srid,
            unquote(endian)

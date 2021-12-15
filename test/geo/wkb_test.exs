@@ -399,6 +399,21 @@ defmodule Geo.WKB.Test do
     assert(point.srid == 4326)
   end
 
+  test "Decode EWKB of empty MultiLineString" do
+    multi_line_string = Geo.WKB.decode!("010500000001000000010200000000000000")
+    assert multi_line_string.coordinates == [[]]
+    assert multi_line_string.properties == %{}
+    assert multi_line_string.srid == nil
+  end
+
+  test "Decode EWKB of empty MultiLineString that has an srid" do
+    multi_line_string = Geo.WKB.decode!("0020000005000010E600000001000000000200000000")
+
+    assert multi_line_string.coordinates == [[]]
+    assert multi_line_string.properties == %{}
+    assert multi_line_string.srid == 4326
+  end
+
   test "Encode MultiLineString to WKB" do
     geom = %Geo.MultiLineString{coordinates: [[{10, 10}, {20, 20}], [{15, 15}, {30, 15}]]}
 
