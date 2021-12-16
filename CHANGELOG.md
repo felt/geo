@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.4.3 - 2021-12-15
+- Fix
+  - [Handle MultiLineString with empty coordinates](https://github.com/bryanjos/geo/pull/164)
+  - [Clarify whether functions in Geo.WKB accept or return base16 or bytes](https://github.com/bryanjos/geo/pull/166)
+
 ## v3.4.2 - 2021-04-11
 
 - Fix
