@@ -22,7 +22,7 @@
 
 - Enhancements
   - The implementation of encoding and decoding WKBs has been updated to use iodata instead of binaries, improving overall performance.
-  - `Geo.WKB.decode!` and ``Geo.WKB.decode` can now take iodata in addition to binary data
+  - `Geo.WKB.decode!` and `Geo.WKB.decode` can now take iodata in addition to binary data
 
 ## v3.3.8 - 2021-04-02
 
