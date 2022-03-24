@@ -180,8 +180,7 @@ defmodule Geo.JSON.Decoder do
     raise DecodeError, message: "#{type} is not a valid type"
   end
 
-  defp list_to_tuple([x, y, _z]), do: {x, y}
-  defp list_to_tuple([x, y]), do: {x, y}
+  defp list_to_tuple([x, y | _]), do: {x, y}
 
   defp get_srid(%{"type" => "name", "properties" => %{"name" => "EPSG:" <> srid}}) do
     {srid, _} = Integer.parse(srid)
