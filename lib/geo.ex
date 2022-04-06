@@ -10,6 +10,7 @@ defmodule Geo do
           | Geo.PointZM.t()
           | Geo.LineString.t()
           | Geo.LineStringZ.t()
+          | Geo.LineStringZM.t()
           | Geo.Polygon.t()
           | Geo.PolygonZ.t()
           | Geo.MultiPoint.t()
@@ -38,6 +39,7 @@ defmodule Geo do
         Geo.PointZM,
         Geo.LineString,
         Geo.LineStringZ,
+        Geo.LineStringZM,
         Geo.Polygon,
         Geo.PolygonZ,
         Geo.MultiPoint,
@@ -63,6 +65,7 @@ defmodule Geo do
         Geo.PointZM,
         Geo.LineString,
         Geo.LineStringZ,
+        Geo.LineStringZM,
         Geo.Polygon,
         Geo.PolygonZ,
         Geo.MultiPoint,

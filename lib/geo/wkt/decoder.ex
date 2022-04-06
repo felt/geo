@@ -8,6 +8,7 @@ defmodule Geo.WKT.Decoder do
     PointZM,
     LineString,
     LineStringZ,
+    LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
@@ -61,6 +62,10 @@ defmodule Geo.WKT.Decoder do
 
   defp do_decode("POINT" <> coordinates, srid) do
     %Point{coordinates: create_point(coordinates), srid: srid}
+  end
+
+  defp do_decode("LINESTRINGZM" <> coordinates, srid) do
+    %LineStringZM{coordinates: create_line_string(coordinates), srid: srid}
   end
 
   defp do_decode("LINESTRINGZ" <> coordinates, srid) do

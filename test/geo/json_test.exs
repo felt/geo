@@ -91,6 +91,16 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+  test "GeoJson to LineStringZM and back" do
+    json = "{ \"type\": \"LineStringZM\", \"coordinates\": [ [100.0, 0.0, 50.0, 1], [101.0, 1.0, 20.0, 2] ]}"
+    exjson = Jason.decode!(json)
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+
+    assert(geom.coordinates == [{100.0, 0.0, 50.0, 1}, {101.0, 1.0, 20.0, 2}])
+    new_exjson = Geo.JSON.encode!(geom)
+    assert(exjson == new_exjson)
+  end
+
   test "Throw altitude away from things other than points" do
     json =
       "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0, 1.0], [101.0, 0.0, 1.0], [101.0, 1.0, 1.0], [100.0, 1.0, 1.0], [100.0, 0.0, 1.0] ]]}"

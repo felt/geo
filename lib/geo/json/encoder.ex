@@ -6,6 +6,7 @@ defmodule Geo.JSON.Encoder do
     PointZ,
     LineString,
     LineStringZ,
+    LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
@@ -140,6 +141,12 @@ defmodule Geo.JSON.Encoder do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
     %{"type" => "LineStringZ", "coordinates" => coordinates}
+  end
+
+  defp do_encode(%LineStringZM{coordinates: coordinates}) do
+    coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
+
+    %{"type" => "LineStringZM", "coordinates" => coordinates}
   end
 
   defp do_encode(%Polygon{coordinates: coordinates}) do
