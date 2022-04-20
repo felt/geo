@@ -91,9 +91,9 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
-  test "Throw altitude away from things other than points" do
+  test "Throw altitude away and any extra elements from things other than points" do
     json =
-      "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0, 1.0], [101.0, 0.0, 1.0], [101.0, 1.0, 1.0], [100.0, 1.0, 1.0], [100.0, 0.0, 1.0] ]]}"
+      "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0, 1.0, null], [101.0, 0.0, 1.0, null], [101.0, 1.0, 1.0, null], [100.0, 1.0, 1.0, null], [100.0, 0.0, 1.0, null] ]]}"
 
     geom = Jason.decode!(json) |> Geo.JSON.decode!()
 
