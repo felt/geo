@@ -110,6 +110,10 @@ defmodule Geo.JSON.Decoder do
     %Point{coordinates: {x, y}, srid: get_srid(crs), properties: properties}
   end
 
+  defp do_decode("Point", [], properties, crs) do
+    %Point{coordinates: nil, srid: get_srid(crs), properties: properties}
+  end
+
   defp do_decode("LineString", coordinates, properties, crs) do
     coordinates = Enum.map(coordinates, &list_to_tuple(&1))
 

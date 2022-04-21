@@ -309,6 +309,14 @@ defmodule Geo.JSON.Test do
     end
   end
 
+  test "encodes and decodes back to the correct Empty Point struct" do
+    geom = %Geo.Point{coordinates: nil}
+    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+
+    assert(json == "{\"coordinates\":[],\"type\":\"Point\"}")
+    assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+  end
+
   property "encodes and decodes back to the correct LineString struct" do
     check all list <- list_of({float(), float()}, min_length: 1) do
       geom = %Geo.LineString{coordinates: list}

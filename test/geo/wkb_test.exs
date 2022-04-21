@@ -500,6 +500,12 @@ defmodule Geo.WKB.Test do
     assert(point.srid == 4326)
   end
 
+  test "Decode empty Point EWKB to Point" do
+    point = Geo.WKB.decode!("0101000020E6100000000000000000F87F000000000000F87F")
+    assert(point.coordinates == nil)
+    assert(point.srid == 4326)
+  end
+
   test "Decode empty MultiPolygon EWKB to MultiPolygon" do
     multipolygon = Geo.WKB.decode!("0106000020E610000000000000")
     assert(multipolygon.coordinates == [])
