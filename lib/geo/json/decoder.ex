@@ -5,6 +5,7 @@ defmodule Geo.JSON.Decoder do
     Point,
     PointZ,
     LineString,
+    LineStringM,
     LineStringZ,
     Polygon,
     MultiPoint,
@@ -115,6 +116,12 @@ defmodule Geo.JSON.Decoder do
     coordinates = Enum.map(coordinates, &list_to_tuple(&1))
 
     %LineString{coordinates: coordinates, srid: get_srid(crs), properties: properties}
+  end
+
+  defp do_decode("LineStringM", coordinates, properties, crs) do
+    coordinates = Enum.map(coordinates, &List.to_tuple(&1))
+
+    %LineStringM{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
 
   defp do_decode("LineStringZ", coordinates, properties, crs) do

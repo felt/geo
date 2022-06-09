@@ -158,6 +158,33 @@ defmodule Geo.WKB.Test do
     )
   end
 
+  test "Decode WKB to LineStringM" do
+    point =
+      Geo.WKB.decode!(
+        "004000000200000003403E000000000000402400000000000040080000000000004024000000000000403E0000000000004056800000000000404400000000000040440000000000004044000000000000"
+      )
+
+    assert(point.coordinates == [{30, 10, 3}, {10, 30, 90}, {40, 40, 40}])
+  end
+
+  test "Encode LineStringM to EWKB" do
+    geom = %Geo.LineStringM{coordinates: [{30, 10, 3}, {10, 30, 90}, {40, 40, 40}], srid: 4326}
+
+    assert(
+      Geo.WKB.encode!(geom, :ndr) ==
+        "0102000060E6100000030000000000000000003E400000000000002440000000000000084000000000000024400000000000003E400000000000805640000000000000444000000000000044400000000000004440"
+    )
+  end
+
+  test "Encode LineStringM to WKB" do
+    geom = %Geo.LineStringM{coordinates: [{30, 10, 3}, {10, 30, 90}, {40, 40, 40}]}
+
+    assert(
+      Geo.WKB.encode!(geom) ==
+        "004000000200000003403E000000000000402400000000000040080000000000004024000000000000403E0000000000004056800000000000404400000000000040440000000000004044000000000000"
+    )
+  end
+
   test "Decode WKB to LineStringZ" do
     point =
       Geo.WKB.decode!(
