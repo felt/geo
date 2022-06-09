@@ -11,6 +11,7 @@ defmodule Geo.WKT.Decoder do
     Polygon,
     PolygonZ,
     MultiPoint,
+    MultiPointM,
     MultiPointZ,
     MultiLineString,
     MultiPolygon,
@@ -77,6 +78,10 @@ defmodule Geo.WKT.Decoder do
 
   defp do_decode("POLYGON" <> coordinates, srid) do
     %Polygon{coordinates: create_polygon(coordinates), srid: srid}
+  end
+
+  defp do_decode("MULTIPOINTM" <> coordinates, srid) do
+    %MultiPointM{coordinates: create_line_string(coordinates), srid: srid}
   end
 
   defp do_decode("MULTIPOINTZ" <> coordinates, srid) do

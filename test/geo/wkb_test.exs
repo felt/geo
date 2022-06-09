@@ -389,6 +389,25 @@ defmodule Geo.WKB.Test do
     )
   end
 
+  test "Encode MultiPointM to WKB" do
+    geom = %Geo.MultiPointM{coordinates: [{13.1668, 52.45695, 120}], srid: 4326}
+
+    assert(
+      Geo.WKB.encode!(geom, :ndr) ==
+        "0104000060E610000001000000010100004013F241CF66552A401FF46C567D3A4A400000000000005E40"
+    )
+  end
+
+  test "Decode EWKB to MultiPointM" do
+    point =
+      Geo.WKB.decode!(
+        "0104000060E610000001000000010100004013F241CF66552A401FF46C567D3A4A400000000000005E40"
+      )
+
+    assert(point.coordinates == [{13.1668, 52.45695, 120}])
+    assert(point.srid == 4326)
+  end
+
   test "Decode EWKB to MultiLineString" do
     point =
       Geo.WKB.decode!(

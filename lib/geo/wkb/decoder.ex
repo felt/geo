@@ -10,6 +10,7 @@ defmodule Geo.WKB.Decoder do
   @polygon 0x00_00_00_03
   @polygon_z 0x80_00_00_03
   @multi_point 0x00_00_00_04
+  @multi_point_m 0x40_00_00_04
   @multi_point_z 0x80_00_00_04
   @multi_line_string 0x00_00_00_05
   @multi_line_string_z 0x80_00_00_05
@@ -32,6 +33,7 @@ defmodule Geo.WKB.Decoder do
     PolygonZ,
     GeometryCollection,
     MultiPoint,
+    MultiPointM,
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
@@ -219,6 +221,22 @@ defmodule Geo.WKB.Decoder do
         end)
 
       {%MultiPoint{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_point_m,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%PointM{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiPointM{coordinates: coordinates, srid: srid}, rest}
     end
 
     defp do_decode(
