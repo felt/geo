@@ -144,9 +144,10 @@ defmodule Geo.JSON.Encoder do
   end
 
   defp do_encode(%LineStringZM{coordinates: coordinates}) do
-    coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
-
-    %{"type" => "LineStringZM", "coordinates" => coordinates}
+    # GeoJSON does not allow "m", and does not recognize "LineStringZM" as
+    # a type 
+    coordinates = Enum.map(coordinates, fn({x, y, z, _m}) -> [x, y, z] end)
+    %{"type" => "LineString", "coordinates" => coordinates}
   end
 
   defp do_encode(%Polygon{coordinates: coordinates}) do
