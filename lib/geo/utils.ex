@@ -1,6 +1,6 @@
 defmodule Geo.Utils do
   @moduledoc false
-  use Bitwise
+  import Bitwise
 
   @doc """
   Turns a hex string or an integer of base 16 into its floating point

@@ -19,7 +19,7 @@ defmodule Geo.WKB.Decoder do
 
   @wkbsridflag 0x20000000
 
-  use Bitwise
+  import Bitwise
 
   alias Geo.{
     Point,
