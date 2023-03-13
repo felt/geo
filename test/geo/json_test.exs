@@ -57,6 +57,16 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+  test "GeoJson Point without coordinates" do
+    json = "{ \"type\": \"Point\", \"coordinates\": [] }"
+    exjson = Jason.decode!(json)
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert(is_nil(geom.coordinates))
+
+    new_exjson = Geo.JSON.encode!(geom)
+    assert(exjson == new_exjson)
+  end
+
   test "GeoJson with SRID to Point and back" do
     json =
       "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[100.0, 101.0]}"

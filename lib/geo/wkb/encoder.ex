@@ -57,6 +57,14 @@ defmodule Geo.WKB.Encoder do
       [unquote(endian), binary, rest]
     end
 
+    def do_encode(%Point{coordinates: nil}, :ndr) do
+      {@point, [<<00, 00, 00, 00, 00, 00, 248, 127>>, <<00, 00, 00, 00, 00, 00, 248, 127>>]}
+    end
+
+    def do_encode(%Point{coordinates: nil}, :xdr) do
+      {@point, [<<127, 248, 00, 00, 00, 00, 00, 00>>, <<127, 248, 00, 00, 00, 00, 00, 00>>]}
+    end
+
     def do_encode(%Point{coordinates: {x, y}}, unquote(endian_atom)) do
       {@point, [<<x::unquote(modifier)-float-64>>, <<y::unquote(modifier)-float-64>>]}
     end

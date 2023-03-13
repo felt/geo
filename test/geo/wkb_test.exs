@@ -709,6 +709,22 @@ defmodule Geo.WKB.Test do
     assert {:ok, "0101000000000000000000F03F000000000000F03F"} = Geo.WKB.encode(geom, :ndr)
   end
 
+  test "Encode/Decode Empty Point in big endian" do
+    geom = %Geo.Point{coordinates: nil}
+    geom_wkb = "00000000017FF80000000000007FF8000000000000"
+
+    assert Geo.WKB.encode!(geom, :xdr) == geom_wkb
+    assert Geo.WKB.decode!(geom_wkb) == geom
+  end
+
+  test "Encode/Decode Empty Point in little endian" do
+    geom = %Geo.Point{coordinates: nil}
+    geom_wkb = "00000000017FF80000000000007FF8000000000000"
+
+    assert Geo.WKB.encode!(geom, :xdr) == geom_wkb
+    assert Geo.WKB.decode!(geom_wkb) == geom
+  end
+
   property "encodes and decodes back to the correct Point struct" do
     check all(
             x <- float(),
