@@ -138,6 +138,18 @@ defmodule Geo.JSON.Test do
     new_exjson = Geo.JSON.encode!(geom)
     assert(exjson == new_exjson)
   end
+  
+  test "GeoJson to MultiLineStringZ and back" do
+    json =
+      "{ \"type\": \"MultiLineStringZ\", \"coordinates\": [[ [100.0, 0.0, 13], [101.0, 1.0, 14] ],[ [102.0, 2.0, 14], [103.0, 3.0, 13] ]]}"
+
+    exjson = Jason.decode!(json)
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+
+    assert(geom.coordinates == [[{100.0, 0.0, 13}, {101.0, 1.0, 14}], [{102.0, 2.0, 14}, {103.0, 3.0, 13}]])
+    new_exjson = Geo.JSON.encode!(geom)
+    assert(exjson == new_exjson)
+  end
 
   test "GeoJson to MultiPolygon and back" do
     json =
