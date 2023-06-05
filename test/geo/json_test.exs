@@ -301,6 +301,43 @@ defmodule Geo.JSON.Test do
     assert geom1.properties["label"] == "8 Boulevard du Port 80000 Amiens"
   end
 
+  test "Decode feature with null geometry" do
+    json = """
+      {
+        "properties": {
+          "context": "80, Somme, Picardie",
+          "housenumber": "8"
+        },
+        "geometry": null,
+        "type": "Feature"
+      }
+    """
+
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert is_nil(geom)
+  end
+
+  test "Decode feature in a feature collection with null geometry" do
+    json = """
+      {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "properties": {
+              "context": "80, Somme, Picardie",
+              "housenumber": "8"
+            },
+            "geometry": null,
+            "type": "Feature"
+          }
+        ]
+      }
+    """
+
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert geom.geometries == []
+  end
+
   property "encodes and decodes back to the correct Point struct" do
     check all x <- float(),
               y <- float() do
