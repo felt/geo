@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.5 - 2023-06-05
+- Enhancement
+  - [Support null feature geometries](https://github.com/bryanjos/geo/pull/176)
+
+
 ## v3.4.3 - 2021-12-15
 - Fix
   - [Handle MultiLineString with empty coordinates](https://github.com/bryanjos/geo/pull/164)
