@@ -2,7 +2,7 @@ defmodule Geo.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/bryanjos/geo"
-  @version "3.5.0"
+  @version "3.5.1"
 
   def project do
     [

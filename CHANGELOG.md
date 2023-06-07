@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.5.1 - 2023-06-07
+- Fix
+  - [Fix Application.get_env and use Bitwise warnings](https://github.com/bryanjos/geo/pull/180)
+
 ## v3.5 - 2023-06-05
 - Enhancement
   - [Support null feature geometries](https://github.com/bryanjos/geo/pull/176)
