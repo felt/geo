@@ -29,7 +29,7 @@ defmodule Geo do
   """
   @type endian :: :ndr | :xdr
 
-  if Application.get_env(:geo, :impl_to_string, true) do
+  if Application.compile_env(:geo, :impl_to_string, true) do
     defimpl String.Chars,
       for: [
         Geo.Point,

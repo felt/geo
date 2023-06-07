@@ -8,7 +8,7 @@ defmodule Geo.Mixfile do
     [
       app: :geo,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.10",
       deps: deps(),
       description: description(),
       package: package(),
@@ -31,10 +31,10 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [
-      {:jason, "~> 1.2", optional: true},
-      {:ex_doc, "~> 0.24", only: :dev, runtime: false},
+      {:jason, "~> 1.4", optional: true},
+      {:ex_doc, "~> 0.29", only: :dev, runtime: false},
       {:stream_data, "~> 0.5", only: :test, runtime: false},
-      {:benchee, "~> 1.0", only: :dev, runtime: false}
+      {:benchee, "~> 1.1", only: :dev, runtime: false}
     ]
   end
 

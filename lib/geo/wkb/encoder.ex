@@ -19,8 +19,6 @@ defmodule Geo.WKB.Encoder do
 
   @wkbsridflag 0x20000000
 
-  use Bitwise
-
   alias Geo.{
     Point,
     PointZ,
