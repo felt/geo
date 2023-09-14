@@ -1,7 +1,7 @@
 defmodule Geo.Mixfile do
   use Mix.Project
 
-  @source_url "https://github.com/bryanjos/geo"
+  @source_url "https://github.com/felt/geo"
   @version "3.5.1"
 
   def project do
@@ -42,9 +42,9 @@ defmodule Geo.Mixfile do
     # These are the default files included in the package
     [
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
-      maintainers: ["Bryan Joseph"],
+      maintainers: ["Tyler Young", "Bryan Joseph"],
       licenses: ["MIT"],
-      links: %{"GitHub" => "https://github.com/bryanjos/geo"}
+      links: %{"GitHub" => "https://github.com/felt/geo"}
     ]
   end
 

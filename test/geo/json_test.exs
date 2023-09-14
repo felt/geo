@@ -82,7 +82,9 @@ defmodule Geo.JSON.Test do
   end
 
   test "GeoJson to LineStringZ and back" do
-    json = "{ \"type\": \"LineStringZ\", \"coordinates\": [ [100.0, 0.0, 50.0], [101.0, 1.0, 20.0] ]}"
+    json =
+      "{ \"type\": \"LineStringZ\", \"coordinates\": [ [100.0, 0.0, 50.0], [101.0, 1.0, 20.0] ]}"
+
     exjson = Jason.decode!(json)
     geom = Jason.decode!(json) |> Geo.JSON.decode!()
 
@@ -339,15 +341,17 @@ defmodule Geo.JSON.Test do
   end
 
   property "encodes and decodes back to the correct Point struct" do
-    check all x <- float(),
-              y <- float() do
+    check all(
+            x <- float(),
+            y <- float()
+          ) do
       geom = %Geo.Point{coordinates: {x, y}}
       assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
     end
   end
 
   property "encodes and decodes back to the correct LineString struct" do
-    check all list <- list_of({float(), float()}, min_length: 1) do
+    check all(list <- list_of({float(), float()}, min_length: 1)) do
       geom = %Geo.LineString{coordinates: list}
       assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
     end
