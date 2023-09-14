@@ -57,6 +57,16 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+  test "GeoJson Point without coordinates" do
+    json = "{ \"type\": \"Point\", \"coordinates\": [] }"
+    exjson = Jason.decode!(json)
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert(is_nil(geom.coordinates))
+
+    new_exjson = Geo.JSON.encode!(geom)
+    assert(exjson == new_exjson)
+  end
+
   test "GeoJson with SRID to Point and back" do
     json =
       "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[100.0, 101.0]}"
@@ -348,6 +358,14 @@ defmodule Geo.JSON.Test do
       geom = %Geo.Point{coordinates: {x, y}}
       assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
     end
+  end
+
+  test "encodes and decodes back to the correct Empty Point struct" do
+    geom = %Geo.Point{coordinates: nil}
+    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+
+    assert(json == "{\"coordinates\":[],\"type\":\"Point\"}")
+    assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
   end
 
   property "encodes and decodes back to the correct LineString struct" do

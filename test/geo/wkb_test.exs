@@ -500,6 +500,12 @@ defmodule Geo.WKB.Test do
     assert(point.srid == 4326)
   end
 
+  test "Decode empty Point EWKB to Point" do
+    point = Geo.WKB.decode!("0101000020E6100000000000000000F87F000000000000F87F")
+    assert(point.coordinates == nil)
+    assert(point.srid == 4326)
+  end
+
   test "Decode empty MultiPolygon EWKB to MultiPolygon" do
     multipolygon = Geo.WKB.decode!("0106000020E610000000000000")
     assert(multipolygon.coordinates == [])
@@ -701,6 +707,22 @@ defmodule Geo.WKB.Test do
   test "Encode Point to WKB using encode" do
     geom = %Geo.Point{coordinates: {1, 1}}
     assert {:ok, "0101000000000000000000F03F000000000000F03F"} = Geo.WKB.encode(geom, :ndr)
+  end
+
+  test "Encode/Decode Empty Point in big endian" do
+    geom = %Geo.Point{coordinates: nil}
+    geom_wkb = "00000000017FF80000000000007FF8000000000000"
+
+    assert Geo.WKB.encode!(geom, :xdr) == geom_wkb
+    assert Geo.WKB.decode!(geom_wkb) == geom
+  end
+
+  test "Encode/Decode Empty Point in little endian" do
+    geom = %Geo.Point{coordinates: nil}
+    geom_wkb = "00000000017FF80000000000007FF8000000000000"
+
+    assert Geo.WKB.encode!(geom, :xdr) == geom_wkb
+    assert Geo.WKB.decode!(geom_wkb) == geom
   end
 
   property "encodes and decodes back to the correct Point struct" do
