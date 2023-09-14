@@ -63,10 +63,15 @@ jobs:
         if: ${{ matrix.elixir != '1.11.4' && matrix.elixir != '1.10.4' }} 
         run: mix compile --warnings-as-errors
 
+        # stream_data config doesn't work on Elixir 1.10, but we can at least compile
+      - name: Compile
+        if: ${{ matrix.elixir == '1.10.4' }} 
+        run: mix compile
+
       - name: Run tests with warnings as errors
         if: ${{ matrix.elixir != '1.11.4' && matrix.elixir != '1.10.4' }} 
         run: mix test --warnings-as-errors
 
       - name: Run tests
-        if: ${{ matrix.elixir == '1.11.4' || matrix.elixir == '1.10.4' }}
+        if: ${{ matrix.elixir == '1.11.4' }}
         run: mix test
