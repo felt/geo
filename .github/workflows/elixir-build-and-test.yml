@@ -1,0 +1,72 @@
+name: Elixir Unit Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  build:
+    name: Elixir Unit Tests
+    runs-on: ubuntu-20.04
+    env:
+      MIX_ENV: test
+    strategy:
+      matrix:
+        elixir: ["1.10.4", "1.11.4", "1.12.3", "1.13.4", "1.14.4", "1.15.5"]
+        otp: ["22.3", "23.3.4", "24.3.4", "25.3.2", "26.0.2"]
+        exclude:
+          # Elixir 1.10 only supports up to OTP 23
+          - elixir: "1.10.4"
+            otp: "26.0.2"
+          - elixir: "1.10.4"
+            otp: "25.3.2"
+          - elixir: "1.10.4"
+            otp: "24.3.4"
+          # Elixir 1.11 doesn't support the latest OTP
+          - elixir: "1.11.4"
+            otp: "25.3.2"
+          - elixir: "1.11.4"
+            otp: "26.0.2"
+          # Elixir 1.12 doesn't support the latest OTP
+          - elixir: "1.12.3"
+            otp: "25.3.2"
+          - elixir: "1.12.3"
+            otp: "26.0.2"
+          # Elixir 1.13 doesn't support the latest OTP
+          - elixir: "1.13.4"
+            otp: "26.0.2"
+          # Elixir 1.14 requires at least OTP 23
+          - elixir: "1.14.4"
+            otp: "22.3"
+          # Elixir 1.15 requires at least OTP 24
+          - elixir: "1.15.5"
+            otp: "22.3"
+          - elixir: "1.15.5"
+            otp: "23.3.4"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Elixir Project
+        uses: ./.github/actions/elixir-setup
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+          build-app: false
+
+      - name: Compile with warnings as errors
+        if: ${{ matrix.elixir != '1.11.4' && matrix.elixir != '1.10.4' }} 
+        run: mix compile --warnings-as-errors
+
+      - name: Run tests with warnings as errors
+        if: ${{ matrix.elixir != '1.11.4' && matrix.elixir != '1.10.4' }} 
+        run: mix test --warnings-as-errors
+
+      - name: Run tests
+        if: ${{ matrix.elixir == '1.11.4' || matrix.elixir == '1.10.4' }}
+        run: mix test

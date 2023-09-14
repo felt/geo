@@ -1,0 +1,45 @@
+name: Elixir Quality Checks
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  quality_checks:
+    name: Elixir Quality Checks
+    runs-on: ubuntu-latest
+    env:
+      # In MIX_ENV=test, `$ mix xref graph` shows us a whole bunch of
+      # test stuff that isn't really relevant.
+      # The other checks don't really care what environment they run in.
+      MIX_ENV: dev
+      elixir: "1.15.4"
+      otp: "26.0.2"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Elixir Project
+        uses: ./.github/actions/elixir-setup
+        with:
+          elixir-version: ${{ env.elixir }}
+          otp-version: ${{ env.otp }}
+          build-app: false
+
+      - name: Check for unused deps
+        run: mix deps.unlock --check-unused
+
+      - name: Check code formatting
+        run: mix format --check-formatted
+        # We run all checks here even if others failed so that
+        # we give devs as much feedback as possible & save some time.
+        if: always()
+
+      - name: Check for compile-time dependencies between modules
+        run: mix xref graph --label compile-connected --fail-above 0
+        if: always()
