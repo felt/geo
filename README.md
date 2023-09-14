@@ -7,7 +7,7 @@
 [![License](https://img.shields.io/hexpm/l/geo.svg)](https://github.com/felt/geo/blob/master/LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/felt/geo.svg)](https://github.com/felt/geo/commits/master)
 
-A collection of GIS functions. Handles conversions to and from well-known test (WKT), well-known binary (WKB), and GeoJSON for the following geometries:
+A collection of GIS functions. Handles conversions to and from well-known text (WKT), well-known binary (WKB), and GeoJSON for the following geometries:
 
 * Point
 * PointZ
