@@ -2,27 +2,27 @@
 
 ## v3.5.1 - 2023-06-07
 - Fix
-  - [Fix Application.get_env and use Bitwise warnings](https://github.com/bryanjos/geo/pull/180)
+  - [Fix Application.get_env and use Bitwise warnings](https://github.com/felt/geo/pull/180)
 
 ## v3.5 - 2023-06-05
 - Enhancement
-  - [Support null feature geometries](https://github.com/bryanjos/geo/pull/176)
+  - [Support null feature geometries](https://github.com/felt/geo/pull/176)
 
 
 ## v3.4.3 - 2021-12-15
 - Fix
-  - [Handle MultiLineString with empty coordinates](https://github.com/bryanjos/geo/pull/164)
-  - [Clarify whether functions in Geo.WKB accept or return base16 or bytes](https://github.com/bryanjos/geo/pull/166)
+  - [Handle MultiLineString with empty coordinates](https://github.com/felt/geo/pull/164)
+  - [Clarify whether functions in Geo.WKB accept or return base16 or bytes](https://github.com/felt/geo/pull/166)
 
 ## v3.4.2 - 2021-04-11
 
 - Fix
-  - [Do not accept iodata for decoding](https://github.com/bryanjos/geo/pull/158)
+  - [Do not accept iodata for decoding](https://github.com/felt/geo/pull/158)
 
 ## v3.4.1 - 2021-04-10
 
 - Fix
-  - [Update Specs](https://github.com/bryanjos/geo/pull/157)
+  - [Update Specs](https://github.com/felt/geo/pull/157)
 
 ## v3.4.0 - 2021-04-09
 
@@ -36,18 +36,18 @@
 ## v3.3.8 - 2021-04-02
 
 - Fix
-  - [Misc doc changes](https://github.com/bryanjos/geo/pull/153)
+  - [Misc doc changes](https://github.com/felt/geo/pull/153)
 
 ## v3.3.7 - 2020-11-20
 
 - Fix
-  - [Make Jason optional](https://github.com/bryanjos/geo/pull/149)
+  - [Make Jason optional](https://github.com/felt/geo/pull/149)
 
 ## v3.3.6 - 2020-11-05
 
 - Enhancement
-  - [Replace Poison with Jason for JSON encoding in tests](https://github.com/bryanjos/geo/pull/141)
-  - [Add JSON decoding support for LineStringZ](https://github.com/bryanjos/geo/pull/147)
+  - [Replace Poison with Jason for JSON encoding in tests](https://github.com/felt/geo/pull/141)
+  - [Add JSON decoding support for LineStringZ](https://github.com/felt/geo/pull/147)
 
 ## v3.3.5 - 2020-08-26
 
@@ -57,13 +57,13 @@
 ## v3.3.4 - 2020-08-07
 
 - Fixed
-  - [Update typespec to make Point easier to use](https://github.com/bryanjos/geo/pull/140)
+  - [Update typespec to make Point easier to use](https://github.com/felt/geo/pull/140)
 
 ## v3.3.3 - 2019-12-13
 
 - Fixed
-  - [Add missing MultiPointZ in list of geometry types](https://github.com/bryanjos/geo/pull/122)
-  - [Improve docs around Geo.endian type](https://github.com/bryanjos/geo/pull/123)
+  - [Add missing MultiPointZ in list of geometry types](https://github.com/felt/geo/pull/122)
+  - [Improve docs around Geo.endian type](https://github.com/felt/geo/pull/123)
 
 ## v3.3.2 - 2019-08-26
 
@@ -78,22 +78,22 @@
 ## v3.3.0 - 2019-08-20
 
 - Added
-  - [Updated Type Specs](https://github.com/bryanjos/geo/pull/116)
-  - [Allow to disable String.Chars implementation for Geo objects](https://github.com/bryanjos/geo/pull/110)
+  - [Updated Type Specs](https://github.com/felt/geo/pull/116)
+  - [Allow to disable String.Chars implementation for Geo objects](https://github.com/felt/geo/pull/110)
 
 ## v3.2.0 - 2019-07-23
 
 - Added
-  - [3D versions of the various datatypes](https://github.com/bryanjos/geo/pull/111)
+  - [3D versions of the various datatypes](https://github.com/felt/geo/pull/111)
 
 ## v3.1.0 - 2019-02-08
 
 - Fixed
-  - [Optimise reverse_byte_order/1](https://github.com/bryanjos/geo/pull/107)
+  - [Optimise reverse_byte_order/1](https://github.com/felt/geo/pull/107)
 
 - Added
-  - [Support WKB empty multipolygons](https://github.com/bryanjos/geo/pull/100)
-  - [Add PointZ support to Geo.Json](https://github.com/bryanjos/geo/pull/99)
+  - [Support WKB empty multipolygons](https://github.com/felt/geo/pull/100)
+  - [Add PointZ support to Geo.Json](https://github.com/felt/geo/pull/99)
 
 ## v3.0.0 - 2018-04-14
 
@@ -118,36 +118,36 @@
   - `Geo.WKB.decode` now returns either `{:ok, geometry}` or `{:error, exception}`
   - `Geo.JSON.encode` now returns either `{:ok, map}` or `{:error, exception}`
   - `Geo.JSON.decode` now returns either `{:ok, geom}` or `{:error, exception}`
-  - All Ecto.Type behaviour implementations were removed. This may not effect too many people, but it was moved to the [geo_postgis](https://github.com/bryanjos/geo_postgis) package
+  - All Ecto.Type behaviour implementations were removed. This may not effect too many people, but it was moved to the [geo_postgis](https://github.com/felt/geo_postgis) package
 
 ## v2.1.0 - 2018-01-28
 
 - Fix
   - Make stricter patterns for casts functions so that error pattern is used when types are wrong
-  - [Change handling of EPSG/SRID to match standard](https://github.com/bryanjos/geo/pull/79)
-  - [Fix String.strip() deprecations in Elixir 1.5+](https://github.com/bryanjos/geo/pull/78)
+  - [Change handling of EPSG/SRID to match standard](https://github.com/felt/geo/pull/79)
+  - [Fix String.strip() deprecations in Elixir 1.5+](https://github.com/felt/geo/pull/78)
 
 ## v2.0.0 - 2017-07-15
 
 - Breaking
-  - Split out PostGIS functionality into its own library, [geo_postgis](https://github.com/bryanjos/geo_postgis)
+  - Split out PostGIS functionality into its own library, [geo_postgis](https://github.com/felt/geo_postgis)
 
 ## v1.5.0 - 2017-06-10
 
 - Enhancement
-  - [Add `st_distancesphere/2`](https://github.com/bryanjos/geo/pull/69)
+  - [Add `st_distancesphere/2`](https://github.com/felt/geo/pull/69)
 
 ## v1.4.1 - 2017-02-17
 
 - Fixes
-  - [Updated ecto related documentation on Geo module](https://github.com/bryanjos/geo/pull/66)
+  - [Updated ecto related documentation on Geo module](https://github.com/felt/geo/pull/66)
 
 ## v1.4.0 - 2017-02-17
 
 - Enhancements
-  - [Add `st_dwithin_in_meters\3`](https://github.com/bryanjos/geo/pull/64)
-  - [Make sure an srid of 0 does not show srid in WKT](https://github.com/bryanjos/geo/pull/63)
-  - [Add types PointZ, PointM and PointZM](https://github.com/bryanjos/geo/pull/56)
+  - [Add `st_dwithin_in_meters\3`](https://github.com/felt/geo/pull/64)
+  - [Make sure an srid of 0 does not show srid in WKT](https://github.com/felt/geo/pull/63)
+  - [Add types PointZ, PointM and PointZM](https://github.com/felt/geo/pull/56)
 
 ## v1.3.1 - 2016-12-24
 
@@ -158,7 +158,7 @@
 
 - Enhancements
 
-  - [Support new Postgrex 0.13 Extension API](https://github.com/bryanjos/geo/pull/53)
+  - [Support new Postgrex 0.13 Extension API](https://github.com/felt/geo/pull/53)
 
 - Breaking
   - Now only supports Postgrex 0.13+
@@ -167,12 +167,12 @@
 ## v1.2.1 - 2016-11-04
 
 - Enhancements
-  - [add st_transform](https://github.com/bryanjos/geo/pull/51)
+  - [add st_transform](https://github.com/felt/geo/pull/51)
 
 ## v1.2.0 - 2016-10-26
 
 - Enhancements
-  - [add st_distance_sphere](https://github.com/bryanjos/geo/pull/49)
+  - [add st_distance_sphere](https://github.com/felt/geo/pull/49)
 
 ## v1.1.2 - 2016-09-14
 
