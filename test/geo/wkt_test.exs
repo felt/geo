@@ -334,4 +334,15 @@ defmodule Geo.WKT.Test do
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end
   end
+
+  test "check LineString regression on Elixir 1.134 + OTP 24.3.4" do
+    geom = %Geo.LineString{coordinates: [{6.082409157592909e19, 1.2576001607965288e20}]}
+    assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+
+    geom = %Geo.LineStringZ{
+      coordinates: [{6.082409157592909e19, 1.2576001607965288e20, -0.20340391884184397}]
+    }
+
+    assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+  end
 end
