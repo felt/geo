@@ -19,7 +19,7 @@ defmodule Geo.WKB.Decoder do
 
   @wkbsridflag 0x20000000
 
-  use Bitwise
+  import Bitwise
 
   alias Geo.{
     Point,
@@ -316,5 +316,28 @@ defmodule Geo.WKB.Decoder do
 
       {%GeometryCollection{geometries: geometries, srid: srid}, rest}
     end
+  end
+
+  defp do_decode(
+         @point,
+         <<0, 0, 0, 0, 0, 0, 248, 127, 0, 0, 0, 0, 0, 0, 248, 127, rest::bits>>,
+         srid,
+         1
+       ) do
+    {%Point{coordinates: nil, srid: srid}, rest}
+  end
+
+  defp do_decode(
+         @point,
+         binary,
+         srid,
+         0
+       ) do
+    little_binary =
+      binary
+      |> :binary.decode_unsigned(:big)
+      |> :binary.encode_unsigned(:little)
+
+    do_decode(@point, little_binary, srid, 1)
   end
 end

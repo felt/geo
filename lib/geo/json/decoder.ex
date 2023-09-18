@@ -31,8 +31,11 @@ defmodule Geo.JSON.Decoder do
 
   @doc """
   Takes a map representing GeoJSON and returns a Geometry.
+
+  Feature objects with null geometries will be stripped from a FeatureCollection,
+  and a standalone Feature object with null geometry will be decoded to nil.
   """
-  @spec decode!(map()) :: Geo.geometry()
+  @spec decode!(map()) :: Geo.geometry() | nil
   def decode!(geo_json) do
     cond do
       Map.has_key?(geo_json, "geometries") ->
@@ -73,7 +76,8 @@ defmodule Geo.JSON.Decoder do
 
       Map.get(geo_json, "type") == "FeatureCollection" ->
         geometries =
-          Enum.map(Map.get(geo_json, "features"), fn x ->
+          Map.get(geo_json, "features")
+          |> Enum.map(fn x ->
             do_decode(
               Map.get(x, "type"),
               Map.get(x, "geometry"),
@@ -81,6 +85,7 @@ defmodule Geo.JSON.Decoder do
               Map.get(x, "id", "")
             )
           end)
+          |> Enum.reject(&is_nil/1)
 
         %GeometryCollection{
           geometries: geometries,
@@ -95,7 +100,7 @@ defmodule Geo.JSON.Decoder do
   @doc """
   Takes a map representing GeoJSON and returns a Geometry.
   """
-  @spec decode(map()) :: {:ok, Geo.geometry()} | {:error, DecodeError.t()}
+  @spec decode(map()) :: {:ok, Geo.geometry() | nil} | {:error, DecodeError.t()}
   def decode(geo_json) do
     {:ok, decode!(geo_json)}
   rescue
@@ -109,6 +114,10 @@ defmodule Geo.JSON.Decoder do
 
   defp do_decode("Point", [x, y], properties, crs) do
     %Point{coordinates: {x, y}, srid: get_srid(crs), properties: properties}
+  end
+
+  defp do_decode("Point", [], properties, crs) do
+    %Point{coordinates: nil, srid: get_srid(crs), properties: properties}
   end
 
   defp do_decode("LineString", coordinates, properties, crs) do
@@ -177,6 +186,8 @@ defmodule Geo.JSON.Decoder do
 
     %MultiPolygonZ{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
+
+  defp do_decode("Feature", nil, _properties, _id), do: nil
 
   defp do_decode("Feature", geometry, properties, _id) do
     do_decode(Map.get(geometry, "type"), Map.get(geometry, "coordinates"), properties, nil)

@@ -57,6 +57,16 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+  test "GeoJson Point without coordinates" do
+    json = "{ \"type\": \"Point\", \"coordinates\": [] }"
+    exjson = Jason.decode!(json)
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert(is_nil(geom.coordinates))
+
+    new_exjson = Geo.JSON.encode!(geom)
+    assert(exjson == new_exjson)
+  end
+
   test "GeoJson with SRID to Point and back" do
     json =
       "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[100.0, 101.0]}"
@@ -82,7 +92,9 @@ defmodule Geo.JSON.Test do
   end
 
   test "GeoJson to LineStringZ and back" do
-    json = "{ \"type\": \"LineStringZ\", \"coordinates\": [ [100.0, 0.0, 50.0], [101.0, 1.0, 20.0] ]}"
+    json =
+      "{ \"type\": \"LineStringZ\", \"coordinates\": [ [100.0, 0.0, 50.0], [101.0, 1.0, 20.0] ]}"
+
     exjson = Jason.decode!(json)
     geom = Jason.decode!(json) |> Geo.JSON.decode!()
 
@@ -313,16 +325,63 @@ defmodule Geo.JSON.Test do
     assert geom1.properties["label"] == "8 Boulevard du Port 80000 Amiens"
   end
 
+  test "Decode feature with null geometry" do
+    json = """
+      {
+        "properties": {
+          "context": "80, Somme, Picardie",
+          "housenumber": "8"
+        },
+        "geometry": null,
+        "type": "Feature"
+      }
+    """
+
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert is_nil(geom)
+  end
+
+  test "Decode feature in a feature collection with null geometry" do
+    json = """
+      {
+        "type": "FeatureCollection",
+        "features": [
+          {
+            "properties": {
+              "context": "80, Somme, Picardie",
+              "housenumber": "8"
+            },
+            "geometry": null,
+            "type": "Feature"
+          }
+        ]
+      }
+    """
+
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert geom.geometries == []
+  end
+
   property "encodes and decodes back to the correct Point struct" do
-    check all x <- float(),
-              y <- float() do
+    check all(
+            x <- float(),
+            y <- float()
+          ) do
       geom = %Geo.Point{coordinates: {x, y}}
       assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
     end
   end
 
+  test "encodes and decodes back to the correct Empty Point struct" do
+    geom = %Geo.Point{coordinates: nil}
+    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+
+    assert(json == "{\"coordinates\":[],\"type\":\"Point\"}")
+    assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+  end
+
   property "encodes and decodes back to the correct LineString struct" do
-    check all list <- list_of({float(), float()}, min_length: 1) do
+    check all(list <- list_of({float(), float()}, min_length: 1)) do
       geom = %Geo.LineString{coordinates: list}
       assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
     end
