@@ -3,7 +3,7 @@ name: Elixir Quality Checks
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
       - "**"
