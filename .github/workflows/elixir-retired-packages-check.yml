@@ -3,7 +3,7 @@ name: Elixir Retired Packages Check
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
       - "**"
