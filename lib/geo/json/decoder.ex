@@ -155,7 +155,7 @@ defmodule Geo.JSON.Decoder do
 
     %MultiLineString{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
-  
+
   defp do_decode("MultiLineStringZ", coordinates, properties, crs) do
     coordinates =
       Enum.map(coordinates, fn sub_coordinates ->
