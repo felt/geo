@@ -9,6 +9,7 @@ defmodule Geo.JSON.Decoder do
     Polygon,
     MultiPoint,
     MultiLineString,
+    MultiLineStringZ,
     MultiPolygon,
     MultiPolygonZ,
     GeometryCollection
@@ -153,6 +154,15 @@ defmodule Geo.JSON.Decoder do
       end)
 
     %MultiLineString{coordinates: coordinates, srid: get_srid(crs), properties: properties}
+  end
+
+  defp do_decode("MultiLineStringZ", coordinates, properties, crs) do
+    coordinates =
+      Enum.map(coordinates, fn sub_coordinates ->
+        Enum.map(sub_coordinates, &List.to_tuple(&1))
+      end)
+
+    %MultiLineStringZ{coordinates: coordinates, srid: get_srid(crs), properties: properties}
   end
 
   defp do_decode("MultiPolygon", coordinates, properties, crs) do
