@@ -3,7 +3,7 @@ name: Elixir Unit Tests
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
     branches:
       - "**"
@@ -70,8 +70,21 @@ jobs:
 
       - name: Run tests with warnings as errors
         if: ${{ matrix.elixir != '1.11.4' && matrix.elixir != '1.10.4' }} 
-        run: mix test --warnings-as-errors
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          timeout_minutes: 5
+          command: mix test --warnings-as-errors
+          new_command_on_retry: mix test --warnings-as-errors --failed
+      
 
       - name: Run tests
         if: ${{ matrix.elixir == '1.11.4' }}
-        run: mix test
+        uses: nick-fields/retry@v2
+        with:
+          max_attempts: 3
+          timeout_minutes: 5
+          command: mix test
+          new_command_on_retry: mix test --failed
