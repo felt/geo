@@ -130,6 +130,22 @@ defmodule Geo.WKT.Test do
     assert(geom.srid == 4326)
   end
 
+  test "Encode MultiPointM to WKT" do
+    geom = %Geo.MultiPointM{coordinates: [{0, 0, 100}, {20, 20, 200}]}
+    assert(Geo.WKT.encode!(geom) == "MULTIPOINTM(0 0 100,20 20 200)")
+  end
+
+  test "Decode WKT to MultiPointM" do
+    geom = Geo.WKT.decode!("MULTIPOINTM(0 0 100,20 20 200)")
+    assert(geom.coordinates == [{0, 0, 100}, {20, 20, 200}])
+  end
+
+  test "Decode EWKT to MultiPointM" do
+    geom = Geo.WKT.decode!("SRID=4326;MULTIPOINTM(0 0 100,20 20 200)")
+    assert(geom.coordinates == [{0, 0, 100}, {20, 20, 200}])
+    assert(geom.srid == 4326)
+  end
+
   test "Encode MultiLineString to WKT" do
     geom = %Geo.MultiLineString{
       coordinates: [[{10, 10}, {20, 20}, {10, 40}], [{40, 40}, {30, 30}, {40, 20}, {30, 10}]]

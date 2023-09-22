@@ -6,10 +6,12 @@ defmodule Geo.WKB.Encoder do
   @point_z 0x80_00_00_01
   @point_zm 0xC0_00_00_01
   @line_string 0x00_00_00_02
+  @line_string_m 0x40_00_00_02
   @line_string_z 0x80_00_00_02
   @polygon 0x00_00_00_03
   @polygon_z 0x80_00_00_03
   @multi_point 0x00_00_00_04
+  @multi_point_m 0x40_00_00_04
   @multi_point_z 0x80_00_00_04
   @multi_line_string 0x00_00_00_05
   @multi_line_string_z 0x80_00_00_05
@@ -25,10 +27,12 @@ defmodule Geo.WKB.Encoder do
     PointM,
     PointZM,
     LineString,
+    LineStringM,
     LineStringZ,
     Polygon,
     PolygonZ,
     MultiPoint,
+    MultiPointM,
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
@@ -104,6 +108,19 @@ defmodule Geo.WKB.Encoder do
       {@line_string, [<<count::unquote(modifier)-32>> | coordinates]}
     end
 
+    def do_encode(%LineStringM{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn {x, y, z}, acc ->
+          {[
+             <<x::unquote(modifier)-float-64>>,
+             <<y::unquote(modifier)-float-64>>,
+             <<z::unquote(modifier)-float-64>>
+           ], acc + 1}
+        end)
+
+      {@line_string_m, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
     def do_encode(%LineStringZ{coordinates: coordinates}, unquote(endian_atom)) do
       {coordinates, count} =
         Enum.map_reduce(coordinates, 0, fn {x, y, z}, acc ->
@@ -145,6 +162,16 @@ defmodule Geo.WKB.Encoder do
         end)
 
       {@multi_point, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
+    def do_encode(%MultiPointM{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          point = encode!(%PointM{coordinates: coordinate}, unquote(endian_atom))
+          {point, acc + 1}
+        end)
+
+      {@multi_point_m, [<<count::unquote(modifier)-32>> | coordinates]}
     end
 
     def do_encode(%MultiPointZ{coordinates: coordinates}, unquote(endian_atom)) do

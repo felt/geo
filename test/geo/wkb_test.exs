@@ -158,6 +158,33 @@ defmodule Geo.WKB.Test do
     )
   end
 
+  test "Decode WKB to LineStringM" do
+    point =
+      Geo.WKB.decode!(
+        "004000000200000003403E000000000000402400000000000040080000000000004024000000000000403E0000000000004056800000000000404400000000000040440000000000004044000000000000"
+      )
+
+    assert(point.coordinates == [{30, 10, 3}, {10, 30, 90}, {40, 40, 40}])
+  end
+
+  test "Encode LineStringM to EWKB" do
+    geom = %Geo.LineStringM{coordinates: [{30, 10, 3}, {10, 30, 90}, {40, 40, 40}], srid: 4326}
+
+    assert(
+      Geo.WKB.encode!(geom, :ndr) ==
+        "0102000060E6100000030000000000000000003E400000000000002440000000000000084000000000000024400000000000003E400000000000805640000000000000444000000000000044400000000000004440"
+    )
+  end
+
+  test "Encode LineStringM to WKB" do
+    geom = %Geo.LineStringM{coordinates: [{30, 10, 3}, {10, 30, 90}, {40, 40, 40}]}
+
+    assert(
+      Geo.WKB.encode!(geom) ==
+        "004000000200000003403E000000000000402400000000000040080000000000004024000000000000403E0000000000004056800000000000404400000000000040440000000000004044000000000000"
+    )
+  end
+
   test "Decode WKB to LineStringZ" do
     point =
       Geo.WKB.decode!(
@@ -387,6 +414,25 @@ defmodule Geo.WKB.Test do
       Geo.WKB.encode!(geom, :ndr) ==
         "01040000A0E6100000030000000101000080000000000000000000000000000000000000000000000000010100008000000000000034400000000000003440000000000000344001010000800000000000004E400000000000004E400000000000004E40"
     )
+  end
+
+  test "Encode MultiPointM to WKB" do
+    geom = %Geo.MultiPointM{coordinates: [{13.1668, 52.45695, 120}], srid: 4326}
+
+    assert(
+      Geo.WKB.encode!(geom, :ndr) ==
+        "0104000060E610000001000000010100004013F241CF66552A401FF46C567D3A4A400000000000005E40"
+    )
+  end
+
+  test "Decode EWKB to MultiPointM" do
+    point =
+      Geo.WKB.decode!(
+        "0104000060E610000001000000010100004013F241CF66552A401FF46C567D3A4A400000000000005E40"
+      )
+
+    assert(point.coordinates == [{13.1668, 52.45695, 120}])
+    assert(point.srid == 4326)
   end
 
   test "Decode EWKB to MultiLineString" do
