@@ -1,12 +1,14 @@
 defmodule Geo.WKB.Encoder do
   @moduledoc false
 
+  # these numbers can be referenced against postgis.git/doc/ZMSgeoms.txt
   @point 0x00_00_00_01
   @point_m 0x40_00_00_01
   @point_z 0x80_00_00_01
   @point_zm 0xC0_00_00_01
   @line_string 0x00_00_00_02
   @line_string_z 0x80_00_00_02
+  @line_string_zm 0xC0_00_00_02
   @polygon 0x00_00_00_03
   @polygon_z 0x80_00_00_03
   @multi_point 0x00_00_00_04
@@ -26,6 +28,7 @@ defmodule Geo.WKB.Encoder do
     PointZM,
     LineString,
     LineStringZ,
+    LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
@@ -115,6 +118,20 @@ defmodule Geo.WKB.Encoder do
         end)
 
       {@line_string_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
+    def do_encode(%LineStringZM{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn {x, y, z, m}, acc ->
+          {[
+             <<x::unquote(modifier)-float-64>>,
+             <<y::unquote(modifier)-float-64>>,
+             <<z::unquote(modifier)-float-64>>,
+             <<m::unquote(modifier)-float-64>>
+           ], acc + 1}
+        end)
+
+      {@line_string_zm, [<<count::unquote(modifier)-32>> | coordinates]}
     end
 
     def do_encode(%Polygon{coordinates: coordinates}, unquote(endian_atom)) do

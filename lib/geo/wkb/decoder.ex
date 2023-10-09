@@ -1,12 +1,14 @@
 defmodule Geo.WKB.Decoder do
   @moduledoc false
 
+  # these numbers can be referenced against postgis.git/doc/ZMSgeoms.txt
   @point 0x00_00_00_01
   @point_m 0x40_00_00_01
   @point_z 0x80_00_00_01
   @point_zm 0xC0_00_00_01
   @line_string 0x00_00_00_02
   @line_string_z 0x80_00_00_02
+  @line_string_zm 0xC0_00_00_02
   @polygon 0x00_00_00_03
   @polygon_z 0x80_00_00_03
   @multi_point 0x00_00_00_04
@@ -28,6 +30,7 @@ defmodule Geo.WKB.Decoder do
     PointZM,
     LineString,
     LineStringZ,
+    LineStringZM,
     Polygon,
     PolygonZ,
     GeometryCollection,
@@ -159,6 +162,33 @@ defmodule Geo.WKB.Decoder do
         end)
 
       {%LineStringZ{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @line_string_zm,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(1..count, rest, fn _,
+                                           <<x::unquote(modifier)-float-64,
+                                             y::unquote(modifier)-float-64,
+                                             z::unquote(modifier)-float-64,
+                                             m::unquote(modifier)-float-64, rest::bits>> ->
+          {%PointZM{coordinates: coordinates}, _rest} =
+            do_decode(
+              @point_zm,
+              <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+                z::unquote(modifier)-float-64, m::unquote(modifier)-float-64>>,
+              nil,
+              unquote(endian)
+            )
+
+          {coordinates, rest}
+        end)
+
+      {%LineStringZM{coordinates: coordinates, srid: srid}, rest}
     end
 
     defp do_decode(

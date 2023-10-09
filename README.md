@@ -15,6 +15,7 @@ A collection of GIS functions. Handles conversions to and from well-known text (
 * PointZM
 * LineString
 * LineStringZ
+* LineStringZM
 * Polygon
 * PolygonZ
 * MultiPoint

@@ -8,6 +8,7 @@ defmodule Geo.WKT.Encoder do
     PointZM,
     LineString,
     LineStringZ,
+    LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
@@ -64,6 +65,12 @@ defmodule Geo.WKT.Encoder do
     coordinate_string = create_line_string_str(coordinates)
 
     "LINESTRINGZ#{coordinate_string}"
+  end
+
+  defp do_encode(%LineStringZM{coordinates: coordinates}) do
+    coordinate_string = create_line_string_str(coordinates)
+
+    "LINESTRINGZM#{coordinate_string}"
   end
 
   defp do_encode(%Polygon{coordinates: coordinates}) do
@@ -149,6 +156,7 @@ defmodule Geo.WKT.Encoder do
 
   defp create_coord_str({x, y}), do: "#{x} #{y}"
   defp create_coord_str({x, y, z}), do: "#{x} #{y} #{z}"
+  defp create_coord_str({x, y, z, m}), do: "#{x} #{y} #{z} #{m}"
 
   defp get_srid_binary(nil), do: ""
   defp get_srid_binary(0), do: ""

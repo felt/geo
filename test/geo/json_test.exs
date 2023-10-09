@@ -103,6 +103,25 @@ defmodule Geo.JSON.Test do
     assert(exjson == new_exjson)
   end
 
+  test "Drops M coordinate when decoding LineStringZM" do
+    json =
+      "{ \"type\": \"LineStringZM\", \"coordinates\": [ [100.0, 0.0, 50.0, 1], [101.0, 1.0, 20.0, 2] ]}"
+
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    assert geom.coordinates == [{100.0, 0.0, 50.0, 1}, {101.0, 1.0, 20.0, 2}]
+  end
+
+  test "Encodes LineStringZM, dropping M" do
+    encoded =
+      %Geo.LineStringZM{coordinates: [{100.0, 0.0, 50.0, 1}, {101.0, 1.0, 20.0, 2}]}
+      |> Geo.JSON.encode!()
+
+    assert encoded == %{
+             "type" => "LineString",
+             "coordinates" => [[100.0, 0.0, 50.0], [101.0, 1.0, 20.0]]
+           }
+  end
+
   test "Throw altitude away and any extra elements from things other than points" do
     json =
       "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0, 1.0, null], [101.0, 0.0, 1.0, null], [101.0, 1.0, 1.0, null], [100.0, 1.0, 1.0, null], [100.0, 0.0, 1.0, null] ]]}"

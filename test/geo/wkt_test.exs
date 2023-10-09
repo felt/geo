@@ -335,6 +335,13 @@ defmodule Geo.WKT.Test do
     end
   end
 
+  property "encodes and decodes back to the correct LineStringZM struct" do
+    check all(list <- list_of({float(), float(), float(), float()}, min_length: 1)) do
+      geom = %Geo.LineStringZM{coordinates: list}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
+  end
+
   test "check LineString regression on Elixir 1.134 + OTP 24.3.4" do
     geom = %Geo.LineString{coordinates: [{6.082409157592909e19, 1.2576001607965288e20}]}
     assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
