@@ -180,7 +180,7 @@ defmodule Geo.WKB.Decoder do
             do_decode(
               @point_zm,
               <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
-              z::unquote(modifier)-float-64, m::unquote(modifier)-float-64>>,
+                z::unquote(modifier)-float-64, m::unquote(modifier)-float-64>>,
               nil,
               unquote(endian)
             )

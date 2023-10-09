@@ -789,5 +789,4 @@ defmodule Geo.WKB.Test do
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end
   end
-
 end

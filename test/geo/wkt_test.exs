@@ -336,7 +336,7 @@ defmodule Geo.WKT.Test do
   end
 
   property "encodes and decodes back to the correct LineStringZM struct" do
-    check all list <- list_of({float(), float(), float(), float()}, min_length: 1) do
+    check all(list <- list_of({float(), float(), float(), float()}, min_length: 1)) do
       geom = %Geo.LineStringZM{coordinates: list}
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end

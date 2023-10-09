@@ -3,6 +3,10 @@ defmodule Geo.LineStringZM do
   Defines the LineStringZM struct.
   """
 
-  @type t :: %__MODULE__{coordinates: [{number, number, number, number}], srid: integer | nil, properties: map}
+  @type t :: %__MODULE__{
+          coordinates: [{number, number, number, number}],
+          srid: integer | nil,
+          properties: map
+        }
   defstruct coordinates: [], srid: nil, properties: %{}
 end
