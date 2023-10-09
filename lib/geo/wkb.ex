@@ -21,7 +21,7 @@ defmodule Geo.WKB do
 
   @doc """
   Takes a Geometry and returns a base-16 encoded WKB string.
-  
+
   The endian decides what the byte order will be.
   """
   @spec encode!(Geo.geometry(), Geo.endian()) :: binary

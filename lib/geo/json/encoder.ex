@@ -127,6 +127,10 @@ defmodule Geo.JSON.Encoder do
     %{"type" => "Point", "coordinates" => [x, y]}
   end
 
+  defp do_encode(%Point{coordinates: nil}) do
+    %{"type" => "Point", "coordinates" => []}
+  end
+
   defp do_encode(%PointZ{coordinates: {x, y, z}}) do
     %{"type" => "Point", "coordinates" => [x, y, z]}
   end
