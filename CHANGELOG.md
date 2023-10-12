@@ -1,5 +1,23 @@
 # Changelog
 
+## v3.6.0
+
+As of v3.6.0, `geo` (like [`geo_postgis`](https://github.com/felt/geo_postgis)) is being maintained by the Felt team. As a company building a geospatial product on Elixir, with a track record of [supporting open source software](https://felt.com/open-source), we're excited for the future of the project.
+
+### New features
+
+* [Add support for empty point](https://github.com/felt/geo/pull/172) by new contributor @bolek
+* [Add support for LineStringZM](https://github.com/felt/geo/pull/171) by new contributor @kanatohodets
+* [Support decoding MultiLineStringZ](https://github.com/felt/geo/pull/179) by new contributor @caspg
+
+### Misc. changes
+
+- Fix compile warnings ([#186](https://github.com/felt/geo/pull/186) by @s3cur3)
+- Docs improvements ([#177](https://github.com/felt/geo/pull/177) by new contributor @ghecho, [#182](https://github.com/felt/geo/pull/182) by @s3cur3)
+- Dependency updates: `ex_doc` ([#185](https://github.com/felt/geo/pull/185)), `jason` ([#183](https://github.com/felt/geo/pull/183)), `stream_data` ([#184](https://github.com/felt/geo/pull/184))
+
+**Full Changelog**: https://github.com/felt/geo/compare/v3.5.1...v3.6.0
+
 ## v3.5.1 - 2023-06-07
 - Fix
   - [Fix Application.get_env and use Bitwise warnings](https://github.com/felt/geo/pull/180)

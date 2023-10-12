@@ -33,7 +33,7 @@ _Note_: If you are looking to do geospatial calculations in memory with Geo's st
 ```elixir
 defp deps do
   [
-    {:geo, "~> 3.5"}
+    {:geo, "~> 3.6"}
   ]
 end
 ```
