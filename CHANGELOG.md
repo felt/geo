@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.6.0
+## v3.6.0 — 2023-10-19
 
 As of v3.6.0, `geo` (like [`geo_postgis`](https://github.com/felt/geo_postgis)) is being maintained by the Felt team. As a company building a geospatial product on Elixir, with a track record of [supporting open source software](https://felt.com/open-source), we're excited for the future of the project.
 
