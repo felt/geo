@@ -20,8 +20,8 @@ A collection of GIS functions. Handles conversions to and from well-known text (
 * PolygonZ
 * MultiPoint
 * MultiPointZ
-* MuliLineString
-* MuliLineStringZ
+* MultiLineString
+* MultiLineStringZ
 * MultiPolygon
 * MultiPolygonZ
 * GeometryCollection
