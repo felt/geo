@@ -1,6 +1,6 @@
 defmodule Geo.PolygonZ do
   @moduledoc """
-  Defines the Polygon struct.
+  Defines the PolygonZ struct.
   """
 
   @type t :: %__MODULE__{

@@ -1,3 +1,5 @@
+# Run from the project root with $ mix run bench/benchmarks.exs
+
 binaries_list_fn = fn geom -> geom |> Geo.WKB.encode!() |> Geo.WKB.decode!() end
 iodata_list_fn = fn geom -> geom |> Geo.WKB.encode_to_iodata() |> IO.iodata_to_binary() |> Geo.WKB.decode!() end
 
