@@ -197,18 +197,15 @@ defmodule Geo.JSON.Decoder do
   defp do_decode("Feature", nil, _properties, _id), do: nil
 
   defp do_decode("Feature", geometry, properties, _id) do
-    cond do
-
-      Map.get(geometry, "type") == "GeometryCollection" ->
-        geometry_collection = decode!(geometry)
-
-        %GeometryCollection{
-          geometries: geometry_collection.geometries,
-          properties: properties
-        }
-
-      true ->
-        do_decode(Map.get(geometry, "type"), Map.get(geometry, "coordinates"), properties, nil)
+    if geometry["type"] == "GeometryCollection" do
+      geometry_collection = decode!(geometry)
+      
+      %GeometryCollection{
+        geometries: geometry_collection.geometries,
+        properties: properties
+      }
+    else
+      do_decode(Map.get(geometry, "type"), Map.get(geometry, "coordinates"), properties, nil)
     end
   end
 
