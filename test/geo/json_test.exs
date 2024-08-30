@@ -431,6 +431,23 @@ defmodule Geo.JSON.Test do
     end
   end
 
+  test "Decode rejects geometries with garbage coordinates" do
+    json = """
+      {
+        "properties": {},
+        "geometry": {
+          "type": "Point",
+          "coordinates": {"x": 1.0, "y": 2.0}
+        },
+        "type": "Feature"
+      }
+    """
+
+    assert_raise ArgumentError, fn ->
+      Jason.decode!(json) |> Geo.JSON.decode!()
+    end
+  end
+
   property "encodes and decodes back to the correct Point struct" do
     check all(
             x <- float(),

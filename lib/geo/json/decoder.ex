@@ -275,4 +275,8 @@ defmodule Geo.JSON.Decoder do
         raise ArgumentError, "expected a numeric coordinate, got: #{inspect(other)}"
     end)
   end
+
+  defp ensure_numeric(other) do
+    raise ArgumentError, "expected a numeric coordinate, got: #{inspect(other)}"
+  end
 end
