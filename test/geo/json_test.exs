@@ -387,6 +387,50 @@ defmodule Geo.JSON.Test do
     assert geom.geometries == []
   end
 
+  test "Decode seamlessly converts coordinates that are numbers-as-strings" do
+    check all(
+            x <- float(),
+            y <- float()
+          ) do
+      json = """
+        {
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": ["#{x}", "#{y}"]
+          },
+          "type": "Feature"
+        }
+      """
+
+      assert %Geo.Point{coordinates: {^x, ^y}} = Jason.decode!(json) |> Geo.JSON.decode!()
+    end
+  end
+
+  test "Decode rejects geometries with non-numeric coordinates" do
+    for {bad_x, bad_y} <- [
+          {" 100.0", "0.0"},
+          {"100.0", "0.0?"},
+          {"100.", "0.0"},
+          {"100.0", nil, "0.0"}
+        ] do
+      json = """
+        {
+          "properties": {},
+          "geometry": {
+            "type": "Point",
+            "coordinates": [#{inspect(bad_x)}, #{inspect(bad_y)}]
+          },
+          "type": "Feature"
+        }
+      """
+
+      assert_raise ArgumentError, fn ->
+        Jason.decode!(json) |> Geo.JSON.decode!()
+      end
+    end
+  end
+
   property "encodes and decodes back to the correct Point struct" do
     check all(
             x <- float(),

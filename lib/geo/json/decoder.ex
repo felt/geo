@@ -46,7 +46,7 @@ defmodule Geo.JSON.Decoder do
           Enum.map(Map.get(geo_json, "geometries"), fn x ->
             do_decode(
               Map.get(x, "type"),
-              Map.get(x, "coordinates"),
+              ensure_numeric(x["coordinates"]),
               Map.get(x, "properties", %{}),
               crs
             )
@@ -62,7 +62,7 @@ defmodule Geo.JSON.Decoder do
 
         do_decode(
           Map.get(geo_json, "type"),
-          Map.get(geo_json, "coordinates"),
+          ensure_numeric(geo_json["coordinates"]),
           Map.get(geo_json, "properties", %{}),
           crs
         )
@@ -205,7 +205,12 @@ defmodule Geo.JSON.Decoder do
         properties: properties
       }
     else
-      do_decode(Map.get(geometry, "type"), Map.get(geometry, "coordinates"), properties, nil)
+      do_decode(
+        Map.get(geometry, "type"),
+        ensure_numeric(geometry["coordinates"]),
+        properties,
+        nil
+      )
     end
   end
 
@@ -230,5 +235,44 @@ defmodule Geo.JSON.Decoder do
 
   defp get_srid(nil) do
     nil
+  end
+
+  # Fast paths for the common (correct) cases
+  defp ensure_numeric(num) when is_number(num), do: num
+  defp ensure_numeric([x, y] = l) when is_number(x) and is_number(y), do: l
+
+  defp ensure_numeric([x, y, z] = l)
+       when is_number(x) and is_number(y) and (is_number(z) or is_nil(z)) do
+    l
+  end
+
+  defp ensure_numeric([x, y, z, m] = l)
+       when is_number(x) and is_number(y) and (is_number(z) or is_nil(z)) and
+              (is_number(m) or is_nil(z)) do
+    l
+  end
+
+  defp ensure_numeric(l) when is_list(l) do
+    Enum.map(l, fn
+      num when is_number(num) ->
+        num
+
+      str when is_binary(str) ->
+        try do
+          String.to_float(str)
+        catch
+          ArgumentError ->
+            raise ArgumentError, "expected a numeric coordinate, got the string #{inspect(str)}"
+        end
+
+      nil ->
+        nil
+
+      l when is_list(l) ->
+        Enum.map(l, &ensure_numeric/1)
+
+      other ->
+        raise ArgumentError, "expected a numeric coordinate, got: #{inspect(other)}"
+    end)
   end
 end
