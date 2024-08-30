@@ -199,6 +199,7 @@ defmodule Geo.JSON.Decoder do
   defp do_decode("Feature", geometry, properties, _id) do
     if geometry["type"] == "GeometryCollection" do
       geometry_collection = decode!(geometry)
+
       %GeometryCollection{
         geometries: geometry_collection.geometries,
         properties: properties
