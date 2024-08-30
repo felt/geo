@@ -522,7 +522,7 @@ defmodule Geo.JSON.Test do
 
     geom = Jason.decode!(json) |> Geo.JSON.decode!()
 
-    assert %GeometryCollection{} = geom
+    assert %Geo.GeometryCollection{} = geom
     assert length(geom.geometries) == 2
     assert Enum.all?(geom.geometries, &match?(%Geo.MultiPolygon{}, &1))
     assert geom.properties["id"] == "FLC017"
