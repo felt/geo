@@ -36,7 +36,7 @@ defmodule Geo.JSON.Test do
     json = "{\"type\":\"Point\",\"coordinates\":[100.0,0.0,70.0]}"
     geom = Jason.decode!(json) |> Geo.JSON.decode!()
 
-    assert(geom == %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}})
+    assert geom == %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}, srid: 4326}
   end
 
   test "LineString to GeoJson" do
@@ -54,7 +54,7 @@ defmodule Geo.JSON.Test do
     assert(geom.coordinates == {100.0, 0.0})
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson Point without coordinates" do
@@ -64,7 +64,7 @@ defmodule Geo.JSON.Test do
     assert(is_nil(geom.coordinates))
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson with SRID to Point and back" do
@@ -78,7 +78,7 @@ defmodule Geo.JSON.Test do
     assert(geom.srid == 4326)
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson to LineString and back" do
@@ -88,7 +88,7 @@ defmodule Geo.JSON.Test do
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson to LineStringZ and back" do
@@ -100,7 +100,7 @@ defmodule Geo.JSON.Test do
 
     assert(geom.coordinates == [{100.0, 0.0, 50.0}, {101.0, 1.0, 20.0}])
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "Drops M coordinate when decoding LineStringZM" do
@@ -145,7 +145,7 @@ defmodule Geo.JSON.Test do
     )
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson to MultiPoint and back" do
@@ -155,7 +155,7 @@ defmodule Geo.JSON.Test do
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson to MultiLineString and back" do
@@ -167,7 +167,7 @@ defmodule Geo.JSON.Test do
 
     assert(geom.coordinates == [[{100.0, 0.0}, {101.0, 1.0}], [{102.0, 2.0}, {103.0, 3.0}]])
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson to MultiLineStringZ and back" do
@@ -185,7 +185,7 @@ defmodule Geo.JSON.Test do
     )
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson to MultiPolygon and back" do
@@ -206,7 +206,7 @@ defmodule Geo.JSON.Test do
     )
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJson to GeometryCollection and back" do
@@ -219,7 +219,7 @@ defmodule Geo.JSON.Test do
     assert(Enum.count(geom.geometries) == 2)
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "Unable to encode non-geo type" do
@@ -281,7 +281,7 @@ defmodule Geo.JSON.Test do
     assert(Enum.count(geom.geometries) == 2)
 
     new_exjson = Geo.JSON.encode!(geom)
-    assert(exjson == new_exjson)
+    assert_geojson_equal(exjson, new_exjson)
   end
 
   test "GeoJSON to GeometryCollection" do
@@ -454,7 +454,16 @@ defmodule Geo.JSON.Test do
             y <- float()
           ) do
       geom = %Geo.Point{coordinates: {x, y}}
-      assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+      assert %{geom | srid: 4326} == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+
+      geom_with_srid_and_props = %Geo.Point{
+        coordinates: {x, y},
+        srid: 1234,
+        properties: %{"foo" => "bar"}
+      }
+
+      assert %{geom_with_srid_and_props | srid: 1234} ==
+               Geo.JSON.encode!(geom_with_srid_and_props) |> Geo.JSON.decode!()
     end
   end
 
@@ -463,13 +472,13 @@ defmodule Geo.JSON.Test do
     json = Geo.JSON.encode!(geom) |> Jason.encode!()
 
     assert(json == "{\"coordinates\":[],\"type\":\"Point\"}")
-    assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+    assert %{geom | srid: 4326} == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
   end
 
   property "encodes and decodes back to the correct LineString struct" do
     check all(list <- list_of({float(), float()}, min_length: 1)) do
       geom = %Geo.LineString{coordinates: list}
-      assert geom == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
+      assert %{geom | srid: 4326} == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
     end
   end
 
@@ -588,4 +597,21 @@ defmodule Geo.JSON.Test do
     assert Enum.all?(geom.geometries, &match?(%Geo.MultiPolygon{}, &1))
     assert geom.properties["id"] == "FLC017"
   end
+
+  defp assert_geojson_equal(%{} = json_1, %{} = json_2) do
+    # Per the GeoJSON spec, GeoJSON is assumed to have WGS 84 datum (SRID 4326) by default
+    assert drop_srid_4326(json_1) == drop_srid_4326(json_2),
+           "Inequivalent GeoJSON values:\n" <>
+             "Left:\n" <>
+             "#{inspect(json_1, pretty: true)}\n" <>
+             "Right:\n" <>
+             "#{inspect(json_2, pretty: true)}"
+  end
+
+  defp drop_srid_4326(%{"crs" => crs} = json)
+       when crs == %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"} do
+    Map.delete(json, "crs")
+  end
+
+  defp drop_srid_4326(%{} = json), do: json
 end

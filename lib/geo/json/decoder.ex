@@ -96,6 +96,9 @@ defmodule Geo.JSON.Decoder do
       true ->
         raise DecodeError, value: geo_json
     end
+    # Per #129, the GeoJSON spec says all GeoJSON coordinates default to SRID 4326 (WGS 84)
+    # https://tools.ietf.org/html/rfc7946#section-4
+    |> default_srid_4326()
   end
 
   @doc """
@@ -279,4 +282,12 @@ defmodule Geo.JSON.Decoder do
   defp ensure_numeric(other) do
     raise ArgumentError, "expected a numeric coordinate, got: #{inspect(other)}"
   end
+
+  defp default_srid_4326(%{srid: nil} = geom), do: %{geom | srid: 4326}
+
+  defp default_srid_4326(%{geometries: geometries} = geom) when is_list(geometries) do
+    %{geom | geometries: Enum.map(geometries, &default_srid_4326/1)}
+  end
+
+  defp default_srid_4326(geom), do: geom
 end
