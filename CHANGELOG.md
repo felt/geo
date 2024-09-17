@@ -1,5 +1,72 @@
 # Changelog
 
+## v4.0.0 — 2024-09-17
+
+### Potentially breaking change: [Default decoded GeoJSON to SRID 4326 (WGS 84)](https://github.com/felt/geo/pull/219)
+
+This aligns our GeoJSON decoding with [the GeoJSON spec](https://tools.ietf.org/html/rfc7946#section-4) by making all decoded GeoJSON infer the WGS 84 datum (SRID 4326) by default. Whereas previously when you called `Geo.JSON.decode/1` or `decode!/1`, we would return geometries with an `:srid` of `nil`, we now return `srid: 4326`. Likewise when encoding GeoJSON, we explicitly output a `crs` field indicating the datum.
+
+This is unlikely to break real-world usage unless your implementation was assuming a different datum by default.
+
+A couple examples of the changes:
+
+**Before**:
+
+```elixir
+iex> Geo.JSON.decode!(%{"type" => "Point", "coordinates" => [1.0, 2.0]})
+%Geo.Point{
+  coordinates: {1.0, 2.0},
+  # Note the old default nil SRID!
+  srid: nil
+}
+```
+
+**After**
+
+```elixir
+iex> Geo.JSON.decode!(%{"type" => "Point", "coordinates" => [1.0, 2.0]})
+%Geo.Point{
+  coordinates: {1.0, 2.0},
+  # New explicit default of WGS 84
+  srid: 4326
+}
+```
+
+If you were to then encode this value again, you'd end up with a new `crs` field in the output GeoJSON:
+
+```elixir
+iex> %{"type" => "Point", "coordinates" => [1.0, 2.0]}
+...> |> Geo.JSON.decode!()
+...> |> GeoJSON.encode!()
+%{
+  "type" => "Point",
+  "coordinates" => [1.0, 2.0],
+  # Note the new `crs` field which was not present in the input to Geo.JSON.decode!/1
+  "crs" => %{"properties" => %{"name" => "EPSG:4326"}, "type" => "name"}
+}
+```
+
+This last behavior is the most potentially troublesome. However, we don't have a good way of distinguishing a case where you explicitly had the `crs` set in the input to the decoding function (in which case you would probably also like to have it present in the re-encoded version) compared to one in which it's been inferred.
+
+Thanks to @gworkman for reporting this issue ([#129](https://github.com/felt/geo/issues/129)).
+
+### Potentially breaking change: [Convert string coordinates to floats, or raise an error](https://github.com/felt/geo/pull/218)
+
+This fixes an issue where we were silently accepting non-numeric coordinates in the GeoJSON decoder, such that you could wind up doing things like decoding a point like `%Geo.Point{coordinates: {"100.0", "-10.0"}}`. This would obviously not have gone well for you later in your processing pipeline, and it violates our typespecs.
+
+The fix here, suggested by @LostKobrakai, is to convert those strings to numbers where we can do so unambiguously. While such inputs are clearly invalid, it's easy enough to handle them in the way that the user was hoping that we should probably just do it. In cases where there's any ambiguity at all, we raise an `ArgumentError`.
+
+### Other bug fixes in v4.0.0
+
+- [Support GeoJSON Feature object with nested GeometryCollection](https://github.com/felt/geo/pull/194) by new contributor @carstenpiepel (🎉)
+
+### Other changes in v4.0.0
+
+- [Fix typo in the README](https://github.com/felt/geo/pull/197) by @caspg
+- [Fix typo](https://github.com/felt/geo/pull/216) by new contributor @preciz (🎉)
+- [Optional dependency bump for `jason` to v1.4.4](https://github.com/felt/geo/pull/215)
+- Dev dependency bumps for ex_doc, benchee, stream_data
+
 ## v3.6.0 — 2023-10-19
 
 As of v3.6.0, `geo` (like [`geo_postgis`](https://github.com/felt/geo_postgis)) is being maintained by the Felt team. As a company building a geospatial product on Elixir, with a track record of [supporting open source software](https://felt.com/open-source), we're excited for the future of the project.

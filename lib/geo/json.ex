@@ -7,13 +7,16 @@ defmodule Geo.JSON do
   so that you can use the resulting GeoJSON structure as a property
   in larger JSON structures.
 
+  Note that, per [the GeoJSON spec](https://tools.ietf.org/html/rfc7946#section-4),
+  all geometries are assumed to use the WGS 84 datum (SRID 4326) by default.
+
   ## Examples
 
       # Using Jason as the JSON parser for these examples
 
       iex> json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
       ...> json |> Jason.decode!() |> Geo.JSON.decode!()
-      %Geo.Point{coordinates: {100.0, 0.0}, srid: nil}
+      %Geo.Point{coordinates: {100.0, 0.0}, srid: 4326}
 
       iex> geom = %Geo.Point{coordinates: {100.0, 0.0}, srid: nil}
       ...> Jason.encode!(geom)
