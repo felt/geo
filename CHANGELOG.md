@@ -1,6 +1,6 @@
 # Changelog
 
-## v4.0.0 — 2024-09
+## v4.0.0 — 2024-09-17
 
 ### Potentially breaking change: [Default decoded GeoJSON to SRID 4326 (WGS 84)](https://github.com/felt/geo/pull/219)
 
@@ -56,7 +56,7 @@ This fixes an issue where we were silently accepting non-numeric coordinates in 
 
 The fix here, suggested by @LostKobrakai, is to convert those strings to numbers where we can do so unambiguously. While such inputs are clearly invalid, it's easy enough to handle them in the way that the user was hoping that we should probably just do it. In cases where there's any ambiguity at all, we raise an `ArgumentError`.
 
-### Bug fixes in v4.0.0
+### Other bug fixes in v4.0.0
 
 - [Support GeoJSON Feature object with nested GeometryCollection](https://github.com/felt/geo/pull/194) by new contributor @carstenpiepel (🎉)
 
