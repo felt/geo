@@ -57,6 +57,45 @@ defmodule Geo.JSON.Test do
     assert_geojson_equal(exjson, new_exjson)
   end
 
+  test "GeoJson to Point (with integer components) and back" do
+    json = """
+      {
+        "type": "Point",
+        "coordinates": [100, 0]
+      }
+    """
+
+    exjson = Jason.decode!(json)
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+
+    assert(geom.coordinates == {100.0, 0.0})
+
+    new_exjson = Geo.JSON.encode!(geom)
+    assert_geojson_equal(exjson, new_exjson)
+  end
+
+  test "GeoJson to Point (with string:integer components) and back" do
+    json = """
+      {
+        "type": "Point",
+        "coordinates": ["100", "0"]
+      }
+    """
+
+    exjson =
+      %{
+        "type" => "Point",
+        "coordinates" => [100.0, 0.0]
+      }
+
+    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+
+    assert(geom.coordinates == {100.0, 0.0})
+
+    new_exjson = Geo.JSON.encode!(geom)
+    assert_geojson_equal(exjson, new_exjson)
+  end
+
   test "GeoJson Point without coordinates" do
     json = "{ \"type\": \"Point\", \"coordinates\": [] }"
     exjson = Jason.decode!(json)
@@ -387,23 +426,48 @@ defmodule Geo.JSON.Test do
     assert geom.geometries == []
   end
 
-  test "Decode seamlessly converts coordinates that are numbers-as-strings" do
-    check all(
-            x <- float(),
-            y <- float()
-          ) do
-      json = """
-        {
-          "properties": {},
-          "geometry": {
-            "type": "Point",
-            "coordinates": ["#{x}", "#{y}"]
-          },
-          "type": "Feature"
-        }
-      """
+  describe "decode seamlessly converts coordinates that are numbers-as-strings" do
+    test "works with floats" do
+      check all(
+              x <- float(),
+              y <- float()
+            ) do
+        json = """
+          {
+            "properties": {},
+            "geometry": {
+              "type": "Point",
+              "coordinates": ["#{x}", "#{y}"]
+            },
+            "type": "Feature"
+          }
+        """
 
-      assert %Geo.Point{coordinates: {^x, ^y}} = Jason.decode!(json) |> Geo.JSON.decode!()
+        assert %Geo.Point{coordinates: {^x, ^y}} = Jason.decode!(json) |> Geo.JSON.decode!()
+      end
+    end
+
+    test "works with integers" do
+      check all(
+              x <- integer(),
+              y <- integer()
+            ) do
+        json = """
+          {
+            "properties": {},
+            "geometry": {
+              "type": "Point",
+              "coordinates": ["#{x}", "#{y}"]
+            },
+            "type": "Feature"
+          }
+        """
+
+        # float coercion
+        fx = 0.0 + x
+        fy = 0.0 + y
+        assert %Geo.Point{coordinates: {^fx, ^fy}} = Jason.decode!(json) |> Geo.JSON.decode!()
+      end
     end
   end
 

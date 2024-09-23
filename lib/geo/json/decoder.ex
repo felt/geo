@@ -262,7 +262,7 @@ defmodule Geo.JSON.Decoder do
 
       str when is_binary(str) ->
         try do
-          String.to_float(str)
+          Geo.Utils.string_to_float!(str)
         catch
           ArgumentError ->
             raise ArgumentError, "expected a numeric coordinate, got the string #{inspect(str)}"
