@@ -257,30 +257,28 @@ defmodule Geo.JSON.Decoder do
 
   defp ensure_numeric(l) when is_list(l) do
     Enum.map(l, fn
-      num when is_number(num) ->
-        num
-
-      str when is_binary(str) ->
-        try do
-          String.to_float(str)
-        catch
-          ArgumentError ->
-            raise ArgumentError, "expected a numeric coordinate, got the string #{inspect(str)}"
-        end
-
-      nil ->
-        nil
-
-      l when is_list(l) ->
-        Enum.map(l, &ensure_numeric/1)
-
-      other ->
-        raise ArgumentError, "expected a numeric coordinate, got: #{inspect(other)}"
+      num when is_number(num) -> num
+      str when is_binary(str) -> parse_number(str)
+      lst when is_list(lst) -> Enum.map(lst, &ensure_numeric/1)
+      nil -> nil
+      other -> raise ArgumentError, "expected a numeric coordinate, got: #{inspect(other)}"
     end)
   end
 
   defp ensure_numeric(other) do
     raise ArgumentError, "expected a numeric coordinate, got: #{inspect(other)}"
+  end
+
+  defp parse_number(str) when is_binary(str) do
+    String.to_float(str)
+  rescue
+    ArgumentError ->
+      try do
+        String.to_integer(str)
+      rescue
+        ArgumentError ->
+          raise ArgumentError, "expected a numeric coordinate, got the string #{inspect(str)}"
+      end
   end
 
   defp default_srid_4326(%{srid: nil} = geom), do: %{geom | srid: 4326}
