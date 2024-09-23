@@ -15,7 +15,7 @@ defmodule Geo.Utils do
     end
   end
 
-  @spec string_to_float(String.t()) :: float()
+  @spec string_to_float!(String.t()) :: float() | no_return()
   def string_to_float!(str) when is_binary(str) do
     case string_to_float(str) do
       {:ok, flt} ->
