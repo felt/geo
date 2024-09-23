@@ -1,6 +1,31 @@
 defmodule Geo.Utils do
   @moduledoc false
 
+  @spec string_to_float(String.t()) :: {:ok, float()} | {:error, term}
+  def string_to_float(str) when is_binary(str) do
+    case Float.parse(str) do
+      :error ->
+        {:error, :bad_arg}
+
+      {flt, ""} ->
+        {:ok, flt}
+
+      {_flt, _rest} ->
+        {:error, :bad_arg}
+    end
+  end
+
+  @spec string_to_float(String.t()) :: float()
+  def string_to_float!(str) when is_binary(str) do
+    case string_to_float(str) do
+      {:ok, flt} ->
+        flt
+
+      {:error, :bad_arg} ->
+        raise ArgumentError, "given string is not a textual representation of a float"
+    end
+  end
+
   @doc """
   Turns a hex string or an integer of base 16 into its floating point
   representation.
