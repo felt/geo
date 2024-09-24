@@ -1,5 +1,9 @@
 # Changelog
 
+## v4.0.1 — 2024-09-23
+
+[Fix error raised when decoding JSON with string representations of integer values in coordinates](https://github.com/felt/geo/pull/221) by new contributor @IceDragon200.
+
 ## v4.0.0 — 2024-09-17
 
 ### Potentially breaking change: [Default decoded GeoJSON to SRID 4326 (WGS 84)](https://github.com/felt/geo/pull/219)
