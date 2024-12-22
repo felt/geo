@@ -13,6 +13,7 @@ defmodule Geo.JSON.Encoder do
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
+    MultiLineStringZM,
     MultiPolygon,
     MultiPolygonZ,
     GeometryCollection
@@ -200,6 +201,15 @@ defmodule Geo.JSON.Encoder do
       end)
 
     %{"type" => "MultiLineStringZ", "coordinates" => coordinates}
+  end
+
+  defp do_encode(%MultiLineStringZM{coordinates: coordinates}) do
+    coordinates =
+      Enum.map(coordinates, fn sub_coordinates ->
+        Enum.map(sub_coordinates, &Tuple.to_list(&1))
+      end)
+
+    %{"type" => "MultiLineStringZM", "coordinates" => coordinates}
   end
 
   defp do_encode(%MultiPolygon{coordinates: coordinates}) do
