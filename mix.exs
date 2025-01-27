@@ -53,6 +53,7 @@ defmodule Geo.Mixfile do
       extras: ["CHANGELOG.md", "README.md"],
       main: "readme",
       source_url: @source_url,
+      source_ref: "master",
       formatters: ["html"]
     ]
   end
