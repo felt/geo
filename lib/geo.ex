@@ -17,6 +17,7 @@ defmodule Geo do
           | Geo.MultiPointZ.t()
           | Geo.MultiLineString.t()
           | Geo.MultiLineStringZ.t()
+          | Geo.MultiLineStringZM.t()
           | Geo.MultiPolygon.t()
           | Geo.MultiPolygonZ.t()
           | Geo.GeometryCollection.t()

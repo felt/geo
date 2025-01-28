@@ -22,6 +22,7 @@ A collection of GIS functions. Handles conversions to and from well-known text (
 * MultiPointZ
 * MultiLineString
 * MultiLineStringZ
+* MultiLineStringZM
 * MultiPolygon
 * MultiPolygonZ
 * GeometryCollection
