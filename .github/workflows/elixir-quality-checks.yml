@@ -11,25 +11,26 @@ on:
 jobs:
   quality_checks:
     name: Elixir Quality Checks
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       # In MIX_ENV=test, `$ mix xref graph` shows us a whole bunch of
       # test stuff that isn't really relevant.
       # The other checks don't really care what environment they run in.
       MIX_ENV: dev
-      elixir: "1.15.4"
-      otp: "26.0.2"
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Setup Elixir Project
-        uses: ./.github/actions/elixir-setup
+      - name: Setup beam
+        uses: erlef/setup-beam@v1
         with:
-          elixir-version: ${{ env.elixir }}
-          otp-version: ${{ env.otp }}
-          build-app: false
+          otp-version: 27.2.4
+          elixir-version: 1.18.2
+          install-hex: true
+
+      - name: Install dependencies
+        run: mix deps.get
 
       - name: Check for unused deps
         run: mix deps.unlock --check-unused
