@@ -168,6 +168,14 @@ defmodule Geo.WKB.Decoder do
 
     defp do_decode(
            @line_string_zm,
+           <<0::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ),
+         do: {%LineStringZM{coordinates: [], srid: srid}, rest}
+
+    defp do_decode(
+           @line_string_zm,
            <<count::unquote(modifier)-32, rest::bits>>,
            srid,
            unquote(endian)

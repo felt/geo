@@ -195,6 +195,18 @@ defmodule Geo.WKB.Test do
     )
   end
 
+  test "Encode empty LineStringZM to WKB" do
+    geom = %Geo.LineStringZM{coordinates: []}
+
+    assert(Geo.WKB.encode!(geom, :ndr) == "01020000C000000000")
+  end
+
+  test "Decode WKB to empty LineStringZM" do
+    point = Geo.WKB.decode!("01020000C000000000")
+
+    assert(point.coordinates == [])
+  end
+
   test "Decode WKB to Polygon" do
     point =
       Geo.WKB.decode!(
