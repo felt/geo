@@ -13,7 +13,7 @@ defmodule Geo.JSON.Test do
 
   test "Point to GeoJson" do
     geom = %Geo.Point{coordinates: {100.0, 0.0}}
-    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+    json = Geo.JSON.encode!(geom) |> JSON.encode!()
 
     assert(json == "{\"coordinates\":[100.0,0.0],\"type\":\"Point\"}")
   end
@@ -27,29 +27,29 @@ defmodule Geo.JSON.Test do
 
   test "PointZ to GeoJson" do
     geom = %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}}
-    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+    json = Geo.JSON.encode!(geom) |> JSON.encode!()
 
     assert(json == "{\"coordinates\":[100.0,0.0,70.0],\"type\":\"Point\"}")
   end
 
   test "PointZ from GeoJson" do
     json = "{\"type\":\"Point\",\"coordinates\":[100.0,0.0,70.0]}"
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert geom == %Geo.PointZ{coordinates: {100.0, 0.0, 70.0}, srid: 4326}
   end
 
   test "LineString to GeoJson" do
     geom = %Geo.LineString{coordinates: [{100.0, 0.0}, {101.0, 1.0}]}
-    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+    json = Geo.JSON.encode!(geom) |> JSON.encode!()
 
     assert(json == "{\"coordinates\":[[100.0,0.0],[101.0,1.0]],\"type\":\"LineString\"}")
   end
 
   test "GeoJson to Point and back" do
     json = "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == {100.0, 0.0})
 
@@ -65,8 +65,8 @@ defmodule Geo.JSON.Test do
       }
     """
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == {100.0, 0.0})
 
@@ -88,7 +88,7 @@ defmodule Geo.JSON.Test do
         "coordinates" => [100.0, 0.0]
       }
 
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == {100.0, 0.0})
 
@@ -98,8 +98,8 @@ defmodule Geo.JSON.Test do
 
   test "GeoJson Point without coordinates" do
     json = "{ \"type\": \"Point\", \"coordinates\": [] }"
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
     assert(is_nil(geom.coordinates))
 
     new_exjson = Geo.JSON.encode!(geom)
@@ -110,8 +110,8 @@ defmodule Geo.JSON.Test do
     json =
       "{\"type\":\"Point\",\"crs\":{\"type\":\"name\",\"properties\":{\"name\":\"EPSG:4326\"}},\"coordinates\":[100.0, 101.0]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == {100.0, 101.0})
     assert(geom.srid == 4326)
@@ -122,8 +122,8 @@ defmodule Geo.JSON.Test do
 
   test "GeoJson to LineString and back" do
     json = "{ \"type\": \"LineString\", \"coordinates\": [ [100.0, 0.0], [101.0, 1.0] ]}"
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
     new_exjson = Geo.JSON.encode!(geom)
@@ -134,8 +134,8 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"LineStringZ\", \"coordinates\": [ [100.0, 0.0, 50.0], [101.0, 1.0, 20.0] ]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0, 50.0}, {101.0, 1.0, 20.0}])
     new_exjson = Geo.JSON.encode!(geom)
@@ -146,7 +146,7 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"LineStringZM\", \"coordinates\": [ [100.0, 0.0, 50.0, 1], [101.0, 1.0, 20.0, 2] ]}"
 
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
     assert geom.coordinates == [{100.0, 0.0, 50.0, 1}, {101.0, 1.0, 20.0, 2}]
   end
 
@@ -165,7 +165,7 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0, 1.0, null], [101.0, 0.0, 1.0, null], [101.0, 1.0, 1.0, null], [100.0, 1.0, 1.0, null], [100.0, 0.0, 1.0, null] ]]}"
 
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(
       geom.coordinates == [[{100.0, 0.0}, {101.0, 0.0}, {101.0, 1.0}, {100.0, 1.0}, {100.0, 0.0}]]
@@ -176,8 +176,8 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"Polygon\", \"coordinates\": [[ [100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0] ]]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(
       geom.coordinates == [[{100.0, 0.0}, {101.0, 0.0}, {101.0, 1.0}, {100.0, 1.0}, {100.0, 0.0}]]
@@ -189,8 +189,8 @@ defmodule Geo.JSON.Test do
 
   test "GeoJson to MultiPoint and back" do
     json = "{ \"type\": \"MultiPoint\", \"coordinates\": [ [100.0, 0.0], [101.0, 1.0] ]}"
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [{100.0, 0.0}, {101.0, 1.0}])
     new_exjson = Geo.JSON.encode!(geom)
@@ -201,8 +201,8 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"MultiLineString\", \"coordinates\": [[ [100.0, 0.0], [101.0, 1.0] ],[ [102.0, 2.0], [103.0, 3.0] ]]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(geom.coordinates == [[{100.0, 0.0}, {101.0, 1.0}], [{102.0, 2.0}, {103.0, 3.0}]])
     new_exjson = Geo.JSON.encode!(geom)
@@ -213,8 +213,8 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"MultiLineStringZ\", \"coordinates\": [[ [100.0, 0.0, 13], [101.0, 1.0, 14] ],[ [102.0, 2.0, 14], [103.0, 3.0, 13] ]]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(
       geom.coordinates == [
@@ -231,8 +231,8 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"MultiPolygon\", \"coordinates\": [[[[102.0, 2.0], [103.0, 2.0], [103.0, 3.0], [102.0, 3.0], [102.0, 2.0]]],[[[100.0, 0.0], [101.0, 0.0], [101.0, 1.0], [100.0, 1.0], [100.0, 0.0]],[[100.2, 0.2], [100.8, 0.2], [100.8, 0.8], [100.2, 0.8], [100.2, 0.2]]]]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(
       geom.coordinates == [
@@ -252,8 +252,8 @@ defmodule Geo.JSON.Test do
     json =
       "{ \"type\": \"GeometryCollection\",\"geometries\": [{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0]},{ \"type\": \"LineString\",\"coordinates\": [ [101.0, 0.0], [102.0, 1.0] ]}]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(Enum.count(geom.geometries) == 2)
 
@@ -289,8 +289,8 @@ defmodule Geo.JSON.Test do
     valid_json = "{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0] }"
     invalid_json = "{ \"type\": \"random_type\", \"coordinates\": [100.0, 0.0] }"
 
-    assert {:ok, _value} = Jason.decode!(valid_json) |> Geo.JSON.decode()
-    assert {:error, _error} = Jason.decode!(invalid_json) |> Geo.JSON.decode()
+    assert {:ok, _value} = JSON.decode!(valid_json) |> Geo.JSON.decode()
+    assert {:error, _error} = JSON.decode!(invalid_json) |> Geo.JSON.decode()
   end
 
   test "encode/1" do
@@ -303,7 +303,7 @@ defmodule Geo.JSON.Test do
 
   test "Point with properties to GeoJson" do
     geom = %Geo.Point{coordinates: {100.0, 0.0}, properties: %{hi: "there"}}
-    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+    json = Geo.JSON.encode!(geom) |> JSON.encode!()
 
     assert(
       json == "{\"coordinates\":[100.0,0.0],\"properties\":{\"hi\":\"there\"},\"type\":\"Point\"}"
@@ -314,8 +314,8 @@ defmodule Geo.JSON.Test do
     json =
       "{\"properties\":{\"hi\":\"there\"}, \"type\": \"GeometryCollection\",\"geometries\": [{ \"type\": \"Point\", \"coordinates\": [100.0, 0.0]},{ \"type\": \"LineString\",\"coordinates\": [ [101.0, 0.0], [102.0, 1.0] ]}]}"
 
-    exjson = Jason.decode!(json)
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    exjson = JSON.decode!(json)
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(Enum.count(geom.geometries) == 2)
 
@@ -380,7 +380,7 @@ defmodule Geo.JSON.Test do
         }
     """
 
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert(Enum.count(geom.geometries) == 2)
 
@@ -401,7 +401,7 @@ defmodule Geo.JSON.Test do
       }
     """
 
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
     assert is_nil(geom)
   end
 
@@ -422,7 +422,7 @@ defmodule Geo.JSON.Test do
       }
     """
 
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
     assert geom.geometries == []
   end
 
@@ -443,7 +443,7 @@ defmodule Geo.JSON.Test do
           }
         """
 
-        assert %Geo.Point{coordinates: {^x, ^y}} = Jason.decode!(json) |> Geo.JSON.decode!()
+        assert %Geo.Point{coordinates: {^x, ^y}} = JSON.decode!(json) |> Geo.JSON.decode!()
       end
     end
 
@@ -466,7 +466,7 @@ defmodule Geo.JSON.Test do
         # float coercion
         fx = 0.0 + x
         fy = 0.0 + y
-        assert %Geo.Point{coordinates: {^fx, ^fy}} = Jason.decode!(json) |> Geo.JSON.decode!()
+        assert %Geo.Point{coordinates: {^fx, ^fy}} = JSON.decode!(json) |> Geo.JSON.decode!()
       end
     end
   end
@@ -490,7 +490,7 @@ defmodule Geo.JSON.Test do
       """
 
       assert_raise ArgumentError, fn ->
-        Jason.decode!(json) |> Geo.JSON.decode!()
+        JSON.decode!(json) |> Geo.JSON.decode!()
       end
     end
   end
@@ -508,7 +508,7 @@ defmodule Geo.JSON.Test do
     """
 
     assert_raise ArgumentError, fn ->
-      Jason.decode!(json) |> Geo.JSON.decode!()
+      JSON.decode!(json) |> Geo.JSON.decode!()
     end
   end
 
@@ -533,7 +533,7 @@ defmodule Geo.JSON.Test do
 
   test "encodes and decodes back to the correct Empty Point struct" do
     geom = %Geo.Point{coordinates: nil}
-    json = Geo.JSON.encode!(geom) |> Jason.encode!()
+    json = Geo.JSON.encode!(geom) |> JSON.encode!()
 
     assert(json == "{\"coordinates\":[],\"type\":\"Point\"}")
     assert %{geom | srid: 4326} == Geo.JSON.encode!(geom) |> Geo.JSON.decode!()
@@ -654,7 +654,7 @@ defmodule Geo.JSON.Test do
     }
     """
 
-    geom = Jason.decode!(json) |> Geo.JSON.decode!()
+    geom = JSON.decode!(json) |> Geo.JSON.decode!()
 
     assert %Geo.GeometryCollection{} = geom
     assert length(geom.geometries) == 2

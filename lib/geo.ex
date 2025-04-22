@@ -56,8 +56,8 @@ defmodule Geo do
     end
   end
 
-  if Code.ensure_loaded?(Jason.Encoder) do
-    defimpl Jason.Encoder,
+  if Code.ensure_loaded?(JSON.Encoder) do
+    defimpl JSON.Encoder,
       for: [
         Geo.Point,
         Geo.PointZ,
@@ -77,7 +77,7 @@ defmodule Geo do
         Geo.GeometryCollection
       ] do
       def encode(value, opts) do
-        Jason.Encode.map(Geo.JSON.encode!(value), opts)
+        JSON.encode!(Geo.JSON.encode!(value), opts)
       end
     end
   end
