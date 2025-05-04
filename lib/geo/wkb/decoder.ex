@@ -7,11 +7,13 @@ defmodule Geo.WKB.Decoder do
   @point_z 0x80_00_00_01
   @point_zm 0xC0_00_00_01
   @line_string 0x00_00_00_02
+  @line_string_m 0x40_00_00_02
   @line_string_z 0x80_00_00_02
   @line_string_zm 0xC0_00_00_02
   @polygon 0x00_00_00_03
   @polygon_z 0x80_00_00_03
   @multi_point 0x00_00_00_04
+  @multi_point_m 0x40_00_00_04
   @multi_point_z 0x80_00_00_04
   @multi_line_string 0x00_00_00_05
   @multi_line_string_z 0x80_00_00_05
@@ -30,12 +32,14 @@ defmodule Geo.WKB.Decoder do
     PointM,
     PointZM,
     LineString,
+    LineStringM,
     LineStringZ,
     LineStringZM,
     Polygon,
     PolygonZ,
     GeometryCollection,
     MultiPoint,
+    MultiPointM,
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
@@ -138,6 +142,32 @@ defmodule Geo.WKB.Decoder do
         end)
 
       {%LineString{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @line_string_m,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(1..count, rest, fn _,
+                                           <<x::unquote(modifier)-float-64,
+                                             y::unquote(modifier)-float-64,
+                                             z::unquote(modifier)-float-64, rest::bits>> ->
+          {%PointM{coordinates: coordinates}, _rest} =
+            do_decode(
+              @point_m,
+              <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+                z::unquote(modifier)-float-64>>,
+              nil,
+              unquote(endian)
+            )
+
+          {coordinates, rest}
+        end)
+
+      {%LineStringM{coordinates: coordinates, srid: srid}, rest}
     end
 
     defp do_decode(
@@ -259,6 +289,22 @@ defmodule Geo.WKB.Decoder do
         end)
 
       {%MultiPoint{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_point_m,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%PointM{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiPointM{coordinates: coordinates, srid: srid}, rest}
     end
 
     defp do_decode(

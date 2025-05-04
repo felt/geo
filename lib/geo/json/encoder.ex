@@ -5,11 +5,13 @@ defmodule Geo.JSON.Encoder do
     Point,
     PointZ,
     LineString,
+    LineStringM,
     LineStringZ,
     LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
+    MultiPointM,
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
@@ -142,6 +144,12 @@ defmodule Geo.JSON.Encoder do
     %{"type" => "LineString", "coordinates" => coordinates}
   end
 
+  defp do_encode(%LineStringM{coordinates: coordinates}) do
+    coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
+
+    %{"type" => "LineStringM", "coordinates" => coordinates}
+  end
+
   defp do_encode(%LineStringZ{coordinates: coordinates}) do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
@@ -177,6 +185,12 @@ defmodule Geo.JSON.Encoder do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
     %{"type" => "MultiPoint", "coordinates" => coordinates}
+  end
+
+  defp do_encode(%MultiPointM{coordinates: coordinates}) do
+    coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
+
+    %{"type" => "MultiPointM", "coordinates" => coordinates}
   end
 
   defp do_encode(%MultiPointZ{coordinates: coordinates}) do
