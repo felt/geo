@@ -176,6 +176,122 @@ defmodule Geo.WKT.Test do
     assert(geom.srid == 4326)
   end
 
+  test "Encode MultiLineStringZ to WKT" do
+    geom = %Geo.MultiLineStringZ{
+      coordinates: [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    }
+
+    assert(
+      Geo.WKT.encode!(geom) ==
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+    )
+  end
+
+  test "Decode WKT to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+  end
+
+  test "Decode WKT with spaces between LineStrings to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60), (40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+  end
+
+  test "Decode EWKT to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "SRID=4326;MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+
+    assert(geom.srid == 4326)
+  end
+
+  test "Encode MultiLineStringZM to WKT" do
+    geom = %Geo.MultiLineStringZM{
+      coordinates: [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    }
+
+    assert(
+      Geo.WKT.encode!(geom) ==
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+    )
+  end
+
+  test "Decode WKT to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+  end
+
+  test "Decode WKT with spaces between LineStrings to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3), (40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+  end
+
+  test "Decode EWKT to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "SRID=4326;MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+
+    assert(geom.srid == 4326)
+  end
+
   test "Encode MultiPolygon to WKT" do
     geom = %Geo.MultiPolygon{
       coordinates: [

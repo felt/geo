@@ -15,6 +15,7 @@ defmodule Geo.WKB.Decoder do
   @multi_point_z 0x80_00_00_04
   @multi_line_string 0x00_00_00_05
   @multi_line_string_z 0x80_00_00_05
+  @multi_line_string_zm 0xC0_00_00_05
   @multi_polygon 0x00_00_00_06
   @multi_polygon_z 0x80_00_00_06
   @geometry_collection 0x00_00_00_07
@@ -38,6 +39,7 @@ defmodule Geo.WKB.Decoder do
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
+    MultiLineStringZM,
     MultiPolygon,
     MultiPolygonZ
   }
@@ -163,6 +165,14 @@ defmodule Geo.WKB.Decoder do
 
       {%LineStringZ{coordinates: coordinates, srid: srid}, rest}
     end
+
+    defp do_decode(
+           @line_string_zm,
+           <<0::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ),
+         do: {%LineStringZM{coordinates: [], srid: srid}, rest}
 
     defp do_decode(
            @line_string_zm,
@@ -297,6 +307,22 @@ defmodule Geo.WKB.Decoder do
         end)
 
       {%MultiLineStringZ{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
+           @multi_line_string_zm,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%LineStringZM{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiLineStringZM{coordinates: coordinates, srid: srid}, rest}
     end
 
     defp do_decode(
