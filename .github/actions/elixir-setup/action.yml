@@ -64,7 +64,7 @@ runs:
         otp-version: ${{ inputs.otp-version }}
 
     - name: Get deps cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: deps/
         key: deps-${{ inputs.cache-key }}-${{ runner.os }}-${{ hashFiles('**/mix.lock') }}
@@ -72,7 +72,7 @@ runs:
           deps-${{ inputs.cache-key }}-${{ runner.os }}-
 
     - name: Get build cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: build-cache
       with:
         path: _build/${{env.MIX_ENV}}/
@@ -81,7 +81,7 @@ runs:
           build-${{ inputs.cache-key }}-${{ runner.os }}-${{ inputs.otp-version }}-${{ inputs.elixir-version }}-${{ env.MIX_ENV }}-
 
     - name: Get Hex cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: hex-cache
       with:
         path: ~/.hex
@@ -90,7 +90,7 @@ runs:
           hex-${{ inputs.cache-key }}-${{ runner.os }}-${{ inputs.otp-version }}-${{ inputs.elixir-version }}-
 
     - name: Get Mix cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       id: mix-cache
       with:
         path: ${{ env.MIX_HOME || '~/.mix' }}

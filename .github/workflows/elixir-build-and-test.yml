@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Elixir Unit Tests
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     env:
       MIX_ENV: test
     strategy:
@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup Elixir Project
         uses: ./.github/actions/elixir-setup
