@@ -2,6 +2,23 @@ defmodule Geo.Utils.Test do
   use ExUnit.Case, async: true
   use ExUnitProperties
 
+  describe "string_to_float/1" do
+    test "can convert a textual float" do
+      assert {:ok, +0.0} == Geo.Utils.string_to_float("0.0")
+      assert {:ok, 12.34} == Geo.Utils.string_to_float("12.34")
+    end
+
+    test "can convert a textual integer" do
+      assert {:ok, +0.0} == Geo.Utils.string_to_float("0")
+      assert {:ok, 12.0} == Geo.Utils.string_to_float("12")
+    end
+
+    test "can handle badly formatted float" do
+      assert {:error, :bad_arg} == Geo.Utils.string_to_float("0.x")
+      assert {:error, :bad_arg} == Geo.Utils.string_to_float("11f")
+    end
+  end
+
   test "Hex String to Float Conversion" do
     assert(Geo.Utils.hex_to_float("40000000") == 2.0)
     assert(Geo.Utils.hex_to_float("C0000000") == -2.0)

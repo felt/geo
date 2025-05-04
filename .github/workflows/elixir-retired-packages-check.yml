@@ -1,0 +1,32 @@
+name: Elixir Retired Packages Check
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  retired_packages:
+    name: Elixir Retired Packages Check
+    runs-on: ubuntu-latest
+    env:
+      MIX_ENV: dev
+      elixir: "1.15.4"
+      otp: "26.0.2"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Elixir Project
+        uses: ./.github/actions/elixir-setup
+        with:
+          elixir-version: ${{ env.elixir }}
+          otp-version: ${{ env.otp }}
+          build-app: false
+
+      - name: Check for retired/abandoned deps
+        run: mix hex.audit

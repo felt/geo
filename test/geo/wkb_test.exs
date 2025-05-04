@@ -222,6 +222,18 @@ defmodule Geo.WKB.Test do
     )
   end
 
+  test "Encode empty LineStringZM to WKB" do
+    geom = %Geo.LineStringZM{coordinates: []}
+
+    assert(Geo.WKB.encode!(geom, :ndr) == "01020000C000000000")
+  end
+
+  test "Decode WKB to empty LineStringZM" do
+    point = Geo.WKB.decode!("01020000C000000000")
+
+    assert(point.coordinates == [])
+  end
+
   test "Decode WKB to Polygon" do
     point =
       Geo.WKB.decode!(
@@ -469,6 +481,52 @@ defmodule Geo.WKB.Test do
     )
   end
 
+  test "Decode WKB to MultiLineStringZM" do
+    geom =
+      Geo.WKB.decode!(
+        "00C00000050000000200C0000002000000024024000000000000402400000000000040240000000000003FF0000000000000403400000000000040340000000000004034000000000000400000000000000000C000000200000002402E000000000000402E000000000000402E0000000000004008000000000000403E000000000000402E00000000000040240000000000004010000000000000"
+      )
+
+    expected_coords = [[{10, 10, 10, 1}, {20, 20, 20, 2}], [{15, 15, 15, 3}, {30, 15, 10, 4}]]
+
+    assert(geom.coordinates == expected_coords)
+  end
+
+  test "Encode MultiLineStringZM to WKB" do
+    geom = %Geo.MultiLineStringZM{
+      coordinates: [[{10, 10, 10, 1}, {20, 20, 20, 2}], [{15, 15, 15, 3}, {30, 15, 10, 4}]]
+    }
+
+    assert(
+      Geo.WKB.encode!(geom) ==
+        "00C00000050000000200C0000002000000024024000000000000402400000000000040240000000000003FF0000000000000403400000000000040340000000000004034000000000000400000000000000000C000000200000002402E000000000000402E000000000000402E0000000000004008000000000000403E000000000000402E00000000000040240000000000004010000000000000"
+    )
+  end
+
+  test "Decode EWKB to MultiLineStringZM" do
+    geom =
+      Geo.WKB.decode!(
+        "01050000E0E61000000200000001020000C002000000000000000000244000000000000024400000000000002440000000000000F03F000000000000344000000000000034400000000000003440000000000000004001020000C0020000000000000000002E400000000000002E400000000000002E4000000000000008400000000000003E400000000000002E4000000000000024400000000000001040"
+      )
+
+    expected_coords = [[{10, 10, 10, 1}, {20, 20, 20, 2}], [{15, 15, 15, 3}, {30, 15, 10, 4}]]
+
+    assert(geom.coordinates == expected_coords)
+    assert(geom.srid == 4326)
+  end
+
+  test "Encode MultiLineStringZM to EWKB" do
+    geom = %Geo.MultiLineStringZM{
+      coordinates: [[{10, 10, 10, 1}, {20, 20, 20, 2}], [{15, 15, 15, 3}, {30, 15, 10, 4}]],
+      srid: 4326
+    }
+
+    assert(
+      Geo.WKB.encode!(geom, :ndr) ==
+        "01050000E0E61000000200000001020000C002000000000000000000244000000000000024400000000000002440000000000000F03F000000000000344000000000000034400000000000003440000000000000004001020000C0020000000000000000002E400000000000002E400000000000002E4000000000000008400000000000003E400000000000002E4000000000000024400000000000001040"
+    )
+  end
+
   test "Decode WKB to MultiLineStringZ" do
     geom =
       Geo.WKB.decode!(
@@ -543,6 +601,12 @@ defmodule Geo.WKB.Test do
       ]
     )
 
+    assert(point.srid == 4326)
+  end
+
+  test "Decode empty Point EWKB to Point" do
+    point = Geo.WKB.decode!("0101000020E6100000000000000000F87F000000000000F87F")
+    assert(point.coordinates == nil)
     assert(point.srid == 4326)
   end
 
@@ -749,6 +813,22 @@ defmodule Geo.WKB.Test do
     assert {:ok, "0101000000000000000000F03F000000000000F03F"} = Geo.WKB.encode(geom, :ndr)
   end
 
+  test "Encode/Decode Empty Point in big endian" do
+    geom = %Geo.Point{coordinates: nil}
+    geom_wkb = "00000000017FF80000000000007FF8000000000000"
+
+    assert Geo.WKB.encode!(geom, :xdr) == geom_wkb
+    assert Geo.WKB.decode!(geom_wkb) == geom
+  end
+
+  test "Encode/Decode Empty Point in little endian" do
+    geom = %Geo.Point{coordinates: nil}
+    geom_wkb = "00000000017FF80000000000007FF8000000000000"
+
+    assert Geo.WKB.encode!(geom, :xdr) == geom_wkb
+    assert Geo.WKB.decode!(geom_wkb) == geom
+  end
+
   property "encodes and decodes back to the correct Point struct" do
     check all(
             x <- float(),
@@ -803,6 +883,13 @@ defmodule Geo.WKB.Test do
   property "encodes and decodes back to the correct LineStringZ struct" do
     check all(list <- list_of({float(), float(), float()}, min_length: 1)) do
       geom = %Geo.LineStringZ{coordinates: list}
+      assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
+    end
+  end
+
+  property "encodes and decodes back to the correct LineStringZM struct" do
+    check all(list <- list_of({float(), float(), float(), float()}, min_length: 1)) do
+      geom = %Geo.LineStringZM{coordinates: list}
       assert geom == Geo.WKB.encode!(geom) |> Geo.WKB.decode!()
     end
   end

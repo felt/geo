@@ -10,12 +10,14 @@ defmodule Geo do
           | Geo.PointZM.t()
           | Geo.LineString.t()
           | Geo.LineStringZ.t()
+          | Geo.LineStringZM.t()
           | Geo.Polygon.t()
           | Geo.PolygonZ.t()
           | Geo.MultiPoint.t()
           | Geo.MultiPointZ.t()
           | Geo.MultiLineString.t()
           | Geo.MultiLineStringZ.t()
+          | Geo.MultiLineStringZM.t()
           | Geo.MultiPolygon.t()
           | Geo.MultiPolygonZ.t()
           | Geo.GeometryCollection.t()
@@ -29,7 +31,7 @@ defmodule Geo do
   """
   @type endian :: :ndr | :xdr
 
-  if Application.get_env(:geo, :impl_to_string, true) do
+  if Application.compile_env(:geo, :impl_to_string, true) do
     defimpl String.Chars,
       for: [
         Geo.Point,
@@ -38,6 +40,7 @@ defmodule Geo do
         Geo.PointZM,
         Geo.LineString,
         Geo.LineStringZ,
+        Geo.LineStringZM,
         Geo.Polygon,
         Geo.PolygonZ,
         Geo.MultiPoint,
@@ -63,6 +66,7 @@ defmodule Geo do
         Geo.PointZM,
         Geo.LineString,
         Geo.LineStringZ,
+        Geo.LineStringZM,
         Geo.Polygon,
         Geo.PolygonZ,
         Geo.MultiPoint,

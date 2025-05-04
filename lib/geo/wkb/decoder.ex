@@ -1,6 +1,7 @@
 defmodule Geo.WKB.Decoder do
   @moduledoc false
 
+  # these numbers can be referenced against postgis.git/doc/ZMSgeoms.txt
   @point 0x00_00_00_01
   @point_m 0x40_00_00_01
   @point_z 0x80_00_00_01
@@ -8,6 +9,7 @@ defmodule Geo.WKB.Decoder do
   @line_string 0x00_00_00_02
   @line_string_m 0x40_00_00_02
   @line_string_z 0x80_00_00_02
+  @line_string_zm 0xC0_00_00_02
   @polygon 0x00_00_00_03
   @polygon_z 0x80_00_00_03
   @multi_point 0x00_00_00_04
@@ -15,13 +17,14 @@ defmodule Geo.WKB.Decoder do
   @multi_point_z 0x80_00_00_04
   @multi_line_string 0x00_00_00_05
   @multi_line_string_z 0x80_00_00_05
+  @multi_line_string_zm 0xC0_00_00_05
   @multi_polygon 0x00_00_00_06
   @multi_polygon_z 0x80_00_00_06
   @geometry_collection 0x00_00_00_07
 
   @wkbsridflag 0x20000000
 
-  use Bitwise
+  import Bitwise
 
   alias Geo.{
     Point,
@@ -31,6 +34,7 @@ defmodule Geo.WKB.Decoder do
     LineString,
     LineStringM,
     LineStringZ,
+    LineStringZM,
     Polygon,
     PolygonZ,
     GeometryCollection,
@@ -39,6 +43,7 @@ defmodule Geo.WKB.Decoder do
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
+    MultiLineStringZM,
     MultiPolygon,
     MultiPolygonZ
   }
@@ -192,6 +197,41 @@ defmodule Geo.WKB.Decoder do
     end
 
     defp do_decode(
+           @line_string_zm,
+           <<0::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ),
+         do: {%LineStringZM{coordinates: [], srid: srid}, rest}
+
+    defp do_decode(
+           @line_string_zm,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(1..count, rest, fn _,
+                                           <<x::unquote(modifier)-float-64,
+                                             y::unquote(modifier)-float-64,
+                                             z::unquote(modifier)-float-64,
+                                             m::unquote(modifier)-float-64, rest::bits>> ->
+          {%PointZM{coordinates: coordinates}, _rest} =
+            do_decode(
+              @point_zm,
+              <<x::unquote(modifier)-float-64, y::unquote(modifier)-float-64,
+                z::unquote(modifier)-float-64, m::unquote(modifier)-float-64>>,
+              nil,
+              unquote(endian)
+            )
+
+          {coordinates, rest}
+        end)
+
+      {%LineStringZM{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
            @polygon,
            <<count::unquote(modifier)-32, rest::bits>>,
            srid,
@@ -316,6 +356,22 @@ defmodule Geo.WKB.Decoder do
     end
 
     defp do_decode(
+           @multi_line_string_zm,
+           <<count::unquote(modifier)-32, rest::bits>>,
+           srid,
+           unquote(endian)
+         ) do
+      {coordinates, rest} =
+        Enum.map_reduce(List.duplicate(1, count), rest, fn _, <<rest::bits>> ->
+          {%LineStringZM{coordinates: coordinates}, rest} = decode(rest)
+
+          {coordinates, rest}
+        end)
+
+      {%MultiLineStringZM{coordinates: coordinates, srid: srid}, rest}
+    end
+
+    defp do_decode(
            @multi_polygon,
            <<count::unquote(modifier)-32, rest::bits>>,
            srid,
@@ -362,5 +418,28 @@ defmodule Geo.WKB.Decoder do
 
       {%GeometryCollection{geometries: geometries, srid: srid}, rest}
     end
+  end
+
+  defp do_decode(
+         @point,
+         <<0, 0, 0, 0, 0, 0, 248, 127, 0, 0, 0, 0, 0, 0, 248, 127, rest::bits>>,
+         srid,
+         1
+       ) do
+    {%Point{coordinates: nil, srid: srid}, rest}
+  end
+
+  defp do_decode(
+         @point,
+         binary,
+         srid,
+         0
+       ) do
+    little_binary =
+      binary
+      |> :binary.decode_unsigned(:big)
+      |> :binary.encode_unsigned(:little)
+
+    do_decode(@point, little_binary, srid, 1)
   end
 end

@@ -192,6 +192,122 @@ defmodule Geo.WKT.Test do
     assert(geom.srid == 4326)
   end
 
+  test "Encode MultiLineStringZ to WKT" do
+    geom = %Geo.MultiLineStringZ{
+      coordinates: [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    }
+
+    assert(
+      Geo.WKT.encode!(geom) ==
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+    )
+  end
+
+  test "Decode WKT to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+  end
+
+  test "Decode WKT with spaces between LineStrings to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60), (40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+  end
+
+  test "Decode EWKT to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "SRID=4326;MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+
+    assert(geom.srid == 4326)
+  end
+
+  test "Encode MultiLineStringZM to WKT" do
+    geom = %Geo.MultiLineStringZM{
+      coordinates: [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    }
+
+    assert(
+      Geo.WKT.encode!(geom) ==
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+    )
+  end
+
+  test "Decode WKT to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+  end
+
+  test "Decode WKT with spaces between LineStrings to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3), (40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+  end
+
+  test "Decode EWKT to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "SRID=4326;MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+
+    assert(geom.srid == 4326)
+  end
+
   test "Encode MultiPolygon to WKT" do
     geom = %Geo.MultiPolygon{
       coordinates: [
@@ -294,52 +410,78 @@ defmodule Geo.WKT.Test do
   end
 
   property "encodes and decodes back to the correct Point struct" do
-    check all x <- float(),
-              y <- float() do
+    check all(
+            x <- float(),
+            y <- float()
+          ) do
       geom = %Geo.Point{coordinates: {x, y}}
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end
   end
 
   property "encodes and decodes back to the correct PointM struct" do
-    check all x <- float(),
-              y <- float(),
-              m <- float() do
+    check all(
+            x <- float(),
+            y <- float(),
+            m <- float()
+          ) do
       geom = %Geo.PointM{coordinates: {x, y, m}}
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end
   end
 
   property "encodes and decodes back to the correct PointZ struct" do
-    check all x <- float(),
-              y <- float(),
-              z <- float() do
+    check all(
+            x <- float(),
+            y <- float(),
+            z <- float()
+          ) do
       geom = %Geo.PointZ{coordinates: {x, y, z}}
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end
   end
 
   property "encodes and decodes back to the correct PointZM struct" do
-    check all x <- float(),
-              y <- float(),
-              z <- float(),
-              m <- float() do
+    check all(
+            x <- float(),
+            y <- float(),
+            z <- float(),
+            m <- float()
+          ) do
       geom = %Geo.PointZM{coordinates: {x, y, z, m}}
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end
   end
 
   property "encodes and decodes back to the correct LineString struct" do
-    check all list <- list_of({float(), float()}, min_length: 1) do
+    check all(list <- list_of({float(), float()}, min_length: 1)) do
       geom = %Geo.LineString{coordinates: list}
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end
   end
 
   property "encodes and decodes back to the correct LineStringZ struct" do
-    check all list <- list_of({float(), float(), float()}, min_length: 1) do
+    check all(list <- list_of({float(), float(), float()}, min_length: 1)) do
       geom = %Geo.LineStringZ{coordinates: list}
       assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
     end
+  end
+
+  property "encodes and decodes back to the correct LineStringZM struct" do
+    check all(list <- list_of({float(), float(), float(), float()}, min_length: 1)) do
+      geom = %Geo.LineStringZM{coordinates: list}
+      assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+    end
+  end
+
+  test "check LineString regression on Elixir 1.134 + OTP 24.3.4" do
+    geom = %Geo.LineString{coordinates: [{6.082409157592909e19, 1.2576001607965288e20}]}
+    assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
+
+    geom = %Geo.LineStringZ{
+      coordinates: [{6.082409157592909e19, 1.2576001607965288e20, -0.20340391884184397}]
+    }
+
+    assert geom == Geo.WKT.encode!(geom) |> Geo.WKT.decode!()
   end
 end

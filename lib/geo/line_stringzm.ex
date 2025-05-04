@@ -1,10 +1,10 @@
-defmodule Geo.PolygonZ do
+defmodule Geo.LineStringZM do
   @moduledoc """
-  Defines the PolygonZ struct.
+  Defines the LineStringZM struct.
   """
 
   @type t :: %__MODULE__{
-          coordinates: [[{number, number, number}]],
+          coordinates: [{number, number, number, number}],
           srid: integer | nil,
           properties: map
         }

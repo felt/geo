@@ -7,6 +7,7 @@ defmodule Geo.JSON.Encoder do
     LineString,
     LineStringM,
     LineStringZ,
+    LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
@@ -14,6 +15,7 @@ defmodule Geo.JSON.Encoder do
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
+    MultiLineStringZM,
     MultiPolygon,
     MultiPolygonZ,
     GeometryCollection
@@ -128,6 +130,10 @@ defmodule Geo.JSON.Encoder do
     %{"type" => "Point", "coordinates" => [x, y]}
   end
 
+  defp do_encode(%Point{coordinates: nil}) do
+    %{"type" => "Point", "coordinates" => []}
+  end
+
   defp do_encode(%PointZ{coordinates: {x, y, z}}) do
     %{"type" => "Point", "coordinates" => [x, y, z]}
   end
@@ -148,6 +154,13 @@ defmodule Geo.JSON.Encoder do
     coordinates = Enum.map(coordinates, &Tuple.to_list(&1))
 
     %{"type" => "LineStringZ", "coordinates" => coordinates}
+  end
+
+  defp do_encode(%LineStringZM{coordinates: coordinates}) do
+    # GeoJSON does not allow "m", and does not recognize "LineStringZM" as
+    # a type 
+    coordinates = Enum.map(coordinates, fn {x, y, z, _m} -> [x, y, z] end)
+    %{"type" => "LineString", "coordinates" => coordinates}
   end
 
   defp do_encode(%Polygon{coordinates: coordinates}) do
@@ -202,6 +215,15 @@ defmodule Geo.JSON.Encoder do
       end)
 
     %{"type" => "MultiLineStringZ", "coordinates" => coordinates}
+  end
+
+  defp do_encode(%MultiLineStringZM{coordinates: coordinates}) do
+    coordinates =
+      Enum.map(coordinates, fn sub_coordinates ->
+        Enum.map(sub_coordinates, &Tuple.to_list(&1))
+      end)
+
+    %{"type" => "MultiLineStringZM", "coordinates" => coordinates}
   end
 
   defp do_encode(%MultiPolygon{coordinates: coordinates}) do
