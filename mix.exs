@@ -40,6 +40,7 @@ defmodule Geo.Mixfile do
   defp package do
     # These are the default files included in the package
     [
+      {:jason, "~> 1.4", optional: true},
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
       maintainers: ["Tyler Young", "Bryan Joseph"],
       licenses: ["MIT"],
