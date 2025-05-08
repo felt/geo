@@ -31,6 +31,7 @@ defmodule Geo.Mixfile do
 
   defp deps do
     [
+      {:jason, "~> 1.4", optional: true},
       {:ex_doc, "~> 0.29", only: :dev, runtime: false},
       {:stream_data, "~> 0.5 or ~> 1.0", only: :test, runtime: false},
       {:benchee, "~> 1.1", only: :dev, runtime: false}
@@ -40,7 +41,6 @@ defmodule Geo.Mixfile do
   defp package do
     # These are the default files included in the package
     [
-      {:jason, "~> 1.4", optional: true},
       files: ["lib", "mix.exs", "README.md", "CHANGELOG.md"],
       maintainers: ["Tyler Young", "Bryan Joseph"],
       licenses: ["MIT"],
