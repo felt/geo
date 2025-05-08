@@ -7,14 +7,17 @@ defmodule Geo.WKB.Encoder do
   @point_z 0x80_00_00_01
   @point_zm 0xC0_00_00_01
   @line_string 0x00_00_00_02
+  @line_string_m 0x40_00_00_02
   @line_string_z 0x80_00_00_02
   @line_string_zm 0xC0_00_00_02
   @polygon 0x00_00_00_03
   @polygon_z 0x80_00_00_03
   @multi_point 0x00_00_00_04
+  @multi_point_m 0x40_00_00_04
   @multi_point_z 0x80_00_00_04
   @multi_line_string 0x00_00_00_05
   @multi_line_string_z 0x80_00_00_05
+  @multi_line_string_zm 0xC0_00_00_05
   @multi_polygon 0x00_00_00_06
   @multi_polygon_z 0x80_00_00_06
   @geometry_collection 0x00_00_00_07
@@ -27,14 +30,17 @@ defmodule Geo.WKB.Encoder do
     PointM,
     PointZM,
     LineString,
+    LineStringM,
     LineStringZ,
     LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
+    MultiPointM,
     MultiPointZ,
     MultiLineString,
     MultiLineStringZ,
+    MultiLineStringZM,
     MultiPolygon,
     MultiPolygonZ,
     GeometryCollection
@@ -107,6 +113,19 @@ defmodule Geo.WKB.Encoder do
       {@line_string, [<<count::unquote(modifier)-32>> | coordinates]}
     end
 
+    def do_encode(%LineStringM{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn {x, y, z}, acc ->
+          {[
+             <<x::unquote(modifier)-float-64>>,
+             <<y::unquote(modifier)-float-64>>,
+             <<z::unquote(modifier)-float-64>>
+           ], acc + 1}
+        end)
+
+      {@line_string_m, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
     def do_encode(%LineStringZ{coordinates: coordinates}, unquote(endian_atom)) do
       {coordinates, count} =
         Enum.map_reduce(coordinates, 0, fn {x, y, z}, acc ->
@@ -164,6 +183,16 @@ defmodule Geo.WKB.Encoder do
       {@multi_point, [<<count::unquote(modifier)-32>> | coordinates]}
     end
 
+    def do_encode(%MultiPointM{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          point = encode!(%PointM{coordinates: coordinate}, unquote(endian_atom))
+          {point, acc + 1}
+        end)
+
+      {@multi_point_m, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
     def do_encode(%MultiPointZ{coordinates: coordinates}, unquote(endian_atom)) do
       {coordinates, count} =
         Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
@@ -192,6 +221,16 @@ defmodule Geo.WKB.Encoder do
         end)
 
       {@multi_line_string_z, [<<count::unquote(modifier)-32>> | coordinates]}
+    end
+
+    def do_encode(%MultiLineStringZM{coordinates: coordinates}, unquote(endian_atom)) do
+      {coordinates, count} =
+        Enum.map_reduce(coordinates, 0, fn coordinate, acc ->
+          geom = encode!(%LineStringZM{coordinates: coordinate}, unquote(endian_atom))
+          {geom, acc + 1}
+        end)
+
+      {@multi_line_string_zm, [<<count::unquote(modifier)-32>> | coordinates]}
     end
 
     def do_encode(%MultiPolygon{coordinates: coordinates}, unquote(endian_atom)) do
