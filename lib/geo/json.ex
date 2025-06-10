@@ -12,14 +12,14 @@ defmodule Geo.JSON do
 
   ## Examples
 
-      # Using JSON as the JSON parser for these examples
+      # Using JSON or Jason as the JSON parser for these examples
 
       iex> json = "{ \\"type\\": \\"Point\\", \\"coordinates\\": [100.0, 0.0] }"
-      ...> json |> JSON.decode!() |> Geo.JSON.decode!()
+      ...> json |> (if Code.ensure_loaded?(JSON), do: JSON, else: Jason).decode!() |> Geo.JSON.decode!()
       %Geo.Point{coordinates: {100.0, 0.0}, srid: 4326}
 
       iex> geom = %Geo.Point{coordinates: {100.0, 0.0}, srid: nil}
-      ...> JSON.encode!(geom)
+      ...> (if Code.ensure_loaded?(JSON), do: JSON, else: Jason).encode!(geom)
       "{\\"coordinates\\":[100.0,0.0],\\"type\\":\\"Point\\"}"
 
       iex> geom = %Geo.Point{coordinates: {100.0, 0.0}, srid: nil}
