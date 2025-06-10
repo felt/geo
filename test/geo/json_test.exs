@@ -485,7 +485,8 @@ defmodule Geo.JSON.Test do
           }
         """
 
-        assert %Geo.Point{coordinates: {^x, ^y}} = @json_module.decode!(json) |> Geo.JSON.decode!()
+        assert %Geo.Point{coordinates: {^x, ^y}} =
+                 @json_module.decode!(json) |> Geo.JSON.decode!()
       end
     end
 
@@ -508,7 +509,9 @@ defmodule Geo.JSON.Test do
         # float coercion
         fx = 0.0 + x
         fy = 0.0 + y
-        assert %Geo.Point{coordinates: {^fx, ^fy}} = @json_module.decode!(json) |> Geo.JSON.decode!()
+
+        assert %Geo.Point{coordinates: {^fx, ^fy}} =
+                 @json_module.decode!(json) |> Geo.JSON.decode!()
       end
     end
   end
