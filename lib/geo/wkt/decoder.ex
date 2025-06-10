@@ -7,13 +7,17 @@ defmodule Geo.WKT.Decoder do
     PointM,
     PointZM,
     LineString,
+    LineStringM,
     LineStringZ,
     LineStringZM,
     Polygon,
     PolygonZ,
     MultiPoint,
+    MultiPointM,
     MultiPointZ,
     MultiLineString,
+    MultiLineStringZ,
+    MultiLineStringZM,
     MultiPolygon,
     MultiPolygonZ,
     GeometryCollection
@@ -64,6 +68,10 @@ defmodule Geo.WKT.Decoder do
     %Point{coordinates: create_point(coordinates), srid: srid}
   end
 
+  defp do_decode("LINESTRINGM" <> coordinates, srid) do
+    %LineStringM{coordinates: create_line_string(coordinates), srid: srid}
+  end
+
   defp do_decode("LINESTRINGZM" <> coordinates, srid) do
     %LineStringZM{coordinates: create_line_string(coordinates), srid: srid}
   end
@@ -84,16 +92,28 @@ defmodule Geo.WKT.Decoder do
     %Polygon{coordinates: create_polygon(coordinates), srid: srid}
   end
 
+  defp do_decode("MULTIPOINTM" <> coordinates, srid) do
+    %MultiPointM{coordinates: create_line_string(coordinates), srid: srid}
+  end
+
   defp do_decode("MULTIPOINTZ" <> coordinates, srid) do
     %MultiPointZ{coordinates: create_line_string(coordinates), srid: srid}
   end
 
-  defp do_decode("MULTILINESTRING" <> coordinates, srid) do
-    %MultiLineString{coordinates: create_polygon(coordinates), srid: srid}
-  end
-
   defp do_decode("MULTIPOINT" <> coordinates, srid) do
     %MultiPoint{coordinates: create_line_string(coordinates), srid: srid}
+  end
+
+  defp do_decode("MULTILINESTRINGZM" <> coordinates, srid) do
+    %MultiLineStringZM{coordinates: create_polygon(coordinates), srid: srid}
+  end
+
+  defp do_decode("MULTILINESTRINGZ" <> coordinates, srid) do
+    %MultiLineStringZ{coordinates: create_polygon(coordinates), srid: srid}
+  end
+
+  defp do_decode("MULTILINESTRING" <> coordinates, srid) do
+    %MultiLineString{coordinates: create_polygon(coordinates), srid: srid}
   end
 
   defp do_decode("MULTIPOLYGONZ" <> coordinates, srid) do

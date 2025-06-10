@@ -130,6 +130,22 @@ defmodule Geo.WKT.Test do
     assert(geom.srid == 4326)
   end
 
+  test "Encode MultiPointM to WKT" do
+    geom = %Geo.MultiPointM{coordinates: [{0, 0, 100}, {20, 20, 200}]}
+    assert(Geo.WKT.encode!(geom) == "MULTIPOINTM(0 0 100,20 20 200)")
+  end
+
+  test "Decode WKT to MultiPointM" do
+    geom = Geo.WKT.decode!("MULTIPOINTM(0 0 100,20 20 200)")
+    assert(geom.coordinates == [{0, 0, 100}, {20, 20, 200}])
+  end
+
+  test "Decode EWKT to MultiPointM" do
+    geom = Geo.WKT.decode!("SRID=4326;MULTIPOINTM(0 0 100,20 20 200)")
+    assert(geom.coordinates == [{0, 0, 100}, {20, 20, 200}])
+    assert(geom.srid == 4326)
+  end
+
   test "Encode MultiLineString to WKT" do
     geom = %Geo.MultiLineString{
       coordinates: [[{10, 10}, {20, 20}, {10, 40}], [{40, 40}, {30, 30}, {40, 20}, {30, 10}]]
@@ -170,6 +186,122 @@ defmodule Geo.WKT.Test do
       geom.coordinates == [
         [{10, 10}, {20, 20}, {10, 40}],
         [{40, 40}, {30, 30}, {40, 20}, {30, 10}]
+      ]
+    )
+
+    assert(geom.srid == 4326)
+  end
+
+  test "Encode MultiLineStringZ to WKT" do
+    geom = %Geo.MultiLineStringZ{
+      coordinates: [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    }
+
+    assert(
+      Geo.WKT.encode!(geom) ==
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+    )
+  end
+
+  test "Decode WKT to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+  end
+
+  test "Decode WKT with spaces between LineStrings to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60), (40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+  end
+
+  test "Decode EWKT to MultiLineStringZ" do
+    geom =
+      Geo.WKT.decode!(
+        "SRID=4326;MULTILINESTRINGZ((10 10 10,20 20 20,10 40 60),(40 40 40,30 30 30,40 20 40,30 10 20))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10}, {20, 20, 20}, {10, 40, 60}],
+        [{40, 40, 40}, {30, 30, 30}, {40, 20, 40}, {30, 10, 20}]
+      ]
+    )
+
+    assert(geom.srid == 4326)
+  end
+
+  test "Encode MultiLineStringZM to WKT" do
+    geom = %Geo.MultiLineStringZM{
+      coordinates: [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    }
+
+    assert(
+      Geo.WKT.encode!(geom) ==
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+    )
+  end
+
+  test "Decode WKT to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+  end
+
+  test "Decode WKT with spaces between LineStrings to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3), (40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
+      ]
+    )
+  end
+
+  test "Decode EWKT to MultiLineStringZM" do
+    geom =
+      Geo.WKT.decode!(
+        "SRID=4326;MULTILINESTRINGZM((10 10 10 1,20 20 20 2,10 40 60 3),(40 40 40 4,30 30 30 5,40 20 40 6,30 10 20 7))"
+      )
+
+    assert(
+      geom.coordinates == [
+        [{10, 10, 10, 1}, {20, 20, 20, 2}, {10, 40, 60, 3}],
+        [{40, 40, 40, 4}, {30, 30, 30, 5}, {40, 20, 40, 6}, {30, 10, 20, 7}]
       ]
     )
 
