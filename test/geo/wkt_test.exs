@@ -2,6 +2,20 @@ defmodule Geo.WKT.Test do
   use ExUnit.Case, async: false
   use ExUnitProperties
 
+  test "Encodes nil coordinate geometries as EMPTY" do
+    geom = %Geo.Point{coordinates: nil}
+    assert(Geo.WKT.encode!(geom) == "POINT EMPTY")
+
+    geom = %Geo.Polygon{coordinates: nil}
+    assert(Geo.WKT.encode!(geom) == "POLYGON EMPTY")
+
+    geom = %Geo.Polygon{coordinates: []}
+    assert(Geo.WKT.encode!(geom) == "POLYGON EMPTY")
+
+    geom = %Geo.LineStringZM{coordinates: nil}
+    assert(Geo.WKT.encode!(geom) == "LINESTRINGZM EMPTY")
+  end
+
   test "Encode Point to WKT" do
     geom = %Geo.Point{coordinates: {30, -90}}
     assert(Geo.WKT.encode!(geom) == "POINT(30 -90)")
