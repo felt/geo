@@ -67,6 +67,14 @@ defmodule Geo.WKT.Test do
     assert(Geo.WKT.encode!(geom) == "LINESTRING(30 10,10 30,40 40)")
   end
 
+  test "Decode WKT to empty Linestring" do
+    linestring = Geo.WKT.decode!("LINESTRING EMPTY")
+    assert(linestring.coordinates == nil)
+
+    point = Geo.WKT.decode!("POINT EMPTY")
+    assert(point.coordinates == nil)
+  end
+
   test "Decode WKT to Linestring" do
     geom = Geo.WKT.decode!("LINESTRING(30 10,10 30,40 40)")
     assert(geom.coordinates == [{30, 10}, {10, 30}, {40, 40}])
