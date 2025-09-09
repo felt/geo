@@ -53,75 +53,84 @@ defmodule Geo.WKT.Decoder do
   end
 
   defp do_decode("POINT ZM" <> coordinates, srid) do
-    %PointZM{coordinates: create_point(coordinates), srid: srid}
+    %PointZM{coordinates: create_coordinates(coordinates, &create_point/1), srid: srid}
   end
 
   defp do_decode("POINT Z" <> coordinates, srid) do
-    %PointZ{coordinates: create_point(coordinates), srid: srid}
+    %PointZ{coordinates: create_coordinates(coordinates, &create_point/1), srid: srid}
   end
 
   defp do_decode("POINT M" <> coordinates, srid) do
-    %PointM{coordinates: create_point(coordinates), srid: srid}
+    %PointM{coordinates: create_coordinates(coordinates, &create_point/1), srid: srid}
   end
 
   defp do_decode("POINT" <> coordinates, srid) do
-    %Point{coordinates: create_point(coordinates), srid: srid}
+    %Point{coordinates: create_coordinates(coordinates, &create_point/1), srid: srid}
   end
 
   defp do_decode("LINESTRINGM" <> coordinates, srid) do
-    %LineStringM{coordinates: create_line_string(coordinates), srid: srid}
+    %LineStringM{coordinates: create_coordinates(coordinates, &create_line_string/1), srid: srid}
   end
 
   defp do_decode("LINESTRINGZM" <> coordinates, srid) do
-    %LineStringZM{coordinates: create_line_string(coordinates), srid: srid}
+    %LineStringZM{coordinates: create_coordinates(coordinates, &create_line_string/1), srid: srid}
   end
 
   defp do_decode("LINESTRINGZ" <> coordinates, srid) do
-    %LineStringZ{coordinates: create_line_string(coordinates), srid: srid}
+    %LineStringZ{coordinates: create_coordinates(coordinates, &create_line_string/1), srid: srid}
   end
 
   defp do_decode("LINESTRING" <> coordinates, srid) do
-    %LineString{coordinates: create_line_string(coordinates), srid: srid}
+    %LineString{coordinates: create_coordinates(coordinates, &create_line_string/1), srid: srid}
   end
 
   defp do_decode("POLYGONZ" <> coordinates, srid) do
-    %PolygonZ{coordinates: create_polygon(coordinates), srid: srid}
+    %PolygonZ{coordinates: create_coordinates(coordinates, &create_polygon/1), srid: srid}
   end
 
   defp do_decode("POLYGON" <> coordinates, srid) do
-    %Polygon{coordinates: create_polygon(coordinates), srid: srid}
+    %Polygon{coordinates: create_coordinates(coordinates, &create_polygon/1), srid: srid}
   end
 
   defp do_decode("MULTIPOINTM" <> coordinates, srid) do
-    %MultiPointM{coordinates: create_line_string(coordinates), srid: srid}
+    %MultiPointM{coordinates: create_coordinates(coordinates, &create_line_string/1), srid: srid}
   end
 
   defp do_decode("MULTIPOINTZ" <> coordinates, srid) do
-    %MultiPointZ{coordinates: create_line_string(coordinates), srid: srid}
+    %MultiPointZ{coordinates: create_coordinates(coordinates, &create_line_string/1), srid: srid}
   end
 
   defp do_decode("MULTIPOINT" <> coordinates, srid) do
-    %MultiPoint{coordinates: create_line_string(coordinates), srid: srid}
+    %MultiPoint{coordinates: create_coordinates(coordinates, &create_line_string/1), srid: srid}
   end
 
   defp do_decode("MULTILINESTRINGZM" <> coordinates, srid) do
-    %MultiLineStringZM{coordinates: create_polygon(coordinates), srid: srid}
+    %MultiLineStringZM{
+      coordinates: create_coordinates(coordinates, &create_polygon/1),
+      srid: srid
+    }
   end
 
   defp do_decode("MULTILINESTRINGZ" <> coordinates, srid) do
-    %MultiLineStringZ{coordinates: create_polygon(coordinates), srid: srid}
+    %MultiLineStringZ{coordinates: create_coordinates(coordinates, &create_polygon/1), srid: srid}
   end
 
   defp do_decode("MULTILINESTRING" <> coordinates, srid) do
-    %MultiLineString{coordinates: create_polygon(coordinates), srid: srid}
+    %MultiLineString{coordinates: create_coordinates(coordinates, &create_polygon/1), srid: srid}
   end
 
   defp do_decode("MULTIPOLYGONZ" <> coordinates, srid) do
-    %MultiPolygonZ{coordinates: create_multi_polygon(coordinates), srid: srid}
+    %MultiPolygonZ{
+      coordinates: create_coordinates(coordinates, &create_multi_polygon/1),
+      srid: srid
+    }
   end
 
   defp do_decode("MULTIPOLYGON" <> coordinates, srid) do
-    %MultiPolygon{coordinates: create_multi_polygon(coordinates), srid: srid}
+    %MultiPolygon{
+      coordinates: create_coordinates(coordinates, &create_multi_polygon/1),
+      srid: srid
+    }
   end
 
   defp do_decode("GEOMETRYCOLLECTION" <> coordinates, srid) do
@@ -141,10 +150,21 @@ defmodule Geo.WKT.Decoder do
     %GeometryCollection{geometries: geometries, srid: srid}
   end
 
+  defp create_coordinates(coordinates, cont) do
+    bare =
+      coordinates
+      |> String.trim()
+      |> remove_outer_parenthesis()
+
+    case bare do
+      "" -> nil
+      "EMPTY" -> nil
+      coordinates -> cont.(coordinates)
+    end
+  end
+
   defp create_point(coordinates) do
     coordinates
-    |> String.trim()
-    |> remove_outer_parenthesis
     |> String.split()
     |> Enum.map(fn x -> binary_to_number(x) end)
     |> List.to_tuple()
@@ -152,28 +172,22 @@ defmodule Geo.WKT.Decoder do
 
   defp create_line_string(coordinates) do
     coordinates
-    |> String.trim()
-    |> remove_outer_parenthesis
     |> String.split(",")
-    |> Enum.map(&create_point(&1))
+    |> Enum.map(fn c -> create_coordinates(c, &create_point/1) end)
   end
 
   defp create_polygon(coordinates) do
     coordinates
-    |> String.trim()
-    |> remove_outer_parenthesis
     |> String.split(~r{\), *\(})
     |> Enum.map(&repair_str(&1, "(", ")"))
-    |> Enum.map(&create_line_string(&1))
+    |> Enum.map(fn c -> create_coordinates(c, &create_line_string/1) end)
   end
 
   defp create_multi_polygon(coordinates) do
     coordinates
-    |> String.trim()
-    |> remove_outer_parenthesis
     |> String.split(~r{\)\), *\(\(})
     |> Enum.map(&repair_str(&1, "((", "))"))
-    |> Enum.map(&create_polygon(&1))
+    |> Enum.map(fn c -> create_coordinates(c, &create_polygon/1) end)
   end
 
   defp binary_to_number(binary) do

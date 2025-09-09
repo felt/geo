@@ -42,6 +42,20 @@ defmodule Geo.WKT.Encoder do
     get_srid_binary(geom.srid) <> do_encode(geom)
   end
 
+  defp do_encode_empty(%x{}) do
+    typename =
+      x
+      |> Module.split()
+      |> Enum.at(-1)
+      |> to_string()
+      |> String.upcase()
+
+    "#{typename} EMPTY"
+  end
+
+  defp do_encode(%{coordinates: nil} = geometry), do: do_encode_empty(geometry)
+  defp do_encode(%{coordinates: []} = geometry), do: do_encode_empty(geometry)
+
   defp do_encode(%Point{coordinates: {x, y}}) do
     "POINT(#{x} #{y})"
   end
