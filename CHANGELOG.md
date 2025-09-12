@@ -1,5 +1,21 @@
 # Changelog
 
+## v4.1.0 2025-09-11
+
+What's Changed:
+* Fix ExDoc source ref links not working due to wrong branch name by @arcanemachine in https://github.com/felt/geo/pull/229
+* Add MultiLineStringZM by @c0deaddict in https://github.com/felt/geo/pull/225
+* Added MultiPointM and LinestringM by @danbaranov in https://github.com/felt/geo/pull/173
+* Use JSON instead of Jason by @kubosuke in https://github.com/felt/geo/pull/234
+* Add LineStringM to main geo.ex file by @simagyari in https://github.com/felt/geo/pull/241
+
+New Contributors:
+* @arcanemachine made their first contribution in https://github.com/felt/geo/pull/229
+* @c0deaddict made their first contribution in https://github.com/felt/geo/pull/225
+* @danbaranov made their first contribution in https://github.com/felt/geo/pull/173
+* @kubosuke made their first contribution in https://github.com/felt/geo/pull/234
+* @simagyari made their first contribution in https://github.com/felt/geo/pull/241
+
 ## v4.0.1 — 2024-09-23
 
 [Fix error raised when decoding JSON with string representations of integer values in coordinates](https://github.com/felt/geo/pull/221) by new contributor @IceDragon200.
