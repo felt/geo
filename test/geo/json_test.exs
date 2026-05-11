@@ -365,6 +365,48 @@ defmodule Geo.JSON.Test do
     assert_geojson_equal(exjson, new_exjson)
   end
 
+  test "GeoJson with SRID to GeometryCollection and back" do
+    json = """
+      {
+        "type": "GeometryCollection",
+        "crs": {
+          "type": "name",
+          "properties": { "name": "EPSG:4269" }
+        },
+        "geometries": [
+          {
+            "type": "Point",
+            "crs": {
+              "type": "name",
+              "properties": { "name": "EPSG:4269" }
+            },
+            "coordinates": [100.0, 0.0]
+          },
+          {
+            "type": "LineString",
+            "crs": {
+              "type": "name",
+              "properties": { "name": "EPSG:4269" }
+            },
+            "coordinates": [
+              [101.0, 0.0],
+              [102.0, 1.0]
+            ]
+          }
+        ]
+      }
+    """
+
+    exjson = @json_module.decode!(json)
+    geom = @json_module.decode!(json) |> Geo.JSON.decode!()
+
+    assert(Enum.count(geom.geometries) == 2)
+    assert(geom.srid == 4269)
+
+    new_exjson = Geo.JSON.encode!(geom)
+    assert_geojson_equal(exjson, new_exjson)
+  end
+
   test "GeoJSON to GeometryCollection" do
     json = """
       {
