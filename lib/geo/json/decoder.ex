@@ -57,7 +57,8 @@ defmodule Geo.JSON.Decoder do
 
         %GeometryCollection{
           geometries: geometries,
-          properties: Map.get(geo_json, "properties", %{})
+          properties: Map.get(geo_json, "properties", %{}),
+          srid: get_srid(crs)
         }
 
       Map.has_key?(geo_json, "coordinates") ->
