@@ -108,11 +108,11 @@ defmodule Geo.JSON.Decoder do
   @doc """
   Takes a map representing GeoJSON and returns a Geometry.
   """
-  @spec decode(map()) :: {:ok, Geo.geometry() | nil} | {:error, DecodeError.t()}
+  @spec decode(map()) :: {:ok, Geo.geometry() | nil} | {:error, Exception.t()}
   def decode(geo_json) do
     {:ok, decode!(geo_json)}
   rescue
-    exception in [DecodeError] ->
+    exception ->
       {:error, exception}
   end
 
