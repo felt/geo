@@ -17,8 +17,8 @@ jobs:
       # test stuff that isn't really relevant.
       # The other checks don't really care what environment they run in.
       MIX_ENV: dev
-      elixir: "1.15.4"
-      otp: "26.0.2"
+      elixir: "1.19.7"
+      otp: "28.5.0.8"
 
     steps:
       - name: Checkout repository
