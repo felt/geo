@@ -749,6 +749,23 @@ defmodule Geo.JSON.Test do
     assert geom.properties["id"] == "FLC017"
   end
 
+  # Both encoders must be implemented whenever their library is available, since
+  # dependencies (e.g. Postgrex) may encode with Jason even when JSON exists.
+  for json_module <- [JSON, Jason], Code.ensure_loaded?(json_module) do
+    test "#{inspect(json_module)} encodes geometry structs directly" do
+      point = %Geo.Point{coordinates: {100.0, 0.0}, srid: 4326}
+
+      collection = %Geo.GeometryCollection{
+        geometries: [point, %Geo.LineString{coordinates: [{101.0, 0.0}, {102.0, 1.0}]}]
+      }
+
+      for geom <- [point, collection] do
+        json = unquote(json_module).encode!(geom)
+        assert unquote(json_module).decode!(json) == Geo.JSON.encode!(geom)
+      end
+    end
+  end
+
   defp assert_geojson_equal(%{} = json_1, %{} = json_2) do
     # Per the GeoJSON spec, GeoJSON is assumed to have WGS 84 datum (SRID 4326) by default
     assert drop_srid_4326(json_1) == drop_srid_4326(json_2),
