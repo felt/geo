@@ -54,7 +54,7 @@ defmodule Geo.Mixfile do
       main: "readme",
       source_url: @source_url,
       source_ref: "master",
-      formatters: ["html"]
+      formatters: ["html", "markdown"]
     ]
   end
 end
