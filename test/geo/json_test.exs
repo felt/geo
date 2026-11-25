@@ -335,6 +335,23 @@ defmodule Geo.JSON.Test do
     assert {:error, _error} = @json_module.decode!(invalid_json) |> Geo.JSON.decode()
   end
 
+  test "decode/1 returns an error tuple instead of raising" do
+    # decode/1 is the non-raising variant, so anything decode!/1 raises has to
+    # come back as {:error, _}, not just DecodeError.
+    assert {:error, %ArgumentError{}} =
+             Geo.JSON.decode(%{"type" => "Point", "coordinates" => "1,2"})
+
+    assert {:error, %ArgumentError{}} =
+             Geo.JSON.decode(%{"type" => "LineString", "coordinates" => "1,2"})
+
+    assert {:error, %Protocol.UndefinedError{}} =
+             Geo.JSON.decode(%{"type" => "FeatureCollection", "features" => nil})
+
+    # a DecodeError still comes back as one
+    assert {:error, %Geo.JSON.Decoder.DecodeError{}} =
+             Geo.JSON.decode(%{"type" => "random_type"})
+  end
+
   test "encode/1" do
     valid_geom = %Geo.LineString{coordinates: [{100.0, 0.0}, {101.0, 1.0}]}
     invalid_geom = %{random: 123}
